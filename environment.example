@@ -1,93 +1,106 @@
-# Application Configuration
+# SSO Configuration Environment Variables
+# Copy this file to .env and update the values
+
+# Server Configuration
+PORT=9588
+HOST=localhost
 NODE_ENV=development
-APP_NAME=Express Boilerplate
-APP_PORT=3000
-JSON_LIMIT=1gb
 
-# Database Configuration (Development)
-DB_CLIENT_DEV=pg
-DB_HOST_DEV=localhost
-DB_PORT_DEV=5432
-DB_USER_DEV=your_username
-DB_PASS_DEV=your_password
-DB_NAME_DEV=your_database
+# SSO JWT Configuration
+SSO_JWT_SECRET=your-super-secret-jwt-key-change-in-production
+SSO_JWT_ALGORITHM=HS256
+SSO_JWT_ISSUER=gate-sso
+SSO_JWT_AUDIENCE=gate-clients
 
-# Database Configuration (Production)
-DB_CLIENT_PROD=pg
-DB_HOST_PROD=localhost
-DB_PORT_PROD=5432
-DB_USER_PROD=your_username
-DB_PASS_PROD=your_password
-DB_NAME_PROD=your_database
-
-# Database Configuration (Staging/Test)
-DB_CLIENT_TEST=pg
-DB_HOST_TEST=localhost
-DB_PORT_TEST=5432
-DB_USER_TEST=your_username
-DB_PASS_TEST=your_password
-DB_NAME_TEST=your_database
-
-# JWT Configuration
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=24h
-
-# Email Configuration
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-EMAIL_FROM=noreply@yourdomain.com
-
-# AWS Configuration (Optional)
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=us-east-1
-AWS_BUCKET_NAME=your_bucket_name
-
-# MinIO Configuration (Optional)
-MINIO_ENDPOINT=localhost
-MINIO_PORT=9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_NAME=uploads
-MINIO_USE_SSL=false
-
-# RabbitMQ Configuration (Optional)
-RABBITMQ_URL=amqp://localhost:5672
-# Set to 'disabled' to disable RabbitMQ
-# RABBITMQ_URL=disabled
-
-# reCAPTCHA Configuration (Optional)
-RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
-RECAPTCHA_SITE_KEY=your_recaptcha_site_key
-
-# Swagger Configuration
-# Options: true, false, development
-SWAGGER_ENABLED=development
+# Token Expiry Configuration (in seconds)
+SSO_ACCESS_TOKEN_EXPIRY=3600
+SSO_REFRESH_TOKEN_EXPIRY=604800
+SSO_AUTH_CODE_EXPIRY=600
+SSO_SESSION_EXPIRY=86400
 
 # Rate Limiting Configuration
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
+SSO_RATE_LIMIT_PER_MINUTE=60
+SSO_RATE_LIMIT_PER_HOUR=1000
+SSO_LOGIN_RATE_LIMIT=10
+SSO_LOGIN_RATE_LIMIT_HOUR=50
 
-# File Upload Configuration
-MAX_FILE_SIZE=10485760
-ALLOWED_FILE_TYPES=jpg,jpeg,png,gif,pdf,doc,docx
+# Security Configuration
+SSO_MAX_FAILED_ATTEMPTS=5
+SSO_LOCKOUT_DURATION=1800
+SSO_MAX_CONCURRENT_SESSIONS=5
+SSO_PASSWORD_MIN_LENGTH=8
+SSO_REQUIRE_STRONG_PASSWORD=false
+SSO_ENABLE_MFA=false
+
+# Client Configuration
+SSO_DEFAULT_TOKEN_EXPIRY=3600
+SSO_DEFAULT_REFRESH_EXPIRY=604800
+SSO_DEFAULT_MAX_SESSIONS=5
+SSO_DEFAULT_RATE_LIMIT=60
+SSO_REQUIRE_CLIENT_APPROVAL=false
+
+# Database Configuration
+SSO_DB_TYPE=memory
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=gate_sso
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
 
 # Logging Configuration
-LOG_LEVEL=info
-LOG_FILE_PATH=./logs/app.log
+SSO_LOG_LEVEL=info
+SSO_ENABLE_FILE_LOGGING=true
+SSO_LOG_DIRECTORY=./logs
+SSO_MAX_LOG_FILES=10
+SSO_MAX_LOG_SIZE=10MB
+SSO_ENABLE_AUDIT_LOG=false
 
-# SSO Configuration
-# Set to 'server' to act as SSO server, 'client' to act as SSO client
-SSO_MODE=server
-# SSO Server Configuration (when SSO_MODE=server)
-SSO_SERVER_URL=http://localhost:3000
-SSO_SERVER_SECRET=your_sso_server_secret_key
-# SSO Client Configuration (when SSO_MODE=client)
-SSO_CLIENT_ID=your_client_id
-SSO_CLIENT_SECRET=your_client_secret
-SSO_REDIRECT_URI=http://localhost:3001/auth/sso/callback
-SSO_AUTHORIZATION_URL=http://localhost:3000/auth/sso/authorize
-SSO_TOKEN_URL=http://localhost:3000/auth/sso/token
-SSO_USER_INFO_URL=http://localhost:3000/auth/sso/userinfo
+# Monitoring Configuration
+SSO_ENABLE_METRICS=true
+SSO_METRICS_PORT=9090
+SSO_ENABLE_HEALTH_CHECK=true
+SSO_HEALTH_CHECK_INTERVAL=30000
+
+# Email Configuration
+SSO_EMAIL_ENABLED=false
+SSO_EMAIL_PROVIDER=smtp
+SMTP_HOST=localhost
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+SSO_EMAIL_FROM=noreply@gate-sso.com
+
+# Default Users (Development/Testing)
+SSO_ADMIN_USERNAME=admin
+SSO_ADMIN_PASSWORD=password
+SSO_ADMIN_EMAIL=admin@example.com
+SSO_ADMIN_FIRST_NAME=Admin
+SSO_ADMIN_LAST_NAME=User
+
+SSO_USER_USERNAME=user
+SSO_USER_PASSWORD=password
+SSO_USER_EMAIL=user@example.com
+SSO_USER_FIRST_NAME=Regular
+SSO_USER_LAST_NAME=User
+
+# Default Test Client
+SSO_TEST_CLIENT_ID=test_client
+SSO_TEST_CLIENT_SECRET=test_secret
+SSO_TEST_CLIENT_NAME=Test Client Application
+SSO_TEST_CLIENT_DESCRIPTION=Default test client for development
+SSO_TEST_CLIENT_REDIRECT_URIS=http://localhost:3001/callback,http://localhost:3002/callback
+SSO_TEST_CLIENT_SCOPES=read,write
+SSO_TEST_CLIENT_CONTACT_EMAIL=admin@example.com
+SSO_TEST_CLIENT_WEBSITE=http://localhost:3001
+
+# CORS Configuration
+SSO_CORS_ENABLED=true
+SSO_CORS_ORIGINS=http://localhost:3001,http://localhost:3002
+SSO_CORS_CREDENTIALS=true
+SSO_CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
+SSO_CORS_HEADERS=Content-Type,Authorization,X-Requested-With

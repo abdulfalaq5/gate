@@ -1,4 +1,5 @@
 const { usersColumns } = require('./column');
+const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder');
 
 /**
  * Users Repository - Database operations for users table
@@ -27,11 +28,47 @@ class UsersRepository {
     return user
   }
 
-  async findAllActive() {
-    return await this.knex(this.tableName)
+  /**
+   * Find users dengan filter standar (pagination, sorting, searching, filtering)
+   * @param {Object} queryParams - Parsed query parameters dari parseStandardQuery
+   * @returns {Object} Paginated response dengan data dan metadata
+   */
+  async findWithFilters(queryParams) {
+    // Base query untuk data
+    const baseQuery = this.knex(this.tableName)
       .select('*')
-      .where('is_delete', false)
-      .orderBy('created_at', 'desc')
+      .where('is_delete', false);
+
+    // Query untuk count total records
+    const countQuery = buildCountQuery(baseQuery, queryParams);
+    const [{ total }] = await countQuery;
+
+    // Apply filters dan pagination ke base query
+    const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams);
+    const data = await dataQuery;
+
+    // Format response dengan pagination metadata
+    return formatPaginatedResponse(data, queryParams.pagination, total);
+  }
+
+  /**
+   * Find users dengan filter sederhana (tanpa pagination)
+   * @param {Object} filters - Filter parameters
+   * @returns {Array} Array of users
+   */
+  async findWithSimpleFilters(filters = {}) {
+    let query = this.knex(this.tableName)
+      .select('*')
+      .where('is_delete', false);
+
+    // Apply filters
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== '') {
+        query = query.where(key, filters[key]);
+      }
+    });
+
+    return await query.orderBy('created_at', 'desc');
   }
 
   async createUser(data) {

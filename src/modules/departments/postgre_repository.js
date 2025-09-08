@@ -1,49 +1,28 @@
 const { pgCore } = require('../../config/database')
 const { departmentsColumns } = require('./column')
+const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder')
 
 /**
- * Get departments with pagination and filtering
+ * Get departments with pagination and filtering menggunakan sistem filter standar
  */
-const getDepartments = async ({ page = 1, limit = 10, filters = {} }) => {
-  const offset = (page - 1) * limit
+const getDepartments = async (queryParams) => {
+  // Base query untuk departments
+  const baseQuery = pgCore('departments').select('*')
   
-  let query = pgCore('departments')
-    .select('*')
-    .where('is_delete', false)
+  // Apply semua filter standar
+  const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
   
-  // Apply filters
-  if (filters.search) {
-    query = query.where(function() {
-      this.where('department_name', 'ilike', `%${filters.search}%`)
-    })
-  }
+  // Build count query untuk pagination metadata
+  const countQuery = buildCountQuery(baseQuery, queryParams)
   
-  if (filters.company_id) {
-    query = query.where('company_id', filters.company_id)
-  }
-  
-  if (filters.department_parent_id) {
-    query = query.where('department_parent_id', filters.department_parent_id)
-  }
-  
-  if (filters.is_delete !== undefined) {
-    query = query.where('is_delete', filters.is_delete)
-  }
-  
-  const [departments, totalCount] = await Promise.all([
-    query.clone().offset(offset).limit(limit).orderBy('department_name'),
-    query.clone().count('* as count').first()
+  // Execute queries secara parallel
+  const [departments, countResult] = await Promise.all([
+    dataQuery,
+    countQuery.first()
   ])
   
-  return {
-    departments,
-    pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      total: parseInt(totalCount.count),
-      totalPages: Math.ceil(totalCount.count / limit)
-    }
-  }
+  // Format response dengan pagination metadata
+  return formatPaginatedResponse(departments, queryParams.pagination, countResult.total)
 }
 
 /**

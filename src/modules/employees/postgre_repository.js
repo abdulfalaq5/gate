@@ -1,4 +1,5 @@
 const { employeesColumns } = require('./column')
+const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder')
 
 /**
  * Employees Repository - Database operations for employees table
@@ -10,46 +11,26 @@ class EmployeesRepository {
   }
 
   /**
-   * Get employees with pagination and filtering
+   * Get employees with pagination and filtering menggunakan sistem filter standar
    */
-  async getEmployees({ page = 1, limit = 10, filters = {} }) {
-    const offset = (page - 1) * limit
+  async getEmployees(queryParams) {
+    // Base query untuk employees
+    const baseQuery = this.knex(this.tableName).select('*')
     
-    let query = this.knex(this.tableName)
-      .select('*')
-      .where('is_delete', false)
+    // Apply semua filter standar
+    const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
     
-    // Apply filters
-    if (filters.search) {
-      query = query.where(function() {
-        this.where('employee_name', 'ilike', `%${filters.search}%`)
-          .orWhere('employee_email', 'ilike', `%${filters.search}%`)
-      })
-    }
+    // Build count query untuk pagination metadata
+    const countQuery = buildCountQuery(baseQuery, queryParams)
     
-    if (filters.title_id) {
-      query = query.where('title_id', filters.title_id)
-    }
+    // Execute queries secara parallel
+    const [employees, countResult] = await Promise.all([
+      dataQuery,
+      countQuery.first()
+    ])
     
-    // Get total count
-    const countQuery = query.clone()
-    const [{ count }] = await countQuery.count('* as count')
-    
-    // Get paginated results
-    const employees = await query
-      .orderBy('created_at', 'desc')
-      .limit(limit)
-      .offset(offset)
-    
-    return {
-      data: employees,
-      pagination: {
-        page,
-        limit,
-        total: parseInt(count),
-        totalPages: Math.ceil(count / limit)
-      }
-    }
+    // Format response dengan pagination metadata
+    return formatPaginatedResponse(employees, queryParams.pagination, countResult.total)
   }
 
   /**

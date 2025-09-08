@@ -1,70 +1,124 @@
 {
-	"SchemaRoles": {
+	"SchemaRole": {
 		"type": "object",
 		"properties": {
 			"role_id": {
-				"type": "number"
+				"type": "string",
+				"format": "uuid",
+				"description": "Unique identifier for the role"
 			},
 			"role_name": {
-				"type": "string"
+				"type": "string",
+				"description": "Name of the role"
+			},
+			"role_parent_id": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "Parent role ID for hierarchical structure"
 			},
 			"created_at": {
 				"type": "string",
-				"format": "date-time"
+				"format": "date-time",
+				"description": "Creation timestamp"
 			},
 			"created_by": {
-				"type": "string"
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "User who created the role"
 			},
 			"updated_at": {
 				"type": "string",
-				"format": "date-time"
+				"format": "date-time",
+				"nullable": true,
+				"description": "Last update timestamp"
 			},
 			"updated_by": {
-				"type": "string"
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "User who last updated the role"
 			},
 			"deleted_at": {
 				"type": "string",
-				"format": "date-time"
+				"format": "date-time",
+				"nullable": true,
+				"description": "Soft delete timestamp"
 			},
 			"deleted_by": {
-				"type": "string"
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "User who deleted the role"
 			},
-			"can_deleted": {
-				"type": "boolean"
+			"is_delete": {
+				"type": "boolean",
+				"description": "Soft delete flag"
 			}
 		}
 	},
-	"SchemaBodyRoles": {
+	"SchemaRolesPaginatedResponse": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"description": "Indicates if the request was successful"
+			},
+			"message": {
+				"type": "string",
+				"description": "Response message"
+			},
+			"data": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/SchemaRole"
+						},
+						"description": "Array of role objects"
+					},
+					"pagination": {
+						"$ref": "#/components/schemas/SchemaPaginationInfo"
+					}
+				}
+			},
+			"timestamp": {
+				"type": "string",
+				"format": "date-time",
+				"description": "Response timestamp"
+			}
+		}
+	},
+	"SchemaCreateRole": {
+		"type": "object",
+		"required": ["role_name"],
+		"properties": {
+			"role_name": {
+				"type": "string",
+				"description": "Name of the role"
+			},
+			"role_parent_id": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "Parent role ID for hierarchical structure"
+			}
+		}
+	},
+	"SchemaUpdateRole": {
 		"type": "object",
 		"properties": {
 			"role_name": {
-				"type": "string"
-			}
-		}
-	},
-	"SchemaBodyAssignPermission": {
-		"type": "object",
-		"properties": {
-			"permissions": {
-				"type": "array",
-				"items": {
-					"type": "object",
-					"properties": {
-						"role_id": {
-							"type": "string"
-						},
-						"permission_id": {
-							"type": "number"
-						},
-						"menu_id": {
-							"type": "number"
-						},
-						"checked": {
-							"type": "boolean",
-							"description": "true / false"
-						}
-					}
-				}
+				"type": "string",
+				"description": "Name of the role"
+			},
+			"role_parent_id": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "Parent role ID for hierarchical structure"
 			}
 		}
 	}

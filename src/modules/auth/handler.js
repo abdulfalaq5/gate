@@ -11,6 +11,7 @@
 const repository = require('./postgre_repository')
 const { baseResponse, decodeToken } = require('../../utils')
 const { customerSigninLimiter } = require('../../middlewares')
+const { TABLE } = require('./column')
 
 const signin = async (req, res) => {
   const where = { username: req?.body?.username }
@@ -52,7 +53,7 @@ const conductorSignin = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   const { users_id } = decodeToken('default', req)
-  const result = await repository.refreshToken({ users_id })
+  const result = await repository.refreshToken({ [`${TABLE}.user_id`]: users_id })
   return baseResponse(res, result)
 }
 

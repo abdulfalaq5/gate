@@ -27,7 +27,7 @@ if (process.env.RABBITMQ_URL && process.env.RABBITMQ_URL !== 'disabled') {
   console.log('RabbitMQ not configured or disabled, skipping listener initialization')
 }
 
-const limit = process.env.JSON_LIMIT.toString() ?? '1gb'
+const limit = process.env.JSON_LIMIT || '1gb'
 app.set('trust proxy', 1);
 app.use(compress()) // gzip compression
 app.use(methodOverride()) // lets you use HTTP verbs

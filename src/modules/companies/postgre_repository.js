@@ -1,47 +1,28 @@
 const { pgCore } = require('../../config/database')
 const { companiesColumns } = require('./column')
+const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder')
 
 /**
- * Get companies with pagination and filtering
+ * Get companies with pagination and filtering menggunakan sistem filter standar
  */
-const getCompanies = async ({ page = 1, limit = 10, filters = {} }) => {
-  const offset = (page - 1) * limit
+const getCompanies = async (queryParams) => {
+  // Base query untuk companies
+  const baseQuery = pgCore('companies').select('*')
   
-  let query = pgCore('companies')
-    .select('*')
-    .where('is_delete', false)
+  // Apply semua filter standar
+  const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
   
-  // Apply filters
-  if (filters.search) {
-    query = query.where(function() {
-      this.where('company_name', 'ilike', `%${filters.search}%`)
-        .orWhere('company_address', 'ilike', `%${filters.search}%`)
-        .orWhere('company_email', 'ilike', `%${filters.search}%`)
-    })
-  }
+  // Build count query untuk pagination metadata
+  const countQuery = buildCountQuery(baseQuery, queryParams)
   
-  if (filters.company_parent_id) {
-    query = query.where('company_parent_id', filters.company_parent_id)
-  }
-  
-  if (filters.is_delete !== undefined) {
-    query = query.where('is_delete', filters.is_delete)
-  }
-  
-  const [companies, totalCount] = await Promise.all([
-    query.clone().offset(offset).limit(limit).orderBy('company_name'),
-    query.clone().count('* as count').first()
+  // Execute queries secara parallel
+  const [companies, countResult] = await Promise.all([
+    dataQuery,
+    countQuery.first()
   ])
   
-  return {
-    companies,
-    pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      total: parseInt(totalCount.count),
-      totalPages: Math.ceil(totalCount.count / limit)
-    }
-  }
+  // Format response dengan pagination metadata
+  return formatPaginatedResponse(companies, queryParams.pagination, countResult.total)
 }
 
 /**

@@ -1,9 +1,11 @@
 const MenusRepository = require('./postgre_repository');
 const { successResponse, errorResponse } = require('../../utils/response');
+const { pgCore } = require('../../config/database');
+const { parseStandardQuery } = require('../../utils/pagination');
 
 class MenusHandler {
   constructor() {
-    this.menusRepository = new MenusRepository(require('../../repository/postgres/core_postgres'));
+    this.menusRepository = new MenusRepository(pgCore);
   }
 
   async createMenu(req, res) {
@@ -51,9 +53,19 @@ class MenusHandler {
 
   async listMenus(req, res) {
     try {
-      const menus = await this.menusRepository.findAllActive();
+      // Parse query parameters dengan konfigurasi untuk menus
+      const queryParams = parseStandardQuery(req, {
+        allowedSortColumns: ['menu_name', 'menu_order', 'created_at', 'updated_at'],
+        defaultSort: ['menu_order', 'asc'],
+        searchableColumns: ['menu_name', 'menu_url'],
+        allowedFilters: ['menu_name', 'menu_url', 'menu_icon'],
+        dateColumn: 'created_at'
+      });
 
-      return successResponse(res, menus, 'Menus retrieved successfully');
+      // Gunakan method baru dengan filter standar
+      const result = await this.menusRepository.findWithFilters(queryParams);
+
+      return successResponse(res, result, 'Menus retrieved successfully');
     } catch (error) {
       console.error('Error listing menus:', error);
       return errorResponse(res, 'Failed to retrieve menus', 500);
@@ -62,8 +74,15 @@ class MenusHandler {
 
   async getMenuTree(req, res) {
     try {
-      const menus = await this.menusRepository.findAllActive();
-      // Simple tree structure - bisa dikembangkan lebih lanjut
+      // Untuk menu tree, kita tidak perlu pagination, hanya filter sederhana
+      const filters = {};
+      
+      // Parse filter sederhana dari query
+      if (req.query.menu_name) filters.menu_name = req.query.menu_name;
+      if (req.query.menu_url) filters.menu_url = req.query.menu_url;
+      
+      const menus = await this.menusRepository.findWithSimpleFilters(filters);
+      
       return successResponse(res, menus, 'Menu tree retrieved successfully');
     } catch (error) {
       console.error('Error getting menu tree:', error);

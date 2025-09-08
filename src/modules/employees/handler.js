@@ -1,27 +1,27 @@
 const { employeesColumns } = require('./column')
+const { validateRequest } = require('../../utils/validation')
 const { successResponse, errorResponse } = require('../../utils/response')
+const { parseStandardQuery } = require('../../utils/pagination')
+const { pgCore } = require('../../config/database')
 const EmployeesRepository = require('./postgre_repository')
 
-const employeesRepository = new EmployeesRepository(require('../../repository/postgres/core_postgres'))
+const employeesRepository = new EmployeesRepository(pgCore)
 
 /**
  * Get all employees with pagination and filtering
  */
 const getEmployees = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, title_id, is_delete = false } = req.query
-    
-    const filters = {
-      search,
-      title_id,
-      is_delete: is_delete === 'true'
-    }
-    
-    const result = await employeesRepository.getEmployees({
-      page: parseInt(page),
-      limit: parseInt(limit),
-      filters
+    // Parse query parameters menggunakan sistem filter standar
+    const queryParams = parseStandardQuery(req, {
+      allowedSortColumns: ['employee_name', 'employee_email', 'title_id', 'created_at', 'updated_at'],
+      defaultSort: ['employee_name', 'asc'],
+      searchableColumns: ['employee_name', 'employee_email'],
+      allowedFilters: ['title_id', 'is_delete'],
+      dateColumn: 'created_at'
     })
+    
+    const result = await employeesRepository.getEmployees(queryParams)
     
     return successResponse(res, result, 'Employees retrieved successfully')
   } catch (error) {

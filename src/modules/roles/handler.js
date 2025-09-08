@@ -1,9 +1,11 @@
 const RolesRepository = require('./postgre_repository');
 const { successResponse, errorResponse } = require('../../utils/response');
+const { parseStandardQuery } = require('../../utils/pagination');
+const { pgCore } = require('../../config/database');
 
 class RolesHandler {
   constructor() {
-    this.rolesRepository = new RolesRepository(require('../../repository/postgres/core_postgres'));
+    this.rolesRepository = new RolesRepository(pgCore);
   }
 
   async createRole(req, res) {
@@ -48,9 +50,19 @@ class RolesHandler {
 
   async listRoles(req, res) {
     try {
-      const roles = await this.rolesRepository.findAllActive();
+      // Parse query parameters dengan konfigurasi untuk roles
+      const queryParams = parseStandardQuery(req, {
+        allowedSortColumns: ['role_name', 'created_at', 'updated_at'],
+        defaultSort: ['role_name', 'asc'],
+        searchableColumns: ['role_name'],
+        allowedFilters: ['role_name'],
+        dateColumn: 'created_at'
+      });
 
-      return successResponse(res, roles, 'Roles retrieved successfully');
+      // Gunakan method baru dengan filter standar
+      const result = await this.rolesRepository.findWithFilters(queryParams);
+
+      return successResponse(res, result, 'Roles retrieved successfully');
     } catch (error) {
       console.error('Error listing roles:', error);
       return errorResponse(res, 'Failed to retrieve roles', 500);

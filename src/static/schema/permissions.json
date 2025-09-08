@@ -1,0 +1,107 @@
+{
+	"SchemaPermission": {
+		"type": "object",
+		"properties": {
+			"permission_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Unique identifier for the permission"
+			},
+			"permission_name": {
+				"type": "string",
+				"description": "Name of the permission"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time",
+				"description": "Creation timestamp"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "User who created the permission"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time",
+				"nullable": true,
+				"description": "Last update timestamp"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "User who last updated the permission"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time",
+				"nullable": true,
+				"description": "Soft delete timestamp"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "User who deleted the permission"
+			},
+			"is_delete": {
+				"type": "boolean",
+				"description": "Soft delete flag"
+			}
+		}
+	},
+	"SchemaPermissionsPaginatedResponse": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"description": "Indicates if the request was successful"
+			},
+			"message": {
+				"type": "string",
+				"description": "Response message"
+			},
+			"data": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/SchemaPermission"
+						},
+						"description": "Array of permission objects"
+					},
+					"pagination": {
+						"$ref": "#/components/schemas/SchemaPaginationInfo"
+					}
+				}
+			},
+			"timestamp": {
+				"type": "string",
+				"format": "date-time",
+				"description": "Response timestamp"
+			}
+		}
+	},
+	"SchemaCreatePermission": {
+		"type": "object",
+		"required": ["permission_name"],
+		"properties": {
+			"permission_name": {
+				"type": "string",
+				"description": "Name of the permission"
+			}
+		}
+	},
+	"SchemaUpdatePermission": {
+		"type": "object",
+		"properties": {
+			"permission_name": {
+				"type": "string",
+				"description": "Name of the permission"
+			}
+		}
+	}
+}

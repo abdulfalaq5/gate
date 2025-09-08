@@ -1,9 +1,11 @@
 const PermissionsRepository = require('./postgre_repository');
 const { successResponse, errorResponse } = require('../../utils/response');
+const { parseStandardQuery } = require('../../utils/pagination');
+const { pgCore } = require('../../config/database');
 
 class PermissionsHandler {
   constructor() {
-    this.permissionsRepository = new PermissionsRepository(require('../../repository/postgres/core_postgres'));
+    this.permissionsRepository = new PermissionsRepository(pgCore);
   }
 
   async createPermission(req, res) {
@@ -48,9 +50,19 @@ class PermissionsHandler {
 
   async listPermissions(req, res) {
     try {
-      const permissions = await this.permissionsRepository.findAllActive();
+      // Parse query parameters dengan konfigurasi untuk permissions
+      const queryParams = parseStandardQuery(req, {
+        allowedSortColumns: ['permission_name', 'created_at', 'updated_at'],
+        defaultSort: ['permission_name', 'asc'],
+        searchableColumns: ['permission_name'],
+        allowedFilters: ['permission_name'],
+        dateColumn: 'created_at'
+      });
 
-      return successResponse(res, permissions, 'Permissions retrieved successfully');
+      // Gunakan method baru dengan filter standar
+      const result = await this.permissionsRepository.findWithFilters(queryParams);
+
+      return successResponse(res, result, 'Permissions retrieved successfully');
     } catch (error) {
       console.error('Error listing permissions:', error);
       return errorResponse(res, 'Failed to retrieve permissions', 500);

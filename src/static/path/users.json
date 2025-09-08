@@ -252,49 +252,5 @@
 				}
 			}
 		}
-	},
-	"/users/auction-officer": {
-		"get": {
-			"tags": [
-				"Users"
-			],
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "query",
-					"name": "search",
-					"required": false,
-					"schema": {
-						"type": "string"
-					},
-					"description": "Search value is string with rule ex : ?search=Hitam"
-				},
-				{
-					"in": "query",
-					"name": "location_id",
-					"required": false,
-					"schema": {
-						"type": "string"
-					},
-					"description": "Search value is string with rule ex : ?location_id=uuid"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }

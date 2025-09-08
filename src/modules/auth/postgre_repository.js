@@ -30,6 +30,11 @@ const {
 const getByParam = async (where, password, column = COLUMN) => {
   try {
     where[`${TABLE}.deleted_at`] = null;
+    // Convert username to user_name for the query
+    if (where.username) {
+      where[`${TABLE}.user_name`] = where.username;
+      delete where.username;
+    }
     const [result] = await pgCore(TABLE)
       .innerJoin(TABLE_JOIN, `${TABLE_JOIN}.role_id`, `${TABLE}.role_id`)
       .select(column)
@@ -40,14 +45,14 @@ const getByParam = async (where, password, column = COLUMN) => {
         result.password,
         result.salt
       );
-      if (result?.status === '1' && validationPassword === true) {
+      if (result?.status === false && validationPassword === true) {
         const response = mappingSuccess(
           lang.__('get.success'),
           setPayloadToken(result)
         );
         return response?.data;
       }
-      if (result?.status === '1' && validationPassword === false) {
+      if (result?.status === false && validationPassword === false) {
         return mappingSuccess(lang.__('password.invalid'), [], 201, false);
       }
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
@@ -67,6 +72,11 @@ const getByParam = async (where, password, column = COLUMN) => {
 const getByParamInspection = async (where, password, column = COLUMN) => {
   try {
     where[`${TABLE}.deleted_at`] = null;
+    // Convert username to user_name for the query
+    if (where.username) {
+      where[`${TABLE}.user_name`] = where.username;
+      delete where.username;
+    }
     const [result] = await pgCore(TABLE)
       .innerJoin(TABLE_JOIN, `${TABLE_JOIN}.role_id`, `${TABLE}.role_id`)
       .select(column)
@@ -83,18 +93,16 @@ const getByParamInspection = async (where, password, column = COLUMN) => {
         result.password,
         result.salt
       );
-      if (result?.status === '1' && validationPassword === true) {
+      if (result?.status === false && validationPassword === true) {
         const response = mappingSuccess(
           lang.__('get.success'),
           setPayloadToken(result, 'admin', true)
         );
 
-        response.data.data.access_token.location_id = result.location_id;
-        response.data.data.refresh_token.location_id = result.location_id;
 
         return response?.data;
       }
-      if (result?.status === '1' && validationPassword === false) {
+      if (result?.status === false && validationPassword === false) {
         return mappingSuccess(lang.__('password.invalid'), [], 201, false);
       }
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
@@ -124,7 +132,7 @@ const customerSignin = async (email, password, column = COLUMN_CUSTOMER) => {
         result.password,
         result.salt
       );
-      if (result?.status === '1' && validationPassword === true) {
+      if (result?.status === false && validationPassword === true) {
         result.role_name = ROLE.CUSTOMER_BUYER;
         const response = mappingSuccess(
           lang.__('get.success'),
@@ -132,7 +140,7 @@ const customerSignin = async (email, password, column = COLUMN_CUSTOMER) => {
         );
         return response?.data;
       }
-      if (result?.status === '1' && validationPassword === false) {
+      if (result?.status === false && validationPassword === false) {
         return mappingSuccess(lang.__('password.invalid'), [], 201, false);
       }
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
@@ -185,6 +193,11 @@ const meCustomer = async (where, column = COLUMN_CUSTOMER_ME) => {
 const conductorSignin = async (where, password, column = COLUMN) => {
   try {
     where[`${TABLE}.deleted_at`] = null;
+    // Convert username to user_name for the query
+    if (where.username) {
+      where[`${TABLE}.user_name`] = where.username;
+      delete where.username;
+    }
     const [result] = await pgCore(TABLE)
       .leftJoin(TABLE_JOIN, `${TABLE_JOIN}.role_id`, `${TABLE}.role_id`)
       .select(column)
@@ -196,7 +209,7 @@ const conductorSignin = async (where, password, column = COLUMN) => {
         result.salt
       );
       if (
-        result?.status === '1'
+        result?.status === false
         && validationPassword === true
         && ROLE.ONLY_CONDUCTOR.includes(result?.role_name)
       ) {
@@ -206,7 +219,7 @@ const conductorSignin = async (where, password, column = COLUMN) => {
         );
         return response?.data;
       }
-      if (result?.status === '1' && validationPassword === false) {
+      if (result?.status === false && validationPassword === false) {
         return mappingSuccess(lang.__('password.invalid'), [], 201, false);
       }
       return mappingSuccess(lang.__('account.not.access'), [], 201, false);
@@ -500,7 +513,7 @@ const clientSignin = async (email, password, column = COLUMN_CLIENT) => {
         result.password,
         result.salt
       );
-      if (result?.status === '1' && validationPassword === true) {
+      if (result?.status === false && validationPassword === true) {
         result.role_name = ROLE.CLIENT_SELLER;
         const response = mappingSuccess(
           lang.__('get.success'),
@@ -508,7 +521,7 @@ const clientSignin = async (email, password, column = COLUMN_CLIENT) => {
         );
         return response?.data;
       }
-      if (result?.status === '1' && validationPassword === false) {
+      if (result?.status === false && validationPassword === false) {
         return mappingSuccess(lang.__('password.invalid'), [], 201, false);
       }
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);

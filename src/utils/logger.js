@@ -39,6 +39,58 @@ const logger = (fileName, type) => {
   }
 }
 
+// Enhanced logger with different log levels
+class Logger {
+  constructor() {
+    this.levels = {
+      error: 0,
+      warn: 1,
+      info: 2,
+      debug: 3
+    }
+    this.currentLevel = this.levels.info
+  }
+
+  formatMessage(level, message, meta = {}) {
+    const timestamp = new Date().toISOString()
+    const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : ''
+    return `[${timestamp}] ${level.toUpperCase()}: ${message}${metaStr}\n`
+  }
+
+  log(level, message, meta = {}) {
+    if (this.levels[level] <= this.currentLevel) {
+      const formattedMessage = this.formatMessage(level, message, meta)
+      console.log(formattedMessage.trim())
+      
+      // Also write to file
+      try {
+        const { folderPath } = generateFolderLogs('logs', 'application')
+        const finalPath = `${__dirname}/../../${folderPath}/app.log`
+        fs.appendFileSync(finalPath, formattedMessage)
+      } catch (error) {
+        console.error('Failed to write to log file:', error)
+      }
+    }
+  }
+
+  error(message, meta = {}) {
+    this.log('error', message, meta)
+  }
+
+  warn(message, meta = {}) {
+    this.log('warn', message, meta)
+  }
+
+  info(message, meta = {}) {
+    this.log('info', message, meta)
+  }
+
+  debug(message, meta = {}) {
+    this.log('debug', message, meta)
+  }
+}
+
 module.exports = {
-  logger
+  logger,
+  Logger: new Logger()
 }

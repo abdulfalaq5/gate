@@ -108,17 +108,29 @@
 			"pagination": {
 				"type": "object",
 				"properties": {
-					"page": {
-						"type": "integer"
+					"current_page": {
+						"type": "integer",
+						"description": "Current page number"
 					},
-					"limit": {
-						"type": "integer"
+					"per_page": {
+						"type": "integer",
+						"description": "Number of items per page"
 					},
 					"total": {
-						"type": "integer"
+						"type": "integer",
+						"description": "Total number of records"
 					},
-					"totalPages": {
-						"type": "integer"
+					"total_pages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					},
+					"has_next_page": {
+						"type": "boolean",
+						"description": "Whether there is a next page"
+					},
+					"has_prev_page": {
+						"type": "boolean",
+						"description": "Whether there is a previous page"
 					}
 				}
 			}

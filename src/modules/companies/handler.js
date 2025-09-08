@@ -1,6 +1,7 @@
 const { companiesColumns, companiesValidationRules } = require('./column')
 const { validateRequest } = require('../../utils/validation')
 const { successResponse, errorResponse } = require('../../utils/response')
+const { parseStandardQuery } = require('../../utils/pagination')
 const companiesRepository = require('./postgre_repository')
 
 /**
@@ -8,19 +9,16 @@ const companiesRepository = require('./postgre_repository')
  */
 const getCompanies = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, company_parent_id, is_delete = false } = req.query
-    
-    const filters = {
-      search,
-      company_parent_id,
-      is_delete: is_delete === 'true'
-    }
-    
-    const result = await companiesRepository.getCompanies({
-      page: parseInt(page),
-      limit: parseInt(limit),
-      filters
+    // Parse query parameters menggunakan sistem filter standar
+    const queryParams = parseStandardQuery(req, {
+      allowedSortColumns: ['company_name', 'company_address', 'company_email', 'created_at', 'updated_at'],
+      defaultSort: ['company_name', 'asc'],
+      searchableColumns: ['company_name', 'company_address', 'company_email'],
+      allowedFilters: ['company_parent_id', 'is_delete'],
+      dateColumn: 'created_at'
     })
+    
+    const result = await companiesRepository.getCompanies(queryParams)
     
     return successResponse(res, result, 'Companies retrieved successfully')
   } catch (error) {

@@ -1,9 +1,11 @@
 const UsersRepository = require('./postgre_repository');
 const { successResponse, errorResponse } = require('../../utils/response');
+const { parseStandardQuery } = require('../../utils/pagination');
+const { pgCore } = require('../../config/database');
 
 class UsersHandler {
   constructor() {
-    this.usersRepository = new UsersRepository(require('../../repository/postgres/core_postgres'));
+    this.usersRepository = new UsersRepository(pgCore);
   }
 
   async createUser(req, res) {
@@ -52,9 +54,19 @@ class UsersHandler {
 
   async listUsers(req, res) {
     try {
-      const users = await this.usersRepository.findAllActive();
+      // Parse query parameters dengan konfigurasi untuk users
+      const queryParams = parseStandardQuery(req, {
+        allowedSortColumns: ['user_name', 'user_email', 'employee_id', 'role_id', 'created_at', 'updated_at'],
+        defaultSort: ['user_name', 'asc'],
+        searchableColumns: ['user_name', 'user_email'],
+        allowedFilters: ['employee_id', 'role_id', 'is_delete'],
+        dateColumn: 'created_at'
+      });
 
-      return successResponse(res, users, 'Users retrieved successfully');
+      // Gunakan method baru dengan filter standar
+      const result = await this.usersRepository.findWithFilters(queryParams);
+
+      return successResponse(res, result, 'Users retrieved successfully');
     } catch (error) {
       console.error('Error listing users:', error);
       return errorResponse(res, 'Failed to retrieve users', 500);

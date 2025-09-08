@@ -6,6 +6,7 @@ const departments = require('./departments.json')
 const employees = require('./employees.json')
 const importModule = require('./import.json')
 const roles = require('./roles.json')
+const permissions = require('./permissions.json')
 const users = require('./users.json')
 
 module.exports = {
@@ -17,5 +18,6 @@ module.exports = {
   ...employees,
   ...importModule,
   ...roles,
+  ...permissions,
   ...users
 }
