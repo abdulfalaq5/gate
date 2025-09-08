@@ -58,7 +58,7 @@ const refreshToken = async (req, res) => {
 
 const me = async (req, res) => {
   const { users_id } = decodeToken('default', req)
-  const result = await repository.me({ users_id })
+  const result = await repository.meNew(users_id)
   return baseResponse(res, result)
 }
 
