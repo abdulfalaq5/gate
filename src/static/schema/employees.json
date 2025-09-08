@@ -1,0 +1,116 @@
+{
+	"SchemaResponseEmployees": {
+		"type": "object",
+		"properties": {
+			"employee_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_name": {
+				"type": "string"
+			},
+			"employee_email": {
+				"type": "string",
+				"format": "email"
+			},
+			"title_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			}
+		}
+	},
+	"SchemaPostEmployees": {
+		"type": "object",
+		"properties": {
+			"employee_name": {
+				"type": "string",
+				"minLength": 2,
+				"maxLength": 100
+			},
+			"employee_email": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 100
+			},
+			"title_id": {
+				"type": "string",
+				"format": "uuid"
+			}
+		},
+		"required": ["employee_name", "employee_email", "title_id"]
+	},
+	"SchemaPutEmployees": {
+		"type": "object",
+		"properties": {
+			"employee_name": {
+				"type": "string",
+				"minLength": 2,
+				"maxLength": 100
+			},
+			"employee_email": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 100
+			},
+			"title_id": {
+				"type": "string",
+				"format": "uuid"
+			}
+		}
+	},
+	"SchemaResponseEmployeesList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseEmployees"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer"
+					},
+					"limit": {
+						"type": "integer"
+					},
+					"total": {
+						"type": "integer"
+					},
+					"totalPages": {
+						"type": "integer"
+					}
+				}
+			}
+		}
+	}
+}

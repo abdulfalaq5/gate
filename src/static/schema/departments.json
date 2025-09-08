@@ -1,0 +1,114 @@
+{
+	"SchemaResponseDepartments": {
+		"type": "object",
+		"properties": {
+			"department_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"department_name": {
+				"type": "string"
+			},
+			"department_parent_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			}
+		}
+	},
+	"SchemaPostDepartments": {
+		"type": "object",
+		"properties": {
+			"department_name": {
+				"type": "string",
+				"minLength": 2,
+				"maxLength": 100
+			},
+			"department_parent_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid"
+			}
+		},
+		"required": ["department_name", "company_id"]
+	},
+	"SchemaPutDepartments": {
+		"type": "object",
+		"properties": {
+			"department_name": {
+				"type": "string",
+				"minLength": 2,
+				"maxLength": 100
+			},
+			"department_parent_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid"
+			}
+		}
+	},
+	"SchemaResponseDepartmentsList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseDepartments"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer"
+					},
+					"limit": {
+						"type": "integer"
+					},
+					"total": {
+						"type": "integer"
+					},
+					"totalPages": {
+						"type": "integer"
+					}
+				}
+			}
+		}
+	}
+}

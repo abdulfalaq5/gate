@@ -1,6 +1,10 @@
 const express = require('express')
 const auth = require('../../modules/auth')
-const products = require('../../modules/products')
+const companies = require('../../modules/companies')
+const departments = require('../../modules/departments')
+const titles = require('../../modules/titles')
+const employees = require('../../modules/employees')
+const importModule = require('../../modules/import')
 const ssoRoutes = require('./sso')
 const { verifyToken } = require('../../middlewares')
 
@@ -17,7 +21,13 @@ routing.use(`${API_TAG}`, ssoRoutes)
 // Authentication routes
 routing.use(`${API_TAG}/auth`, auth)
 
-// Products routes - public endpoints (no auth required)
-routing.use(`${API_TAG}/products`, products)
+// User Management routes (SSO System)
+routing.use(`${API_TAG}/companies`, companies)
+routing.use(`${API_TAG}/departments`, departments)
+routing.use(`${API_TAG}/titles`, titles)
+routing.use(`${API_TAG}/employees`, employees)
+
+// Import routes
+routing.use(`${API_TAG}/import`, importModule)
 
 module.exports = routing;

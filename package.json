@@ -27,6 +27,7 @@
     "aws-sdk": "^2.1180.0",
     "axios": "^1.2.2",
     "compression": "^1.7.4",
+    "csv-parser": "^3.2.0",
     "dotenv": "^16.0.1",
     "edge.js": "^5.3.7",
     "elastic-apm-node": "^4.7.0",

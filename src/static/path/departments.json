@@ -1,0 +1,292 @@
+{
+	"/departments": {
+		"get": {
+			"tags": ["Departments"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve a paginated list of departments with optional filtering",
+			"parameters": [
+				{
+					"name": "page",
+					"in": "query",
+					"description": "Page number for pagination",
+					"required": false,
+					"schema": {
+						"type": "integer",
+						"default": 1
+					}
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "Number of items per page",
+					"required": false,
+					"schema": {
+						"type": "integer",
+						"default": 10
+					}
+				},
+				{
+					"name": "search",
+					"in": "query",
+					"description": "Search term for department name",
+					"required": false,
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "company_id",
+					"in": "query",
+					"description": "Filter by company ID",
+					"required": false,
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				{
+					"name": "department_parent_id",
+					"in": "query",
+					"description": "Filter by parent department ID",
+					"required": false,
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				{
+					"name": "is_delete",
+					"in": "query",
+					"description": "Filter by deletion status",
+					"required": false,
+					"schema": {
+						"type": "boolean",
+						"default": false
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Departments retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseDepartmentsList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"post": {
+			"tags": ["Departments"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Create a new department with the provided information",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostDepartments"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Department created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseDepartments"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/departments/{id}": {
+		"get": {
+			"tags": ["Departments"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve a specific department by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Department ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Department retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseDepartments"
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Department not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Departments"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Update an existing department",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Department ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutDepartments"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Department updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseDepartments"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Department not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Departments"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Soft delete a department",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Department ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Department deleted successfully"
+				},
+				"404": {
+					"description": "Department not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/departments/company/{companyId}": {
+		"get": {
+			"tags": ["Departments"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve all departments belonging to a specific company",
+			"parameters": [
+				{
+					"name": "companyId",
+					"in": "path",
+					"required": true,
+					"description": "Company ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Departments retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/SchemaResponseDepartments"
+								}
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}

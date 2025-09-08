@@ -1,0 +1,148 @@
+const { employeesColumns } = require('./column')
+const { successResponse, errorResponse } = require('../../utils/response')
+const EmployeesRepository = require('./postgre_repository')
+
+const employeesRepository = new EmployeesRepository(require('../../repository/postgres/core_postgres'))
+
+/**
+ * Get all employees with pagination and filtering
+ */
+const getEmployees = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search, title_id, is_delete = false } = req.query
+    
+    const filters = {
+      search,
+      title_id,
+      is_delete: is_delete === 'true'
+    }
+    
+    const result = await employeesRepository.getEmployees({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      filters
+    })
+    
+    return successResponse(res, result, 'Employees retrieved successfully')
+  } catch (error) {
+    console.error('Error getting employees:', error)
+    return errorResponse(res, 'Failed to retrieve employees', 500)
+  }
+}
+
+/**
+ * Get employee by ID
+ */
+const getEmployeeById = async (req, res) => {
+  try {
+    const { id } = req.params
+    
+    const employee = await employeesRepository.getEmployeeById(id)
+    if (!employee) {
+      return errorResponse(res, 'Employee not found', 404)
+    }
+    
+    return successResponse(res, employee, 'Employee retrieved successfully')
+  } catch (error) {
+    console.error('Error getting employee:', error)
+    return errorResponse(res, 'Failed to retrieve employee', 500)
+  }
+}
+
+/**
+ * Create new employee
+ */
+const createEmployee = async (req, res) => {
+  try {
+    const employeeData = {
+      ...req.body,
+      created_by: req.user?.user_id
+    }
+    
+    const employee = await employeesRepository.createEmployee(employeeData)
+    
+    return successResponse(res, employee, 'Employee created successfully', 201)
+  } catch (error) {
+    console.error('Error creating employee:', error)
+    return errorResponse(res, 'Failed to create employee', 500)
+  }
+}
+
+/**
+ * Update employee
+ */
+const updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params
+    
+    const existingEmployee = await employeesRepository.getEmployeeById(id)
+    if (!existingEmployee) {
+      return errorResponse(res, 'Employee not found', 404)
+    }
+    
+    const updateData = {
+      ...req.body,
+      updated_by: req.user?.user_id,
+      updated_at: new Date()
+    }
+    
+    const employee = await employeesRepository.updateEmployee(id, updateData)
+    
+    return successResponse(res, employee, 'Employee updated successfully')
+  } catch (error) {
+    console.error('Error updating employee:', error)
+    return errorResponse(res, 'Failed to update employee', 500)
+  }
+}
+
+/**
+ * Soft delete employee
+ */
+const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params
+    
+    const existingEmployee = await employeesRepository.getEmployeeById(id)
+    if (!existingEmployee) {
+      return errorResponse(res, 'Employee not found', 404)
+    }
+    
+    const deleteData = {
+      is_delete: true,
+      deleted_at: new Date(),
+      deleted_by: req.user?.user_id
+    }
+    
+    await employeesRepository.updateEmployee(id, deleteData)
+    
+    return successResponse(res, null, 'Employee deleted successfully')
+  } catch (error) {
+    console.error('Error deleting employee:', error)
+    return errorResponse(res, 'Failed to delete employee', 500)
+  }
+}
+
+/**
+ * Get employees by title
+ */
+const getEmployeesByTitle = async (req, res) => {
+  try {
+    const { titleId } = req.params
+    
+    const employees = await employeesRepository.getEmployeesByTitleId(titleId)
+    
+    return successResponse(res, employees, 'Employees retrieved successfully')
+  } catch (error) {
+    console.error('Error getting employees by title:', error)
+    return errorResponse(res, 'Failed to retrieve employees', 500)
+  }
+}
+
+module.exports = {
+  getEmployees,
+  getEmployeeById,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+  getEmployeesByTitle
+}

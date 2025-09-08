@@ -1,10 +1,9 @@
 const PermissionsRepository = require('./postgre_repository');
-const { CustomException } = require('../../utils/exception');
-const { logger } = require('../../utils/logger');
+const { successResponse, errorResponse } = require('../../utils/response');
 
 class PermissionsHandler {
   constructor() {
-    this.permissionsRepository = new PermissionsRepository();
+    this.permissionsRepository = new PermissionsRepository(require('../../repository/postgres/core_postgres'));
   }
 
   async createPermission(req, res) {
@@ -12,14 +11,8 @@ class PermissionsHandler {
       const { permission_name } = req.body;
       const createdBy = req.user?.user_id;
 
-      // Check if permission already exists
-      const existingPermission = await this.permissionsRepository.findOne({
-        permission_name,
-        is_delete: false
-      });
-
-      if (existingPermission) {
-        throw new CustomException('Permission already exists', 400);
+      if (!permission_name) {
+        return errorResponse(res, 'Permission name is required', 400);
       }
 
       const permissionData = {
@@ -29,16 +22,10 @@ class PermissionsHandler {
 
       const permission = await this.permissionsRepository.createPermission(permissionData);
 
-      logger.info('Permission created successfully', { permission_id: permission.permission_id });
-
-      return res.status(201).json({
-        success: true,
-        message: 'Permission created successfully',
-        data: permission,
-      });
+      return successResponse(res, permission, 'Permission created successfully', 201);
     } catch (error) {
-      logger.error('Error creating permission:', error);
-      throw error;
+      console.error('Error creating permission:', error);
+      return errorResponse(res, 'Failed to create permission', 500);
     }
   }
 
@@ -49,58 +36,24 @@ class PermissionsHandler {
       const permission = await this.permissionsRepository.findById(id);
 
       if (!permission) {
-        throw new CustomException('Permission not found', 404);
+        return errorResponse(res, 'Permission not found', 404);
       }
 
-      return res.status(200).json({
-        success: true,
-        message: 'Permission retrieved successfully',
-        data: permission,
-      });
+      return successResponse(res, permission, 'Permission retrieved successfully');
     } catch (error) {
-      logger.error('Error getting permission:', error);
-      throw error;
+      console.error('Error getting permission:', error);
+      return errorResponse(res, 'Failed to retrieve permission', 500);
     }
   }
 
   async listPermissions(req, res) {
     try {
-      const { page = 1, limit = 10, search } = req.query;
-      const offset = (page - 1) * limit;
+      const permissions = await this.permissionsRepository.findAllActive();
 
-      let whereCondition = { is_delete: false };
-
-      if (search) {
-        whereCondition.permission_name = {
-          $ilike: `%${search}%`
-        };
-      }
-
-      const permissions = await this.permissionsRepository.findMany(whereCondition, {
-        limit: parseInt(limit),
-        offset: parseInt(offset),
-        orderBy: 'created_at',
-        orderDirection: 'desc'
-      });
-
-      const total = await this.permissionsRepository.count(whereCondition);
-
-      return res.status(200).json({
-        success: true,
-        message: 'Permissions retrieved successfully',
-        data: {
-          permissions,
-          pagination: {
-            page: parseInt(page),
-            limit: parseInt(limit),
-            total,
-            totalPages: Math.ceil(total / limit),
-          },
-        },
-      });
+      return successResponse(res, permissions, 'Permissions retrieved successfully');
     } catch (error) {
-      logger.error('Error listing permissions:', error);
-      throw error;
+      console.error('Error listing permissions:', error);
+      return errorResponse(res, 'Failed to retrieve permissions', 500);
     }
   }
 
@@ -113,24 +66,10 @@ class PermissionsHandler {
       const permission = await this.permissionsRepository.findById(id);
 
       if (!permission) {
-        throw new CustomException('Permission not found', 404);
-      }
-
-      // Check if permission name already exists (excluding current permission)
-      if (permission_name && permission_name !== permission.permission_name) {
-        const existingPermission = await this.permissionsRepository.findOne({
-          permission_name,
-          is_delete: false,
-          permission_id: { $ne: id }
-        });
-
-        if (existingPermission) {
-          throw new CustomException('Permission name already exists', 400);
-        }
+        return errorResponse(res, 'Permission not found', 404);
       }
 
       const updateData = {
-        updated_at: new Date(),
         updated_by: updatedBy,
       };
 
@@ -140,16 +79,10 @@ class PermissionsHandler {
 
       const updatedPermission = await this.permissionsRepository.updatePermission(id, updateData);
 
-      logger.info('Permission updated successfully', { permission_id: id });
-
-      return res.status(200).json({
-        success: true,
-        message: 'Permission updated successfully',
-        data: updatedPermission,
-      });
+      return successResponse(res, updatedPermission, 'Permission updated successfully');
     } catch (error) {
-      logger.error('Error updating permission:', error);
-      throw error;
+      console.error('Error updating permission:', error);
+      return errorResponse(res, 'Failed to update permission', 500);
     }
   }
 
@@ -161,20 +94,15 @@ class PermissionsHandler {
       const permission = await this.permissionsRepository.findById(id);
 
       if (!permission) {
-        throw new CustomException('Permission not found', 404);
+        return errorResponse(res, 'Permission not found', 404);
       }
 
       await this.permissionsRepository.deletePermission(id, deletedBy);
 
-      logger.info('Permission deleted successfully', { permission_id: id });
-
-      return res.status(200).json({
-        success: true,
-        message: 'Permission deleted successfully',
-      });
+      return successResponse(res, null, 'Permission deleted successfully');
     } catch (error) {
-      logger.error('Error deleting permission:', error);
-      throw error;
+      console.error('Error deleting permission:', error);
+      return errorResponse(res, 'Failed to delete permission', 500);
     }
   }
 
@@ -183,28 +111,14 @@ class PermissionsHandler {
       const { id } = req.params;
       const updatedBy = req.user?.user_id;
 
-      const permission = await this.permissionsRepository.findOne({
-        permission_id: id,
-        is_delete: true
-      });
-
-      if (!permission) {
-        throw new CustomException('Permission not found or not deleted', 404);
-      }
-
       await this.permissionsRepository.restorePermission(id, updatedBy);
 
-      logger.info('Permission restored successfully', { permission_id: id });
-
-      return res.status(200).json({
-        success: true,
-        message: 'Permission restored successfully',
-      });
+      return successResponse(res, null, 'Permission restored successfully');
     } catch (error) {
-      logger.error('Error restoring permission:', error);
-      throw error;
+      console.error('Error restoring permission:', error);
+      return errorResponse(res, 'Failed to restore permission', 500);
     }
   }
 }
 
-module.exports = PermissionsHandler;
+module.exports = new PermissionsHandler();

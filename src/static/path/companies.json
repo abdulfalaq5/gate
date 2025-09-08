@@ -1,0 +1,296 @@
+{
+	"/companies": {
+		"get": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve a paginated list of companies with optional filtering",
+			"parameters": [
+				{
+					"name": "page",
+					"in": "query",
+					"description": "Page number for pagination",
+					"required": false,
+					"schema": {
+						"type": "integer",
+						"default": 1
+					}
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "Number of items per page",
+					"required": false,
+					"schema": {
+						"type": "integer",
+						"default": 10
+					}
+				},
+				{
+					"name": "search",
+					"in": "query",
+					"description": "Search term for company name, address, or email",
+					"required": false,
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "company_parent_id",
+					"in": "query",
+					"description": "Filter by parent company ID",
+					"required": false,
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				},
+				{
+					"name": "is_delete",
+					"in": "query",
+					"description": "Filter by deletion status",
+					"required": false,
+					"schema": {
+						"type": "boolean",
+						"default": false
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Companies retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCompaniesList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"post": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Create a new company with the provided information",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostCompanies"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Company created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCompanies"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/companies/{id}": {
+		"get": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve a specific company by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Company ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Company retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCompanies"
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Company not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Update an existing company",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Company ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutCompanies"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Company updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCompanies"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Company not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Soft delete a company",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Company ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Company deleted successfully"
+				},
+				"404": {
+					"description": "Company not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/companies/hierarchy": {
+		"get": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve the hierarchical structure of companies",
+			"responses": {
+				"200": {
+					"description": "Company hierarchy retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/SchemaResponseCompaniesHierarchy"
+								}
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/companies/stats": {
+		"get": {
+			"tags": ["Companies"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve statistics about companies",
+			"responses": {
+				"200": {
+					"description": "Companies statistics retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCompaniesStats"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}

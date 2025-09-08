@@ -1,49 +1,79 @@
 const { permissionsColumns } = require('./column');
-const { CorePostgres } = require('../../../repository/postgres/core_postgres');
 
-class PermissionsRepository extends CorePostgres {
-  constructor() {
-    super('permissions', permissionsColumns);
+/**
+ * Permissions Repository - Database operations for permissions table
+ */
+class PermissionsRepository {
+  constructor(knex) {
+    this.knex = knex
+    this.tableName = 'permissions'
   }
 
   async findById(permissionId) {
-    return await this.findOne({ permission_id: permissionId, is_delete: false });
+    const [permission] = await this.knex(this.tableName)
+      .select('*')
+      .where('permission_id', permissionId)
+      .where('is_delete', false)
+    
+    return permission
   }
 
   async findAllActive() {
-    return await this.findMany({ is_delete: false });
+    return await this.knex(this.tableName)
+      .select('*')
+      .where('is_delete', false)
+      .orderBy('created_at', 'desc')
   }
 
   async createPermission(data) {
-    return await this.create(data);
+    const [permission] = await this.knex(this.tableName)
+      .insert({
+        ...data,
+        created_at: new Date()
+      })
+      .returning('*')
+    
+    return permission
   }
 
   async updatePermission(permissionId, data) {
-    return await this.update({ permission_id: permissionId }, data);
+    const [permission] = await this.knex(this.tableName)
+      .where('permission_id', permissionId)
+      .update({
+        ...data,
+        updated_at: new Date()
+      })
+      .returning('*')
+    
+    return permission
   }
 
   async deletePermission(permissionId, deletedBy) {
-    return await this.update(
-      { permission_id: permissionId },
-      { 
-        is_delete: true, 
-        deleted_at: new Date(), 
-        deleted_by: deletedBy 
-      }
-    );
+    const [permission] = await this.knex(this.tableName)
+      .where('permission_id', permissionId)
+      .update({
+        is_delete: true,
+        deleted_at: new Date(),
+        deleted_by: deletedBy
+      })
+      .returning('*')
+    
+    return permission
   }
 
   async restorePermission(permissionId, updatedBy) {
-    return await this.update(
-      { permission_id: permissionId },
-      { 
-        is_delete: false, 
-        deleted_at: null, 
+    const [permission] = await this.knex(this.tableName)
+      .where('permission_id', permissionId)
+      .update({
+        is_delete: false,
+        deleted_at: null,
         deleted_by: null,
         updated_at: new Date(),
         updated_by: updatedBy
-      }
-    );
+      })
+      .returning('*')
+    
+    return permission
   }
 }
 

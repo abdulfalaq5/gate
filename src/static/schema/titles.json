@@ -1,0 +1,102 @@
+{
+	"SchemaResponseTitles": {
+		"type": "object",
+		"properties": {
+			"title_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"title_name": {
+				"type": "string"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			}
+		}
+	},
+	"SchemaPostTitles": {
+		"type": "object",
+		"properties": {
+			"title_name": {
+				"type": "string",
+				"minLength": 2,
+				"maxLength": 100
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid"
+			}
+		},
+		"required": ["title_name", "department_id"]
+	},
+	"SchemaPutTitles": {
+		"type": "object",
+		"properties": {
+			"title_name": {
+				"type": "string",
+				"minLength": 2,
+				"maxLength": 100
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid"
+			}
+		}
+	},
+	"SchemaResponseTitlesList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseTitles"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer"
+					},
+					"limit": {
+						"type": "integer"
+					},
+					"total": {
+						"type": "integer"
+					},
+					"totalPages": {
+						"type": "integer"
+					}
+				}
+			}
+		}
+	}
+}
