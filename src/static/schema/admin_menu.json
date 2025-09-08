@@ -1,0 +1,49 @@
+{
+	"SchemaAdminMenu": {
+		"type": "object",
+		"properties": {
+			"menu_id": {
+				"type": "number"
+			},
+			"parent": {
+				"type": "number"
+			},
+			"menu_name": {
+				"type": "string"
+			},
+			"menu_url": {
+				"type": "string"
+			},
+			"menu_status": {
+				"type": "number"
+			},
+			"menu_sort": {
+				"type": "string"
+			},
+			"menu_icon": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_by": {
+				"type": "string"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string"
+			}
+		}
+	}
+}

@@ -1,0 +1,247 @@
+{
+  "/auth/signin": {
+    "post": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Admin Signin",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostSignin"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseSignin"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/refresh-token": {
+    "get": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Admin refresh token",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseSignin"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/me": {
+    "get": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Admin me",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseMe"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/client/signin": {
+    "post": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Client Signin",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostSigninClient"
+            }            
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseSignin"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/client/refresh-token": {
+    "get": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Client refresh token",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseSignin"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/client/me": {
+    "get": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Client me",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseMe"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/member/register": {
+    "post": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Member Register",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostMember"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Created",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseMember"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/member/signin": {
+    "post": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Member Signin",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostSigninMember"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseSigninMember"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/auth/member/me": {
+    "get": {
+      "tags": [
+        "Authentication"
+      ],
+      "summary": "Member me",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseMeMember"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

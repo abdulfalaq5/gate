@@ -1,0 +1,93 @@
+# Application Configuration
+NODE_ENV=development
+APP_NAME=Express Boilerplate
+APP_PORT=3000
+JSON_LIMIT=1gb
+
+# Database Configuration (Development)
+DB_CLIENT_DEV=pg
+DB_HOST_DEV=localhost
+DB_PORT_DEV=5432
+DB_USER_DEV=your_username
+DB_PASS_DEV=your_password
+DB_NAME_DEV=your_database
+
+# Database Configuration (Production)
+DB_CLIENT_PROD=pg
+DB_HOST_PROD=localhost
+DB_PORT_PROD=5432
+DB_USER_PROD=your_username
+DB_PASS_PROD=your_password
+DB_NAME_PROD=your_database
+
+# Database Configuration (Staging/Test)
+DB_CLIENT_TEST=pg
+DB_HOST_TEST=localhost
+DB_PORT_TEST=5432
+DB_USER_TEST=your_username
+DB_PASS_TEST=your_password
+DB_NAME_TEST=your_database
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=24h
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+EMAIL_FROM=noreply@yourdomain.com
+
+# AWS Configuration (Optional)
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_REGION=us-east-1
+AWS_BUCKET_NAME=your_bucket_name
+
+# MinIO Configuration (Optional)
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_NAME=uploads
+MINIO_USE_SSL=false
+
+# RabbitMQ Configuration (Optional)
+RABBITMQ_URL=amqp://localhost:5672
+# Set to 'disabled' to disable RabbitMQ
+# RABBITMQ_URL=disabled
+
+# reCAPTCHA Configuration (Optional)
+RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
+RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+
+# Swagger Configuration
+# Options: true, false, development
+SWAGGER_ENABLED=development
+
+# Rate Limiting Configuration
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# File Upload Configuration
+MAX_FILE_SIZE=10485760
+ALLOWED_FILE_TYPES=jpg,jpeg,png,gif,pdf,doc,docx
+
+# Logging Configuration
+LOG_LEVEL=info
+LOG_FILE_PATH=./logs/app.log
+
+# SSO Configuration
+# Set to 'server' to act as SSO server, 'client' to act as SSO client
+SSO_MODE=server
+# SSO Server Configuration (when SSO_MODE=server)
+SSO_SERVER_URL=http://localhost:3000
+SSO_SERVER_SECRET=your_sso_server_secret_key
+# SSO Client Configuration (when SSO_MODE=client)
+SSO_CLIENT_ID=your_client_id
+SSO_CLIENT_SECRET=your_client_secret
+SSO_REDIRECT_URI=http://localhost:3001/auth/sso/callback
+SSO_AUTHORIZATION_URL=http://localhost:3000/auth/sso/authorize
+SSO_TOKEN_URL=http://localhost:3000/auth/sso/token
+SSO_USER_INFO_URL=http://localhost:3000/auth/sso/userinfo

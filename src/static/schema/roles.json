@@ -1,0 +1,71 @@
+{
+	"SchemaRoles": {
+		"type": "object",
+		"properties": {
+			"role_id": {
+				"type": "number"
+			},
+			"role_name": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_by": {
+				"type": "string"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string"
+			},
+			"can_deleted": {
+				"type": "boolean"
+			}
+		}
+	},
+	"SchemaBodyRoles": {
+		"type": "object",
+		"properties": {
+			"role_name": {
+				"type": "string"
+			}
+		}
+	},
+	"SchemaBodyAssignPermission": {
+		"type": "object",
+		"properties": {
+			"permissions": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"role_id": {
+							"type": "string"
+						},
+						"permission_id": {
+							"type": "number"
+						},
+						"menu_id": {
+							"type": "number"
+						},
+						"checked": {
+							"type": "boolean",
+							"description": "true / false"
+						}
+					}
+				}
+			}
+		}
+	}
+}

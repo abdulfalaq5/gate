@@ -1,0 +1,300 @@
+{
+	"/users": {
+		"get": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"parameters": [
+				{
+					"in": "query",
+					"name": "limit",
+					"required": false,
+					"schema": {
+						"type": "integer"
+					},
+					"description": "Limit value is number by default limit is 10. ex : ?limit=100"
+				},
+				{
+					"in": "query",
+					"name": "page",
+					"required": false,
+					"schema": {
+						"type": "number"
+					},
+					"description": "Page value is number. ex : ?page=1"
+				},
+				{
+					"in": "query",
+					"name": "direction",
+					"required": false,
+					"schema": {
+						"type": "array or string"
+					},
+					"description": "Direction value is array / string with rule if array ex : ?direction[]=id&direction[]=name. if string ex : ?direction=id"
+				},
+				{
+					"in": "query",
+					"name": "order",
+					"required": false,
+					"schema": {
+						"type": "array or string"
+					},
+					"description": "Direction value is array / string with rule if array ex : ?order[]=asc&order[]=desc. if string ex : ?order=asc"
+				},
+				{
+					"in": "query",
+					"name": "status",
+					"required": false,
+					"schema": {
+						"type": "string"
+					},
+					"description": "Filter value is string with rule ex : ?group_type=1,0"
+				},
+				{
+					"in": "query",
+					"name": "search",
+					"required": false,
+					"schema": {
+						"type": "string"
+					},
+					"description": "Search value is string with rule ex : ?search=Hitam"
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaPaginationResponse"
+							}
+						}
+					}
+				}
+			}
+		},
+		"post": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostUsers"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"/users/{users_id}": {
+		"get": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"parameters": [
+				{
+					"in": "path",
+					"name": "users_id",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				}
+			}
+		},
+		"put": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"parameters": [
+				{
+					"in": "path",
+					"name": "users_id",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostUsers"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				}
+			}
+		},
+		"delete": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"parameters": [
+				{
+					"in": "path",
+					"name": "users_id",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"/users/change-password": {
+		"post": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostChangePasswordUsers"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"/users/auction-officer": {
+		"get": {
+			"tags": [
+				"Users"
+			],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"parameters": [
+				{
+					"in": "query",
+					"name": "search",
+					"required": false,
+					"schema": {
+						"type": "string"
+					},
+					"description": "Search value is string with rule ex : ?search=Hitam"
+				},
+				{
+					"in": "query",
+					"name": "location_id",
+					"required": false,
+					"schema": {
+						"type": "string"
+					},
+					"description": "Search value is string with rule ex : ?location_id=uuid"
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "OK",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
