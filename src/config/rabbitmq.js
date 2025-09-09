@@ -1,7 +1,12 @@
 const amqp = require('amqplib');
 const { lang } = require('../lang');
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+// RabbitMQ Configuration
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:9505';
+const RABBITMQ_PORT = process.env.RABBITMQ_PORT || '9505';
+const RABBITMQ_PORT_MANAGEMENT = process.env.RABBITMQ_PORT_MANAGEMENT || '9506';
+const RABBITMQ_DEFAULT_USER = process.env.RABBITMQ_DEFAULT_USER || 'guest';
+const RABBITMQ_DEFAULT_PASS = process.env.RABBITMQ_DEFAULT_PASS || 'guest';
 
 const connectRabbitMQ = async () => {
   try {
@@ -38,7 +43,25 @@ const publishToRabbitMqQueueSingle = async (exchangeName, queueName, data) => {
   }
 }
 
+// Get RabbitMQ configuration info
+const getRabbitMQConfig = () => {
+  return {
+    url: RABBITMQ_URL,
+    port: RABBITMQ_PORT,
+    managementPort: RABBITMQ_PORT_MANAGEMENT,
+    defaultUser: RABBITMQ_DEFAULT_USER,
+    defaultPass: RABBITMQ_DEFAULT_PASS,
+    managementUrl: `http://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@localhost:${RABBITMQ_PORT_MANAGEMENT}`
+  };
+};
+
 module.exports = {
   connectRabbitMQ,
-  publishToRabbitMqQueueSingle
+  publishToRabbitMqQueueSingle,
+  getRabbitMQConfig,
+  RABBITMQ_URL,
+  RABBITMQ_PORT,
+  RABBITMQ_PORT_MANAGEMENT,
+  RABBITMQ_DEFAULT_USER,
+  RABBITMQ_DEFAULT_PASS
 }

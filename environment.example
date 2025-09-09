@@ -51,6 +51,13 @@ POSTGRES_DB=gate_sso
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
 
+# RabbitMQ Configuration
+RABBITMQ_PORT=9505
+RABBITMQ_PORT_MANAGEMENT=9506
+RABBITMQ_URL=amqp://guest:guest@localhost:9505
+RABBITMQ_DEFAULT_USER=guest
+RABBITMQ_DEFAULT_PASS=guest
+
 # Logging Configuration
 SSO_LOG_LEVEL=info
 SSO_ENABLE_FILE_LOGGING=true
