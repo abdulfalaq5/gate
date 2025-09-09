@@ -7,6 +7,7 @@ const {
   ROLE,
   generatePassword,
 } = require('../../utils');
+const { verifyPassword } = require('../../utils/sso');
 const { generateCustomerNo } = require('../../utils/customer')
 const { lang } = require('../../lang');
 const {
@@ -40,11 +41,7 @@ const getByParam = async (where, password, column = COLUMN) => {
       .select(column)
       .where(where);
     if (result) {
-      const validationPassword = isValidPassword(
-        password,
-        result.password,
-        result.salt
-      );
+      const validationPassword = await verifyPassword(password, result.password);
       if (result?.status === false && validationPassword === true) {
         const response = mappingSuccess(
           lang.__('get.success'),
@@ -88,11 +85,7 @@ const getByParamInspection = async (where, password, column = COLUMN) => {
       });
 
     if (result) {
-      const validationPassword = isValidPassword(
-        password,
-        result.password,
-        result.salt
-      );
+      const validationPassword = await verifyPassword(password, result.password);
       if (result?.status === false && validationPassword === true) {
         const response = mappingSuccess(
           lang.__('get.success'),
