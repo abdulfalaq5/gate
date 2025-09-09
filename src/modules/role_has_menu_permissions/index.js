@@ -1,0 +1,17 @@
+const RoleHasMenuPermissionsHandler = require('./handler');
+
+module.exports = {
+  createRoleHasMenuPermission: RoleHasMenuPermissionsHandler.createRoleHasMenuPermission.bind(RoleHasMenuPermissionsHandler),
+  getRoleHasMenuPermission: RoleHasMenuPermissionsHandler.getRoleHasMenuPermission.bind(RoleHasMenuPermissionsHandler),
+  listRoleHasMenuPermissions: RoleHasMenuPermissionsHandler.listRoleHasMenuPermissions.bind(RoleHasMenuPermissionsHandler),
+  getPermissionsByRole: RoleHasMenuPermissionsHandler.getPermissionsByRole.bind(RoleHasMenuPermissionsHandler),
+  getRolesByMenu: RoleHasMenuPermissionsHandler.getRolesByMenu.bind(RoleHasMenuPermissionsHandler),
+  getRolesByPermission: RoleHasMenuPermissionsHandler.getRolesByPermission.bind(RoleHasMenuPermissionsHandler),
+  getPermissionsByRoleAndMenu: RoleHasMenuPermissionsHandler.getPermissionsByRoleAndMenu.bind(RoleHasMenuPermissionsHandler),
+  updateRoleHasMenuPermission: RoleHasMenuPermissionsHandler.updateRoleHasMenuPermission.bind(RoleHasMenuPermissionsHandler),
+  deleteRoleHasMenuPermission: RoleHasMenuPermissionsHandler.deleteRoleHasMenuPermission.bind(RoleHasMenuPermissionsHandler),
+  deleteByRole: RoleHasMenuPermissionsHandler.deleteByRole.bind(RoleHasMenuPermissionsHandler),
+  deleteByMenu: RoleHasMenuPermissionsHandler.deleteByMenu.bind(RoleHasMenuPermissionsHandler),
+  deleteByPermission: RoleHasMenuPermissionsHandler.deleteByPermission.bind(RoleHasMenuPermissionsHandler),
+  deleteByRoleAndMenu: RoleHasMenuPermissionsHandler.deleteByRoleAndMenu.bind(RoleHasMenuPermissionsHandler),
+};

@@ -1,34 +1,37 @@
-const SecureSSOHandler = require('./security_handler');
-const ClientRegistration = require('./client_registration');
-const SessionManager = require('./session_manager');
-const ScopeManager = require('./scope_manager');
+const SSOServerHandler = require('./server_handler');
+const secureSSOHandler = require('./security_handler');
+const clientRegistration = require('./client_registration');
+const sessionManager = require('./session_manager');
+const scopeManager = require('./scope_manager');
+
+// Create instances
+const ssoServerHandler = new SSOServerHandler();
 
 module.exports = {
-  // Core SSO endpoints
-  login: SecureSSOHandler.login.bind(SecureSSOHandler),
-  authorize: SecureSSOHandler.authorize.bind(SecureSSOHandler),
-  token: SecureSSOHandler.token.bind(SecureSSOHandler),
-  userInfo: SecureSSOHandler.userInfo.bind(SecureSSOHandler),
-  callback: SecureSSOHandler.callback.bind(SecureSSOHandler),
-  logout: SecureSSOHandler.logout.bind(SecureSSOHandler),
-  getStats: SecureSSOHandler.getStats.bind(SecureSSOHandler),
+  // Core SSO endpoints - using database handler
+  login: ssoServerHandler.login.bind(ssoServerHandler),
+  authorize: ssoServerHandler.authorize.bind(ssoServerHandler),
+  token: ssoServerHandler.token.bind(ssoServerHandler),
+  userInfo: ssoServerHandler.userInfo.bind(ssoServerHandler),
+  logout: ssoServerHandler.logout.bind(ssoServerHandler),
+  getStats: secureSSOHandler.getStats.bind(secureSSOHandler),
 
   // Client Registration endpoints
-  registerClient: ClientRegistration.registerClient.bind(ClientRegistration),
-  getClient: ClientRegistration.getClient.bind(ClientRegistration),
-  listClients: ClientRegistration.listClients.bind(ClientRegistration),
-  updateClient: ClientRegistration.updateClient.bind(ClientRegistration),
-  deleteClient: ClientRegistration.deleteClient.bind(ClientRegistration),
+  registerClient: clientRegistration.registerClient.bind(clientRegistration),
+  getClient: clientRegistration.getClient.bind(clientRegistration),
+  listClients: clientRegistration.listClients.bind(clientRegistration),
+  updateClient: clientRegistration.updateClient.bind(clientRegistration),
+  deleteClient: clientRegistration.deleteClient.bind(clientRegistration),
 
   // Session Management endpoints
-  getSessionInfo: SessionManager.getSessionInfo.bind(SessionManager),
-  getUserSessions: SessionManager.getUserSessions.bind(SessionManager),
-  getSessionStats: SessionManager.getSessionStats.bind(SessionManager),
-  endSession: SessionManager.endSessionEndpoint.bind(SessionManager),
+  getSessionInfo: sessionManager.getSessionInfo.bind(sessionManager),
+  getUserSessions: sessionManager.getUserSessions.bind(sessionManager),
+  getSessionStats: sessionManager.getSessionStats.bind(sessionManager),
+  endSession: sessionManager.endSessionEndpoint.bind(sessionManager),
 
   // Scope Management endpoints
-  getScopes: ScopeManager.getScopes.bind(ScopeManager),
-  getScopeInfo: ScopeManager.getScopeInfo.bind(ScopeManager),
-  validateScopes: ScopeManager.validateScopesEndpoint.bind(ScopeManager),
-  checkPermission: ScopeManager.checkPermission.bind(ScopeManager),
+  getScopes: scopeManager.getScopes.bind(scopeManager),
+  getScopeInfo: scopeManager.getScopeInfo.bind(scopeManager),
+  validateScopes: scopeManager.validateScopesEndpoint.bind(scopeManager),
+  checkPermission: scopeManager.checkPermission.bind(scopeManager),
 };

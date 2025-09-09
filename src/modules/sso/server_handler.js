@@ -3,11 +3,12 @@ const crypto = require('crypto');
 const ssoConfig = require('../../config/sso');
 const UsersRepository = require('../users/postgre_repository');
 const { CustomException } = require('../../utils/exception');
-const { logger } = require('../../utils/logger');
+const { Logger } = require('../../utils/logger');
+const { pgCore } = require('../../config/database');
 
 class SSOServerHandler {
   constructor() {
-    this.usersRepository = new UsersRepository();
+    this.usersRepository = new UsersRepository(pgCore);
     this.authorizationCodes = new Map(); // In production, use Redis or database
   }
 
@@ -37,6 +38,19 @@ class SSOServerHandler {
   async login(req, res) {
     try {
       const { user_name, user_password, client_id, redirect_uri } = req.body;
+      
+      console.log('SSO Login Request:', { user_name, client_id, redirect_uri });
+
+      // Validation
+      if (!user_name || !user_password) {
+        console.log('Validation failed: missing user_name or user_password');
+        return res.status(400).json({
+          success: false,
+          message: 'Username dan password diperlukan',
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
 
       // Find user by username or email
       let user = await this.usersRepository.findByUsername(user_name);
@@ -45,14 +59,20 @@ class SSOServerHandler {
       }
 
       if (!user) {
+        console.log('User not found:', user_name);
         throw new CustomException('Invalid credentials', 401);
       }
+
+      console.log('User found:', user.user_name);
 
       // Verify password
       const isValidPassword = await this.usersRepository.verifyPassword(user_password, user.user_password);
       if (!isValidPassword) {
+        console.log('Invalid password for user:', user_name);
         throw new CustomException('Invalid credentials', 401);
       }
+
+      console.log('Password verified for user:', user_name);
 
       // Get user details with permissions
       const userDetails = await this.usersRepository.getUserWithDetails(user.user_id);
@@ -64,45 +84,30 @@ class SSOServerHandler {
         authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, user.user_id);
       }
 
-      // Generate JWT token
+      // Generate JWT token - hanya menyimpan user_id untuk mengurangi ukuran token
       const tokenPayload = {
         user_id: user.user_id,
-        user_name: user.user_name,
-        user_email: user.user_email,
-        role_id: user.role_id,
-        employee_id: user.employee_id,
-        permissions: permissions.map(p => ({
-          permission_id: p.permission_id,
-          permission_name: p.permission_name,
-          menu_id: p.menu_id,
-          menu_name: p.menu_name,
-          menu_url: p.menu_url,
-        })),
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+        aud: client_id || ssoConfig.sso.jwt.audience,
+        iss: ssoConfig.sso.jwt.issuer,
       };
 
-      const token = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret, {
-        expiresIn: ssoConfig.sso.jwt.expiresIn,
-        issuer: ssoConfig.sso.jwt.issuer,
-        audience: client_id || ssoConfig.sso.jwt.audience,
-      });
+      const token = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret);
 
-      logger.info('SSO login successful', { user_id: user.user_id, client_id });
+      Logger.info('SSO login successful', { user_id: user.user_id, client_id });
 
       return res.status(200).json({
         success: true,
         message: 'SSO login successful',
         data: {
-          user: {
-            ...userDetails,
-            user_password: undefined, // Remove password from response
-          },
-          permissions,
           token,
           authorization_code: authorizationCode,
+          user_id: user.user_id, // Hanya mengembalikan user_id untuk referensi
         },
       });
     } catch (error) {
-      logger.error('Error during SSO login:', error);
+      Logger.error('Error during SSO login:', error);
       throw error;
     }
   }
@@ -146,7 +151,7 @@ class SSOServerHandler {
         return res.redirect(`/auth/sso/login?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&state=${state}`);
       }
     } catch (error) {
-      logger.error('Error during SSO authorization:', error);
+      Logger.error('Error during SSO authorization:', error);
       throw error;
     }
   }
@@ -216,7 +221,7 @@ class SSOServerHandler {
         scope: 'read write',
       });
     } catch (error) {
-      logger.error('Error generating SSO token:', error);
+      Logger.error('Error generating SSO token:', error);
       throw error;
     }
   }
@@ -238,24 +243,31 @@ class SSOServerHandler {
       }
 
       return res.status(200).json({
-        user_id: user.user_id,
-        user_name: user.user_name,
-        user_email: user.user_email,
-        employee_name: user.employee_name,
-        role_name: user.role_name,
-        title_name: user.title_name,
-        department_name: user.department_name,
-        company_name: user.company_name,
-        permissions: permissions.map(p => ({
-          permission_id: p.permission_id,
-          permission_name: p.permission_name,
-          menu_id: p.menu_id,
-          menu_name: p.menu_name,
-          menu_url: p.menu_url,
-        })),
+        success: true,
+        message: 'User info retrieved successfully',
+        data: {
+          user: {
+            user_id: user.user_id,
+            user_name: user.user_name,
+            user_email: user.user_email,
+            role_id: user.role_id,
+            role_name: user.role_name,
+            employee_id: user.employee_id,
+            employee_name: user.employee_name,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+          },
+          permissions: permissions.map(p => ({
+            permission_id: p.permission_id,
+            permission_name: p.permission_name,
+            menu_id: p.menu_id,
+            menu_name: p.menu_name,
+            menu_url: p.menu_url,
+          })),
+        },
       });
     } catch (error) {
-      logger.error('Error getting user info:', error);
+      Logger.error('Error getting user info:', error);
       throw error;
     }
   }
@@ -273,7 +285,7 @@ class SSOServerHandler {
         message: 'Logout successful',
       });
     } catch (error) {
-      logger.error('Error during SSO logout:', error);
+      Logger.error('Error during SSO logout:', error);
       throw error;
     }
   }

@@ -28,6 +28,54 @@ class UsersRepository {
     return user
   }
 
+  async findByUsername(username) {
+    const [user] = await this.knex(this.tableName)
+      .select('*')
+      .where('user_name', username)
+      .where('is_delete', false)
+    
+    return user
+  }
+
+  async verifyPassword(plainPassword, hashedPassword) {
+    const bcrypt = require('bcrypt');
+    return await bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  async getUserWithDetails(userId) {
+    const [user] = await this.knex(this.tableName)
+      .select(
+        'users.*',
+        'roles.role_name',
+        'employees.employee_name'
+      )
+      .leftJoin('roles', 'users.role_id', 'roles.role_id')
+      .leftJoin('employees', 'users.employee_id', 'employees.employee_id')
+      .where('users.user_id', userId)
+      .where('users.is_delete', false)
+    
+    return user
+  }
+
+  async getUserPermissions(userId) {
+    const permissions = await this.knex('roleHasMenuPermissions')
+      .select(
+        'permissions.permission_id',
+        'permissions.permission_name',
+        'menus.menu_id',
+        'menus.menu_name',
+        'menus.menu_url'
+      )
+      .leftJoin('permissions', 'roleHasMenuPermissions.permission_id', 'permissions.permission_id')
+      .leftJoin('menus', 'roleHasMenuPermissions.menu_id', 'menus.menu_id')
+      .leftJoin('users', 'roleHasMenuPermissions.role_id', 'users.role_id')
+      .where('users.user_id', userId)
+      .where('permissions.is_delete', false)
+      .where('menus.is_delete', false)
+    
+    return permissions
+  }
+
   /**
    * Find users dengan filter standar (pagination, sorting, searching, filtering)
    * @param {Object} queryParams - Parsed query parameters dari parseStandardQuery
