@@ -5,11 +5,11 @@ const { lang } = require('../../lang')
   ** More Documentation in here https://express-validator.github.io/docs/
 */
 const siginValidation = [
-  check('username')
-    .isString()
-    .withMessage(lang.__('validator.string', { field: 'Username' }))
+  check('email')
+    .isEmail()
+    .withMessage(lang.__('validator.email', { field: 'Email' }))
     .notEmpty()
-    .withMessage(lang.__('validator.required', { field: 'Username' })),
+    .withMessage(lang.__('validator.required', { field: 'Email' })),
   check('password')
     .isString()
     .withMessage(lang.__('validator.string', { field: 'Password' }))

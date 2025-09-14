@@ -14,7 +14,7 @@ const { customerSigninLimiter } = require('../../middlewares')
 const { TABLE } = require('./column')
 
 const signin = async (req, res) => {
-  const where = { username: req?.body?.username }
+  const where = { email: req?.body?.email }
   const password = req?.body?.password
   const result = await repository.getByParam(where, password)
   return baseResponse(res, result)

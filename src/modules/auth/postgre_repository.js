@@ -31,7 +31,12 @@ const {
 const getByParam = async (where, password, column = COLUMN) => {
   try {
     where[`${TABLE}.deleted_at`] = null;
-    // Convert username to user_name for the query
+    // Convert email to user_email for the query
+    if (where.email) {
+      where[`${TABLE}.user_email`] = where.email;
+      delete where.email;
+    }
+    // Convert username to user_name for the query (backward compatibility)
     if (where.username) {
       where[`${TABLE}.user_name`] = where.username;
       delete where.username;
@@ -55,7 +60,7 @@ const getByParam = async (where, password, column = COLUMN) => {
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
     }
     return mappingSuccess(
-      lang.__('username.not.found', { val: where?.username }),
+      lang.__('username.not.found', { val: where?.email || where?.username }),
       [],
       201,
       false
@@ -101,7 +106,7 @@ const getByParamInspection = async (where, password, column = COLUMN) => {
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
     }
     return mappingSuccess(
-      lang.__('username.not.found', { val: where?.username }),
+      lang.__('username.not.found', { val: where?.email || where?.username }),
       [],
       201,
       false
@@ -218,7 +223,7 @@ const conductorSignin = async (where, password, column = COLUMN) => {
       return mappingSuccess(lang.__('account.not.access'), [], 201, false);
     }
     return mappingSuccess(
-      lang.__('username.not.found', { val: where?.username }),
+      lang.__('username.not.found', { val: where?.email || where?.username }),
       [],
       201,
       false

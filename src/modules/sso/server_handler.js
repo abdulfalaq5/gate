@@ -37,42 +37,39 @@ class SSOServerHandler {
   // SSO Login endpoint
   async login(req, res) {
     try {
-      const { user_name, user_password, client_id, redirect_uri } = req.body;
+      const { email, password, client_id, redirect_uri } = req.body;
       
-      console.log('SSO Login Request:', { user_name, client_id, redirect_uri });
+      console.log('SSO Login Request:', { email, client_id, redirect_uri });
 
       // Validation
-      if (!user_name || !user_password) {
-        console.log('Validation failed: missing user_name or user_password');
+      if (!email || !password) {
+        console.log('Validation failed: missing email or password');
         return res.status(400).json({
           success: false,
-          message: 'Username dan password diperlukan',
+          message: 'Email dan password diperlukan',
           errors: null,
           timestamp: new Date().toISOString()
         });
       }
 
-      // Find user by username or email
-      let user = await this.usersRepository.findByUsername(user_name);
-      if (!user) {
-        user = await this.usersRepository.findByEmail(user_name);
-      }
+      // Find user by email
+      const user = await this.usersRepository.findByEmail(email);
 
       if (!user) {
-        console.log('User not found:', user_name);
+        console.log('User not found:', email);
         throw new CustomException('Invalid credentials', 401);
       }
 
       console.log('User found:', user.user_name);
 
       // Verify password
-      const isValidPassword = await this.usersRepository.verifyPassword(user_password, user.user_password);
+      const isValidPassword = await this.usersRepository.verifyPassword(password, user.user_password);
       if (!isValidPassword) {
-        console.log('Invalid password for user:', user_name);
+        console.log('Invalid password for user:', email);
         throw new CustomException('Invalid credentials', 401);
       }
 
-      console.log('Password verified for user:', user_name);
+      console.log('Password verified for user:', email);
 
       // Get user details with permissions
       const userDetails = await this.usersRepository.getUserWithDetails(user.user_id);
