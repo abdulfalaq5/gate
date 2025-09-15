@@ -38,6 +38,7 @@ class SSOServerHandler {
   async login(req, res) {
     try {
       const { email, password, client_id, redirect_uri } = req.body;
+      const clientIP = req.ip || req.connection.remoteAddress || '::1';
       
       console.log('SSO Login Request:', { email, client_id, redirect_uri });
 
@@ -81,7 +82,7 @@ class SSOServerHandler {
         authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, user.user_id);
       }
 
-      // Generate JWT token - hanya menyimpan user_id untuk mengurangi ukuran token
+      // Generate JWT token dengan payload yang lebih lengkap
       const tokenPayload = {
         user_id: user.user_id,
         iat: Math.floor(Date.now() / 1000),
@@ -90,18 +91,51 @@ class SSOServerHandler {
         iss: ssoConfig.sso.jwt.issuer,
       };
 
-      const token = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret);
+      const ssoToken = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret);
+
+      // Generate session ID
+      const sessionId = user.user_id; // Using user_id as session_id for simplicity
+      const loginTime = new Date().toISOString();
 
       Logger.info('SSO login successful', { user_id: user.user_id, client_id });
 
       return res.status(200).json({
         success: true,
-        message: 'SSO login successful',
+        message: 'Login SSO berhasil',
         data: {
-          token,
-          authorization_code: authorizationCode,
-          user_id: user.user_id, // Hanya mengembalikan user_id untuk referensi
+          user: {
+            user_id: userDetails.user_id,
+            user_name: userDetails.user_name,
+            user_email: userDetails.user_email,
+            role_id: userDetails.role_id,
+            role_name: userDetails.role_name,
+            employee_id: userDetails.employee_id,
+            employee_name: userDetails.employee_name,
+            created_at: userDetails.created_at,
+            updated_at: userDetails.updated_at
+          },
+          permissions: permissions.map(p => ({
+            permission_id: p.permission_id,
+            permission_name: p.permission_name,
+            menu_id: p.menu_id,
+            menu_name: p.menu_name,
+            menu_url: p.menu_url
+          })),
+          session: {
+            client_id: client_id || 'report-management-client',
+            session_id: sessionId,
+            login_time: loginTime,
+            ip_address: clientIP,
+            last_activity: loginTime
+          },
+          oauth: {
+            authorization_code: authorizationCode,
+            redirect_uri: redirect_uri || 'http://localhost:9581/api/v1/auth/sso/callback',
+            expires_in: 600, // 10 minutes
+            sso_token: ssoToken
+          }
         },
+        timestamp: loginTime
       });
     } catch (error) {
       Logger.error('Error during SSO login:', error);

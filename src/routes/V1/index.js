@@ -9,7 +9,7 @@ const ssoRoutes = require('./sso')
 const { verifyToken } = require('../../middlewares')
 
 const routing = express();
-const API_TAG = '/api/v1';
+const API_TAG = '/api';
 
 /* RULE
 naming convention endpoint: using plural
