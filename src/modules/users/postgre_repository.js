@@ -47,7 +47,9 @@ class UsersRepository {
       .select(
         'users.*',
         'roles.role_name',
-        'employees.employee_name'
+        'employees.employee_name',
+        'employees.employee_email',
+        'employees.title_id'
       )
       .leftJoin('roles', 'users.role_id', 'roles.role_id')
       .leftJoin('employees', 'users.employee_id', 'employees.employee_id')

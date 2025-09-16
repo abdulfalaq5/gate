@@ -93,6 +93,13 @@ class EmployeesRepository {
     
     return employee
   }
+
+  /**
+   * Find employee by email (alias for getEmployeeByEmail)
+   */
+  async findByEmail(email) {
+    return await this.getEmployeeByEmail(email);
+  }
 }
 
 module.exports = EmployeesRepository

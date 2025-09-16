@@ -1,0 +1,150 @@
+{
+  "SchemaPostSSOProfileUpdateCombined": {
+    "type": "object",
+    "properties": {
+      "user_name": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 100,
+        "pattern": "^[a-zA-Z0-9_]+$",
+        "description": "Username baru (3-100 karakter, hanya huruf, angka, dan underscore)",
+        "example": "new_username"
+      },
+      "user_email": {
+        "type": "string",
+        "format": "email",
+        "maxLength": 100,
+        "description": "Email user baru (format email valid, maksimal 100 karakter)",
+        "example": "new@example.com"
+      },
+      "employee_name": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 100,
+        "description": "Nama employee baru (2-100 karakter)",
+        "example": "John Doe"
+      },
+      "employee_email": {
+        "type": "string",
+        "format": "email",
+        "maxLength": 100,
+        "description": "Email employee baru (format email valid, maksimal 100 karakter)",
+        "example": "john.doe@company.com"
+      },
+      "title_id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "ID title/jabatan employee",
+        "example": "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "current_password": {
+        "type": "string",
+        "description": "Password lama untuk verifikasi (required jika ingin mengubah password)",
+        "example": "old_password"
+      },
+      "new_password": {
+        "type": "string",
+        "minLength": 6,
+        "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
+        "description": "Password baru (minimal 6 karakter, harus mengandung minimal 1 huruf kecil, 1 huruf besar, dan 1 angka)",
+        "example": "NewPassword123"
+      },
+      "confirm_password": {
+        "type": "string",
+        "description": "Konfirmasi password baru (harus sama dengan new_password)",
+        "example": "NewPassword123"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Minimal satu field harus diisi. Jika ingin mengubah password, semua field password harus diisi."
+  },
+  "SchemaResponseSSOProfile": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "example": true
+      },
+      "message": {
+        "type": "string",
+        "example": "Profil berhasil diambil"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID unik user",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "user_name": {
+            "type": "string",
+            "description": "Username user",
+            "example": "admin"
+          },
+          "user_email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email user",
+            "example": "admin@example.com"
+          },
+          "employee_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID employee terkait",
+            "example": "123e4567-e89b-12d3-a456-426614174001"
+          },
+          "employee_name": {
+            "type": "string",
+            "description": "Nama employee",
+            "example": "John Doe"
+          },
+          "employee_email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email employee",
+            "example": "john.doe@company.com"
+          },
+          "title_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID title/jabatan employee",
+            "example": "123e4567-e89b-12d3-a456-426614174002"
+          },
+          "role_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID role user",
+            "example": "123e4567-e89b-12d3-a456-426614174003"
+          },
+          "role_name": {
+            "type": "string",
+            "description": "Nama role user",
+            "example": "Administrator"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tanggal pembuatan user",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tanggal terakhir update user",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": ["user_id", "user_name", "user_email", "employee_id", "employee_name", "employee_email", "title_id", "role_id", "role_name", "created_at", "updated_at"]
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp response",
+        "example": "2024-01-01T00:00:00.000Z"
+      }
+    },
+    "required": ["success", "message", "data", "timestamp"]
+  }
+}

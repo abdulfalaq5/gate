@@ -11,6 +11,8 @@ const ssoRoutes = require('../../modules/sso');
 const systemHasMenusRoutes = require('../../modules/system_has_menus');
 const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
 const roleHasMenuPermissionsRoutes = require('../../modules/role_has_menu_permissions');
+const { updateProfileValidation } = require('../../modules/sso/profile_validation');
+const { verifySSOToken } = require('../../middlewares');
 
 // SSO Routes
 router.post('/auth/sso/login', ssoRoutes.login);
@@ -19,6 +21,10 @@ router.post('/auth/sso/token', ssoRoutes.token);
 router.get('/auth/sso/userinfo', ssoRoutes.userInfo);
 router.post('/auth/sso/logout', ssoRoutes.logout);
 router.get('/auth/sso/stats', ssoRoutes.getStats);
+
+// SSO Profile Routes (Protected)
+router.get('/auth/sso/profil', verifySSOToken, ssoRoutes.getProfile);
+router.put('/auth/sso/profil', verifySSOToken, updateProfileValidation, ssoRoutes.updateProfile);
 
 // Client Registration Routes
 router.post('/auth/sso/clients', ssoRoutes.registerClient);

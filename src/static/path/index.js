@@ -8,6 +8,7 @@ const importModule = require('./import.json')
 const roles = require('./roles.json')
 const permissions = require('./permissions.json')
 const users = require('./users.json')
+const ssoProfile = require('./sso_profile.json')
 
 module.exports = {
   ...auth,
@@ -19,5 +20,6 @@ module.exports = {
   ...importModule,
   ...roles,
   ...permissions,
-  ...users
+  ...users,
+  ...ssoProfile
 }

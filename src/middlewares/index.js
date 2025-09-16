@@ -3,6 +3,7 @@ const token = require('./token')
 const validation = require('./validation')
 const recaptcha = require('./recaptcha')
 const rateLimiterMiddleware = require('./rate-limiter')
+const { verifySSOToken } = require('./sso_token')
 
 const verifyTokenMember = async (req, res, next) => {
   try {
@@ -37,5 +38,6 @@ module.exports = {
   ...validation,
   ...recaptcha,
   ...rateLimiterMiddleware,
-  verifyTokenMember
+  verifyTokenMember,
+  verifySSOToken
 }

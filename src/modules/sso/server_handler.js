@@ -139,7 +139,22 @@ class SSOServerHandler {
       });
     } catch (error) {
       Logger.error('Error during SSO login:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -183,7 +198,22 @@ class SSOServerHandler {
       }
     } catch (error) {
       Logger.error('Error during SSO authorization:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -253,7 +283,22 @@ class SSOServerHandler {
       });
     } catch (error) {
       Logger.error('Error generating SSO token:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -299,7 +344,22 @@ class SSOServerHandler {
       });
     } catch (error) {
       Logger.error('Error getting user info:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -317,7 +377,22 @@ class SSOServerHandler {
       });
     } catch (error) {
       Logger.error('Error during SSO logout:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 }

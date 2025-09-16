@@ -3,9 +3,11 @@ const secureSSOHandler = require('./security_handler');
 const clientRegistration = require('./client_registration');
 const sessionManager = require('./session_manager');
 const scopeManager = require('./scope_manager');
+const SSOProfileHandler = require('./profile_handler');
 
 // Create instances
 const ssoServerHandler = new SSOServerHandler();
+const ssoProfileHandler = new SSOProfileHandler();
 
 module.exports = {
   // Core SSO endpoints - using database handler
@@ -34,4 +36,8 @@ module.exports = {
   getScopeInfo: scopeManager.getScopeInfo.bind(scopeManager),
   validateScopes: scopeManager.validateScopesEndpoint.bind(scopeManager),
   checkPermission: scopeManager.checkPermission.bind(scopeManager),
+
+  // Profile Management endpoints
+  getProfile: ssoProfileHandler.getProfile.bind(ssoProfileHandler),
+  updateProfile: ssoProfileHandler.updateProfile.bind(ssoProfileHandler),
 };
