@@ -117,7 +117,6 @@ class SSOServerHandler {
       const menuArray = Object.values(menuPermissions).map(menu => ({
         name: menu.name,
         url: menu.url,
-        menu_id: menu.menu_id,
         permission: [...new Set(menu.permission)] // Remove duplicates
       }));
 
@@ -126,21 +125,16 @@ class SSOServerHandler {
         message: 'Login SSO berhasil',
         data: {
           user: {
-            user_id: userDetails.user_id,
             user_name: userDetails.user_name,
             user_email: userDetails.user_email,
-            role_id: userDetails.role_id,
             role_name: userDetails.role_name,
-            employee_id: userDetails.employee_id,
             employee_name: userDetails.employee_name,
             created_at: userDetails.created_at,
             updated_at: userDetails.updated_at
           },
           menu: menuArray,
           permissions: permissions.map(p => ({
-            permission_id: p.permission_id,
             permission_name: p.permission_name,
-            menu_id: p.menu_id,
             menu_name: p.menu_name,
             menu_url: p.menu_url
           })),
