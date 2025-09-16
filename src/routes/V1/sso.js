@@ -109,19 +109,19 @@ router.delete('/menu-has-permissions/:menu_id/:permission_id', menuHasPermission
 router.delete('/menu-has-permissions/menu/:menu_id', menuHasPermissionsRoutes.deleteByMenu);
 router.delete('/menu-has-permissions/permission/:permission_id', menuHasPermissionsRoutes.deleteByPermission);
 
-// Role Has Menu Permissions
-router.post('/role-has-menu-permissions', roleHasMenuPermissionsRoutes.createRoleHasMenuPermission);
-router.get('/role-has-menu-permissions', roleHasMenuPermissionsRoutes.listRoleHasMenuPermissions);
-router.get('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', roleHasMenuPermissionsRoutes.getRoleHasMenuPermission);
-router.get('/role-has-menu-permissions/role/:role_id', roleHasMenuPermissionsRoutes.getPermissionsByRole);
-router.get('/role-has-menu-permissions/menu/:menu_id', roleHasMenuPermissionsRoutes.getRolesByMenu);
-router.get('/role-has-menu-permissions/permission/:permission_id', roleHasMenuPermissionsRoutes.getRolesByPermission);
-router.get('/role-has-menu-permissions/role/:role_id/menu/:menu_id', roleHasMenuPermissionsRoutes.getPermissionsByRoleAndMenu);
-router.put('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', roleHasMenuPermissionsRoutes.updateRoleHasMenuPermission);
-router.delete('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', roleHasMenuPermissionsRoutes.deleteRoleHasMenuPermission);
-router.delete('/role-has-menu-permissions/role/:role_id', roleHasMenuPermissionsRoutes.deleteByRole);
-router.delete('/role-has-menu-permissions/menu/:menu_id', roleHasMenuPermissionsRoutes.deleteByMenu);
-router.delete('/role-has-menu-permissions/permission/:permission_id', roleHasMenuPermissionsRoutes.deleteByPermission);
-router.delete('/role-has-menu-permissions/role/:role_id/menu/:menu_id', roleHasMenuPermissionsRoutes.deleteByRoleAndMenu);
+// Role Has Menu Permissions (Protected)
+router.post('/role-has-menu-permissions', verifySSOToken, roleHasMenuPermissionsRoutes.createRoleHasMenuPermission);
+router.get('/role-has-menu-permissions', verifySSOToken, roleHasMenuPermissionsRoutes.listRoleHasMenuPermissions);
+router.get('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.getRoleHasMenuPermission);
+router.get('/role-has-menu-permissions/role/:role_id', verifySSOToken, roleHasMenuPermissionsRoutes.getPermissionsByRole);
+router.get('/role-has-menu-permissions/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.getRolesByMenu);
+router.get('/role-has-menu-permissions/permission/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.getRolesByPermission);
+router.get('/role-has-menu-permissions/role/:role_id/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.getPermissionsByRoleAndMenu);
+router.put('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.updateRoleHasMenuPermission);
+router.delete('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteRoleHasMenuPermission);
+router.delete('/role-has-menu-permissions/role/:role_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByRole);
+router.delete('/role-has-menu-permissions/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByMenu);
+router.delete('/role-has-menu-permissions/permission/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByPermission);
+router.delete('/role-has-menu-permissions/role/:role_id/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByRoleAndMenu);
 
 module.exports = router;
