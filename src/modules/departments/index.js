@@ -1,5 +1,5 @@
 const express = require('express')
-const { verifyToken } = require('../../middlewares')
+const { verifySSOToken } = require('../../middlewares')
 const {
   getDepartments,
   getDepartmentById,
@@ -11,8 +11,8 @@ const {
 
 const router = express.Router()
 
-// All routes require authentication
-router.use(verifyToken)
+// All routes require SSO authentication
+router.use(verifySSOToken)
 
 // Departments routes
 router.get('/', getDepartments)
