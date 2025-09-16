@@ -114,11 +114,80 @@
 	},
 	"SchemaUpdateRoleHasMenuPermission": {
 		"type": "object",
+		"required": ["permission_status"],
 		"properties": {
-			"updated_by": {
+			"permission_status": {
+				"type": "boolean",
+				"description": "Permission status: true to grant permission (insert), false to revoke permission (delete)"
+			}
+		}
+	},
+	"SchemaMenuPermissionStatus": {
+		"type": "object",
+		"properties": {
+			"permission_id": {
 				"type": "string",
 				"format": "uuid",
-				"description": "User who updated the relationship"
+				"description": "Unique identifier for the permission"
+			},
+			"permission_name": {
+				"type": "string",
+				"description": "Name of the permission"
+			},
+			"permission_status": {
+				"type": "boolean",
+				"description": "Whether the role has this permission for the menu (true if exists in roleHasMenuPermissions table, false otherwise)"
+			}
+		}
+	},
+	"SchemaMenuWithPermissions": {
+		"type": "object",
+		"properties": {
+			"role_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Unique identifier for the role"
+			},
+			"menu_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Unique identifier for the menu"
+			},
+			"menu_name": {
+				"type": "string",
+				"description": "Name of the menu"
+			},
+			"permissions": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaMenuPermissionStatus"
+				},
+				"description": "Array of permissions with their status for this menu"
+			}
+		}
+	},
+	"SchemaRoleMenusWithPermissionsResponse": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"description": "Indicates if the request was successful"
+			},
+			"message": {
+				"type": "string",
+				"description": "Response message"
+			},
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaMenuWithPermissions"
+				},
+				"description": "Array of menus with their permissions and status for the role"
+			},
+			"timestamp": {
+				"type": "string",
+				"format": "date-time",
+				"description": "Response timestamp"
 			}
 		}
 	}

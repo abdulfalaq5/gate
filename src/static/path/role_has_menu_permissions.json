@@ -283,7 +283,8 @@
 			"tags": [
 				"Role Has Menu Permissions"
 			],
-			"summary": "Update a role-menu-permission relationship",
+			"summary": "Grant or revoke a role-menu-permission relationship",
+			"description": "Set permission_status to true to grant permission (insert), false to revoke permission (delete)",
 			"security": [
 				{
 					"bearerAuth": []
@@ -333,7 +334,7 @@
 			},
 			"responses": {
 				"200": {
-					"description": "OK",
+					"description": "Permission revoked successfully",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -342,8 +343,38 @@
 						}
 					}
 				},
+				"201": {
+					"description": "Permission granted successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad Request - Invalid permission_status value",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
 				"404": {
-					"description": "Not Found",
+					"description": "Not Found - Relationship not found when trying to revoke",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
+				"409": {
+					"description": "Conflict - Relationship already exists when trying to grant",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -445,7 +476,8 @@
 			"tags": [
 				"Role Has Menu Permissions"
 			],
-			"summary": "Get all permissions for a specific role",
+			"summary": "Get all menus with permissions and their status for a specific role",
+			"description": "Returns all menus with their available permissions and whether the role has each permission (true/false)",
 			"security": [
 				{
 					"bearerAuth": []
@@ -469,7 +501,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
+								"$ref": "#/components/schemas/SchemaRoleMenusWithPermissionsResponse"
 							}
 						}
 					}

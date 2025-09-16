@@ -81,9 +81,9 @@ class RoleHasMenuPermissionsHandler {
     try {
       const { role_id } = req.params;
 
-      const permissions = await this.roleHasMenuPermissionsRepository.findByRoleId(role_id);
+      const menusWithPermissions = await this.roleHasMenuPermissionsRepository.getMenusWithPermissionsForRole(role_id);
 
-      return successResponse(res, permissions, 'Permissions for role retrieved successfully');
+      return successResponse(res, menusWithPermissions, 'Menus with permissions for role retrieved successfully');
     } catch (error) {
       console.error('Error getting permissions by role:', error);
       return errorResponse(res, 'Failed to retrieve permissions for role', 500);
@@ -132,21 +132,41 @@ class RoleHasMenuPermissionsHandler {
   async updateRoleHasMenuPermission(req, res) {
     try {
       const { role_id, menu_id, permission_id } = req.params;
+      const { permission_status } = req.body;
       const updatedBy = req.user?.user_id;
 
-      const record = await this.roleHasMenuPermissionsRepository.findById(role_id, menu_id, permission_id);
-
-      if (!record) {
-        return errorResponse(res, 'Role-Menu-Permission relationship not found', 404);
+      if (typeof permission_status !== 'boolean') {
+        return errorResponse(res, 'permission_status must be a boolean value (true/false)', 400);
       }
 
-      const updateData = {
-        updated_by: updatedBy,
-      };
+      if (permission_status === true) {
+        // Insert data ke tabel roleHasMenuPermissions
+        const existingRecord = await this.roleHasMenuPermissionsRepository.findById(role_id, menu_id, permission_id);
+        
+        if (existingRecord) {
+          return errorResponse(res, 'Role-Menu-Permission relationship already exists', 409);
+        }
 
-      const updatedRecord = await this.roleHasMenuPermissionsRepository.updateRoleHasMenuPermission(role_id, menu_id, permission_id, updateData);
+        const recordData = {
+          role_id,
+          menu_id,
+          permission_id,
+          created_by: updatedBy,
+        };
 
-      return successResponse(res, updatedRecord, 'Role-Menu-Permission relationship updated successfully');
+        const newRecord = await this.roleHasMenuPermissionsRepository.createRoleHasMenuPermission(recordData);
+        return successResponse(res, newRecord, 'Role-Menu-Permission relationship created successfully', 201);
+      } else {
+        // Delete data dari tabel roleHasMenuPermissions
+        const existingRecord = await this.roleHasMenuPermissionsRepository.findById(role_id, menu_id, permission_id);
+        
+        if (!existingRecord) {
+          return errorResponse(res, 'Role-Menu-Permission relationship not found', 404);
+        }
+
+        const deletedRecord = await this.roleHasMenuPermissionsRepository.deleteRoleHasMenuPermission(role_id, menu_id, permission_id);
+        return successResponse(res, deletedRecord, 'Role-Menu-Permission relationship deleted successfully');
+      }
     } catch (error) {
       console.error('Error updating role-menu-permission relationship:', error);
       return errorResponse(res, 'Failed to update role-menu-permission relationship', 500);

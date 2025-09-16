@@ -33,7 +33,7 @@ class RoleHasMenuPermissionsRepository {
    */
   async findWithFilters(queryParams) {
     // Base query untuk data dengan join ke tabel roles, menus, dan permissions
-    const baseQuery = this.knex(this.tableName)
+    const baseQuery = this.knex(`${this.tableName} as rhmp`)
       .select(
         'rhmp.*',
         'r.role_name',
@@ -63,7 +63,7 @@ class RoleHasMenuPermissionsRepository {
    * @returns {Array} Array of roleHasMenuPermissions
    */
   async findWithSimpleFilters(filters = {}) {
-    let query = this.knex(this.tableName)
+    let query = this.knex(`${this.tableName} as rhmp`)
       .select(
         'rhmp.*',
         'r.role_name',
@@ -201,6 +201,66 @@ class RoleHasMenuPermissionsRepository {
       .where('menu_id', menuId)
       .del()
       .returning('*')
+  }
+
+  /**
+   * Get all menus with their permissions and status for a specific role
+   * @param {string} roleId - Role ID
+   * @returns {Array} Array of menus with permissions and their status
+   */
+  async getMenusWithPermissionsForRole(roleId) {
+    // Get all menus with their available permissions
+    const menusWithPermissions = await this.knex('menus as m')
+      .select(
+        'm.menu_id',
+        'm.menu_name',
+        'p.permission_id',
+        'p.permission_name'
+      )
+      .leftJoin('menuHasPermissions as mhp', 'm.menu_id', 'mhp.menu_id')
+      .leftJoin('permissions as p', 'mhp.permission_id', 'p.permission_id')
+      .where('m.is_delete', false)
+      .where('p.is_delete', false)
+      .orderBy('m.menu_name', 'asc')
+      .orderBy('p.permission_name', 'asc');
+
+    // Get existing role-menu-permission relationships
+    const existingPermissions = await this.knex(this.tableName)
+      .select('menu_id', 'permission_id')
+      .where('role_id', roleId);
+
+    // Create a Set for faster lookup
+    const existingPermissionsSet = new Set(
+      existingPermissions.map(perm => `${perm.menu_id}-${perm.permission_id}`)
+    );
+
+    // Group by menu and format the response
+    const menuMap = new Map();
+    
+    menusWithPermissions.forEach(row => {
+      if (!row.permission_id) return; // Skip menus without permissions
+      
+      const menuKey = row.menu_id;
+      if (!menuMap.has(menuKey)) {
+        menuMap.set(menuKey, {
+          role_id: roleId,
+          menu_id: row.menu_id,
+          menu_name: row.menu_name,
+          permissions: []
+        });
+      }
+      
+      const permissionKey = `${row.menu_id}-${row.permission_id}`;
+      const permissionStatus = existingPermissionsSet.has(permissionKey);
+      
+      menuMap.get(menuKey).permissions.push({
+        permission_id: row.permission_id,
+        permission_name: row.permission_name,
+        permission_status: permissionStatus
+      });
+    });
+
+    return Array.from(menuMap.values());
   }
 }
 
