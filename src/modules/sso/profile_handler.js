@@ -177,20 +177,30 @@ class SSOProfileHandler {
       const trx = await pgCore.transaction();
 
       try {
-        // Update user data
+        // Update user data (username dan email)
         if (hasUserUpdate) {
           const userUpdateData = {};
           if (user_name) userUpdateData.user_name = user_name;
           if (user_email) userUpdateData.user_email = user_email;
-          if (hasPasswordUpdate) {
-            const saltRounds = 10;
-            userUpdateData.user_password = await bcrypt.hash(new_password, saltRounds);
-          }
 
           await trx('users')
             .where('user_id', userId)
             .update({
               ...userUpdateData,
+              updated_at: new Date(),
+              updated_by: userId
+            });
+        }
+
+        // Update password (terpisah dari update user data)
+        if (hasPasswordUpdate) {
+          const saltRounds = 10;
+          const hashedPassword = await bcrypt.hash(new_password, saltRounds);
+
+          await trx('users')
+            .where('user_id', userId)
+            .update({
+              user_password: hashedPassword,
               updated_at: new Date(),
               updated_by: userId
             });
