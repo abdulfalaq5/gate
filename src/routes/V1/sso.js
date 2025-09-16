@@ -19,7 +19,7 @@ router.post('/auth/sso/login', ssoRoutes.login);
 router.get('/auth/sso/authorize', ssoRoutes.authorize);
 router.post('/auth/sso/token', ssoRoutes.token);
 router.get('/auth/sso/userinfo', ssoRoutes.userInfo);
-router.post('/auth/sso/logout', ssoRoutes.logout);
+router.get('/auth/sso/logout', verifySSOToken, ssoRoutes.logout);
 router.get('/auth/sso/stats', ssoRoutes.getStats);
 
 // SSO Profile Routes (Protected)

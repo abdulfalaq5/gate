@@ -378,14 +378,36 @@ class SSOServerHandler {
   // Logout endpoint
   async logout(req, res) {
     try {
+      const userId = req.user?.user_id;
+      const clientIP = req.ip || req.connection.remoteAddress;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token tidak valid atau tidak ada',
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       // In a real implementation, you would invalidate the token
       // by adding it to a blacklist or using token revocation
+      // For now, we'll just log the logout
 
-      logger.info('SSO logout successful', { user_id: req.user?.user_id });
+      Logger.info('SSO logout successful', { 
+        user_id: userId,
+        ip: clientIP,
+        logout_time: new Date().toISOString()
+      });
 
       return res.status(200).json({
         success: true,
-        message: 'Logout successful',
+        message: 'Logout berhasil',
+        data: {
+          user_id: userId,
+          logout_time: new Date().toISOString()
+        },
+        timestamp: new Date().toISOString()
       });
     } catch (error) {
       Logger.error('Error during SSO logout:', error);
