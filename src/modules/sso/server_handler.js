@@ -133,11 +133,6 @@ class SSOServerHandler {
             updated_at: userDetails.updated_at
           },
           menu: menuArray,
-          permissions: permissions.map(p => ({
-            permission_name: p.permission_name,
-            menu_name: p.menu_name,
-            menu_url: p.menu_url
-          })),
           session: {
             client_id: client_id || 'report-management-client',
             session_id: sessionId,
