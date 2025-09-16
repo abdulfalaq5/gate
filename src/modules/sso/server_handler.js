@@ -99,6 +99,28 @@ class SSOServerHandler {
 
       Logger.info('SSO login successful', { user_id: user.user_id, client_id });
 
+      // Group permissions by menu
+      const menuPermissions = {};
+      permissions.forEach(p => {
+        if (!menuPermissions[p.menu_name]) {
+          menuPermissions[p.menu_name] = {
+            name: p.menu_name,
+            url: p.menu_url,
+            menu_id: p.menu_id,
+            permission: []
+          };
+        }
+        menuPermissions[p.menu_name].permission.push(p.permission_name);
+      });
+
+      // Convert to array and remove duplicates
+      const menuArray = Object.values(menuPermissions).map(menu => ({
+        name: menu.name,
+        url: menu.url,
+        menu_id: menu.menu_id,
+        permission: [...new Set(menu.permission)] // Remove duplicates
+      }));
+
       return res.status(200).json({
         success: true,
         message: 'Login SSO berhasil',
@@ -114,6 +136,7 @@ class SSOServerHandler {
             created_at: userDetails.created_at,
             updated_at: userDetails.updated_at
           },
+          menu: menuArray,
           permissions: permissions.map(p => ({
             permission_id: p.permission_id,
             permission_name: p.permission_name,
