@@ -32,7 +32,7 @@ class MenuHasPermissionsRepository {
    */
   async findWithFilters(queryParams) {
     // Base query untuk data dengan join ke tabel menus dan permissions
-    const baseQuery = this.knex(this.tableName)
+    const baseQuery = this.knex(this.tableName + ' as mhp')
       .select(
         'mhp.*',
         'm.menu_name',
@@ -60,7 +60,7 @@ class MenuHasPermissionsRepository {
    * @returns {Array} Array of menuHasPermissions
    */
   async findWithSimpleFilters(filters = {}) {
-    let query = this.knex(this.tableName)
+    let query = this.knex(this.tableName + ' as mhp')
       .select(
         'mhp.*',
         'm.menu_name',
@@ -81,7 +81,7 @@ class MenuHasPermissionsRepository {
   }
 
   async findByMenuId(menuId) {
-    return await this.knex(this.tableName)
+    return await this.knex(this.tableName + ' as mhp')
       .select(
         'mhp.*',
         'p.permission_name'
@@ -92,7 +92,7 @@ class MenuHasPermissionsRepository {
   }
 
   async findByPermissionId(permissionId) {
-    return await this.knex(this.tableName)
+    return await this.knex(this.tableName + ' as mhp')
       .select(
         'mhp.*',
         'm.menu_name',
