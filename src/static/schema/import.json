@@ -98,5 +98,88 @@
 				"type": "string"
 			}
 		}
+	},
+	"SchemaResponseEmployeeImportResult": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"example": true
+			},
+			"message": {
+				"type": "string",
+				"example": "Employee import completed"
+			},
+			"data": {
+				"type": "object",
+				"properties": {
+					"summary": {
+						"type": "object",
+						"properties": {
+							"total": {
+								"type": "integer",
+								"example": 4
+							},
+							"created": {
+								"type": "integer",
+								"example": 4
+							},
+							"skipped": {
+								"type": "integer",
+								"example": 0
+							},
+							"errors": {
+								"type": "integer",
+								"example": 0
+							}
+						}
+					},
+					"results": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"status": {
+									"type": "string",
+									"enum": ["created", "skipped", "error"],
+									"example": "created"
+								},
+								"data": {
+									"type": "object",
+									"properties": {
+										"employee_id": {
+											"type": "string",
+											"format": "uuid",
+											"example": "123e4567-e89b-12d3-a456-426614174000"
+										},
+										"user_id": {
+											"type": "string",
+											"format": "uuid",
+											"example": "123e4567-e89b-12d3-a456-426614174001"
+										},
+										"name": {
+											"type": "string",
+											"example": "John D"
+										},
+										"account": {
+											"type": "string",
+											"example": "johndoe"
+										},
+										"email": {
+											"type": "string",
+											"example": "john.doe@company.com"
+										}
+									}
+								},
+								"message": {
+									"type": "string",
+									"example": "Employee and user created successfully"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

@@ -4,6 +4,7 @@ const authMember = require('./auth_member.json')
 const companies = require('./companies.json')
 const departments = require('./departments.json')
 const employees = require('./employees.json')
+const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
 const roles = require('./roles.json')
 const permissions = require('./permissions.json')
@@ -20,6 +21,7 @@ module.exports = {
   ...companies,
   ...departments,
   ...employees,
+  ...employeesImport,
   ...importModule,
   ...roles,
   ...permissions,

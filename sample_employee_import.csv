@@ -1,0 +1,5 @@
+Name,Account,Alias,Posisi (HR/GM/VP/BOD/PUB),Title,Department,Gender,Mobile,Office Number,E-mail,Address,Exmail account,Channel,Activation Status,Disabled,WeChat Workplace
+John Doe,johndoe,John D,HR,HR Manager,Human Resources/HR Department,Male,081234567890,021-12345678,john.doe@company.com,"Jakarta, Indonesia",john.doe@exmail.company.com,john.doe@company.com,Active,FALSE,johndoe_wechat
+Jane Smith,janesmith,Jane S,GM,General Manager,Operations/Management,Female,081234567891,021-12345679,jane.smith@company.com,"Bandung, Indonesia",jane.smith@exmail.company.com,jane.smith@company.com,Active,FALSE,janesmith_wechat
+Bob Wilson,bobwilson,Bob W,VP,Vice President,Finance/Financial Department,Male,081234567892,021-12345680,bob.wilson@company.com,"Surabaya, Indonesia",bob.wilson@exmail.company.com,bob.wilson@company.com,Active,FALSE,bobwilson_wechat
+Alice Brown,alicebrown,Alice B,PUB,Public Relations,Marketing/PR Department,Female,081234567893,021-12345681,alice.brown@company.com,"Yogyakarta, Indonesia",alice.brown@exmail.company.com,alice.brown@company.com,Inactive,FALSE,alicebrown_wechat

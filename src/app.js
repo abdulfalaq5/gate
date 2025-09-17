@@ -29,6 +29,17 @@ if (process.env.RABBITMQ_URL && process.env.RABBITMQ_URL !== 'disabled') {
 
 const limit = process.env.JSON_LIMIT || '1gb'
 app.set('trust proxy', 1);
+
+// Set timeout for requests (10 minutes for import operations)
+app.use((req, res, next) => {
+  // Set longer timeout for import endpoints
+  if (req.path.includes('/import')) {
+    req.setTimeout(10 * 60 * 1000) // 10 minutes
+    res.setTimeout(10 * 60 * 1000) // 10 minutes
+  }
+  next()
+})
+
 app.use(compress()) // gzip compression
 app.use(methodOverride()) // lets you use HTTP verbs
 app.use(xss()) // handler xss attack

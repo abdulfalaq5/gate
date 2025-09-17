@@ -1,0 +1,3 @@
+Name,Account,Alias,Posisi (HR/GM/VP/BOD/PUB),Title,Department,Gender,Mobile,Office Number,E-mail,Address,Exmail account,Channel,Activation Status,Disabled,WeChat Workplace
+Test User 1,testuser1,Test User 1,HR,HR Manager,IT Department,Male,081234567890,021-12345678,testuser1@company.com,Jakarta Indonesia,testuser1@company.com,testuser1@company.com,Activated,FALSE,Not follow
+Test User 2,testuser2,Test User 2,GM,General Manager,HR Department,Female,081234567891,021-12345679,testuser2@company.com,Surabaya Indonesia,testuser2@company.com,testuser2@company.com,Activated,FALSE,Not follow
