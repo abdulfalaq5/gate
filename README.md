@@ -23,7 +23,9 @@ Boilerplate Express.js dengan struktur modular yang lengkap untuk pengembangan A
 ├── src/
 │   ├── config/           # Konfigurasi database, AWS, dll
 │   ├── modules/          # Business logic modules
-│   │   ├── auth/         # Module autentikasi (contoh)
+│   │   ├── auth/         # Module autentikasi
+│   │   ├── sso/          # SSO system modules
+│   │   ├── menu_has_permissions/ # Menu-Permission management
 │   │   └── helpers/      # Utility functions
 │   ├── middlewares/      # Custom middlewares
 │   ├── routes/          # API routes
@@ -36,10 +38,37 @@ Boilerplate Express.js dengan struktur modular yang lengkap untuk pengembangan A
 │   ├── listeners/      # RabbitMQ listeners
 │   ├── scripts/        # Background scripts
 │   └── debug/          # Debug utilities
+├── docs/               # 📚 Dokumentasi lengkap
+│   ├── SSO_*.md        # Dokumentasi SSO system
+│   ├── API_*.md        # Dokumentasi API
+│   └── README.md       # Index dokumentasi
+├── test/               # 🧪 Test files & scripts
+│   ├── test-*.sh       # Shell script tests
+│   ├── test-*.js       # Node.js tests
+│   └── README.md       # Panduan testing
 ├── docker/             # Docker configurations
 ├── public/            # Static files
 └── logs/              # Application logs
 ```
+
+## 📚 Dokumentasi
+
+Semua dokumentasi lengkap tersedia di folder [`docs/`](./docs/):
+
+- **[📖 Index Dokumentasi](./docs/README.md)** - Panduan navigasi semua dokumentasi
+- **[🚀 SSO Quick Start](./docs/SSO_QUICK_START_GUIDE.md)** - Panduan cepat implementasi SSO
+- **[🔧 Development Setup](./docs/DEVELOPMENT_SETUP.md)** - Setup environment development
+- **[📋 API Documentation](./docs/MENU_HAS_PERMISSIONS_API_DOCUMENTATION.md)** - Dokumentasi API lengkap
+- **[🧪 Testing Guide](./docs/SSO_TESTING_GUIDE.md)** - Panduan testing sistem
+
+## 🧪 Testing
+
+File test dan script testing tersedia di folder [`test/`](./test/):
+
+- **[📋 Panduan Testing](./test/README.md)** - Overview dan cara menjalankan test
+- **`test-menu-has-permissions-api.sh`** - Test API menu has permissions
+- **`test-sso-curl.sh`** - Test SSO functionality
+- **`test-all-endpoints.sh`** - Test semua endpoint API
 
 ## Getting Started
 

@@ -101,9 +101,9 @@ router.delete('/system-has-menus/menu/:menu_id', systemHasMenusRoutes.deleteByMe
 // Menu Has Permissions
 router.post('/menu-has-permissions', menuHasPermissionsRoutes.createMenuHasPermission);
 router.get('/menu-has-permissions', menuHasPermissionsRoutes.listMenuHasPermissions);
-router.get('/menu-has-permissions/:menu_id/:permission_id', menuHasPermissionsRoutes.getMenuHasPermission);
 router.get('/menu-has-permissions/menu/:menu_id', menuHasPermissionsRoutes.getPermissionsByMenu);
 router.get('/menu-has-permissions/permission/:permission_id', menuHasPermissionsRoutes.getMenusByPermission);
+router.get('/menu-has-permissions/:menu_id/:permission_id', menuHasPermissionsRoutes.getMenuHasPermission);
 router.put('/menu-has-permissions/:menu_id/:permission_id', menuHasPermissionsRoutes.updateMenuHasPermission);
 router.delete('/menu-has-permissions/:menu_id/:permission_id', menuHasPermissionsRoutes.deleteMenuHasPermission);
 router.delete('/menu-has-permissions/menu/:menu_id', menuHasPermissionsRoutes.deleteByMenu);

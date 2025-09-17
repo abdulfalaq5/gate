@@ -100,11 +100,50 @@
 	},
 	"SchemaUpdateMenuHasPermission": {
 		"type": "object",
+		"required": ["permission_status"],
 		"properties": {
-			"updated_by": {
+			"permission_status": {
+				"type": "boolean",
+				"description": "Whether to create (true) or delete (false) the menu-permission relationship"
+			}
+		}
+	},
+	"SchemaMenuPermissionStatus": {
+		"type": "object",
+		"properties": {
+			"permission_id": {
 				"type": "string",
 				"format": "uuid",
-				"description": "User who updated the relationship"
+				"description": "Unique identifier for the permission"
+			},
+			"permission_name": {
+				"type": "string",
+				"description": "Name of the permission"
+			},
+			"permission_status": {
+				"type": "boolean",
+				"description": "Whether the permission is assigned to the menu (true) or not (false)"
+			}
+		}
+	},
+	"SchemaMenuPermissionsResponse": {
+		"type": "object",
+		"properties": {
+			"menu_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Unique identifier for the menu"
+			},
+			"menu_name": {
+				"type": "string",
+				"description": "Name of the menu"
+			},
+			"permissions": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaMenuPermissionStatus"
+				},
+				"description": "Array of permissions with their status for the menu"
 			}
 		}
 	}

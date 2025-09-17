@@ -263,7 +263,8 @@
 			"tags": [
 				"Menu Has Permissions"
 			],
-			"summary": "Update a menu-permission relationship",
+			"summary": "Create or delete a menu-permission relationship based on permission_status",
+			"description": "If permission_status is true, creates a new menu-permission relationship. If false, deletes the existing relationship.",
 			"security": [
 				{
 					"bearerAuth": []
@@ -303,7 +304,7 @@
 			},
 			"responses": {
 				"200": {
-					"description": "OK",
+					"description": "Menu-permission relationship deleted successfully",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -312,8 +313,38 @@
 						}
 					}
 				},
+				"201": {
+					"description": "Menu-permission relationship created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponse"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad Request - permission_status must be a boolean value",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
 				"404": {
-					"description": "Not Found",
+					"description": "Not Found - Menu-permission relationship not found (when trying to delete)",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
+				"409": {
+					"description": "Conflict - Menu-permission relationship already exists (when trying to create)",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -405,7 +436,7 @@
 			"tags": [
 				"Menu Has Permissions"
 			],
-			"summary": "Get all permissions for a specific menu",
+			"summary": "Get all permissions for a specific menu with status",
 			"security": [
 				{
 					"bearerAuth": []
@@ -429,7 +460,35 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean",
+										"description": "Indicates if the request was successful"
+									},
+									"message": {
+										"type": "string",
+										"description": "Response message"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaMenuPermissionsResponse"
+									},
+									"timestamp": {
+										"type": "string",
+										"format": "date-time",
+										"description": "Response timestamp"
+									}
+								}
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Menu not found",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
 							}
 						}
 					}

@@ -150,6 +150,50 @@ class MenuHasPermissionsRepository {
       .del()
       .returning('*')
   }
+
+  /**
+   * Get all permissions with status for a specific menu
+   * @param {string} menuId - Menu ID
+   * @returns {Object} Object containing menu info and permissions array with status
+   */
+  async getMenuPermissionsWithStatus(menuId) {
+    // Get menu information
+    const [menu] = await this.knex('menus as m')
+      .select('m.menu_id', 'm.menu_name')
+      .where('m.menu_id', menuId)
+      .where('m.is_delete', false);
+
+    if (!menu) {
+      return null;
+    }
+
+    // Get all permissions
+    const allPermissions = await this.knex('permissions as p')
+      .select('p.permission_id', 'p.permission_name')
+      .where('p.is_delete', false)
+      .orderBy('p.permission_name');
+
+    // Get existing menu-permission relationships
+    const existingRelations = await this.knex(this.tableName + ' as mhp')
+      .select('mhp.permission_id')
+      .where('mhp.menu_id', menuId);
+
+    // Create a set of existing permission IDs for quick lookup
+    const existingPermissionIds = new Set(existingRelations.map(rel => rel.permission_id));
+
+    // Build permissions array with status
+    const permissions = allPermissions.map(permission => ({
+      permission_id: permission.permission_id,
+      permission_name: permission.permission_name,
+      permission_status: existingPermissionIds.has(permission.permission_id)
+    }));
+
+    return {
+      menu_id: menu.menu_id,
+      menu_name: menu.menu_name,
+      permissions: permissions
+    };
+  }
 }
 
 module.exports = MenuHasPermissionsRepository;
