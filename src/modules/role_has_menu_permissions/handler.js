@@ -58,10 +58,20 @@ class RoleHasMenuPermissionsHandler {
 
   async listRoleHasMenuPermissions(req, res) {
     try {
-      // Get all menus with their permissions and status
-      const result = await this.roleHasMenuPermissionsRepository.getAllMenusWithPermissionsStatus();
+      // Parse query parameters untuk pagination, sorting, dan filtering
+      const options = {
+        allowedSortColumns: ['role_name', 'menu_name', 'permission_name', 'created_at', 'updated_at'],
+        defaultSort: ['created_at', 'desc'],
+        searchableColumns: ['role_name', 'menu_name', 'permission_name'],
+        allowedFilters: ['role_id', 'menu_id', 'permission_id'],
+        dateColumn: 'created_at'
+      };
+      const queryParams = parseStandardQuery(req, options);
+      
+      // Get role-menu-permission relationships dengan filters
+      const result = await this.roleHasMenuPermissionsRepository.findWithFilters(queryParams);
 
-      return successResponse(res, result, 'Menus with permissions retrieved successfully');
+      return successResponse(res, result, 'Role-menu-permission relationships retrieved successfully');
     } catch (error) {
       console.error('Error listing role-menu-permission relationships:', error);
       return errorResponse(res, 'Failed to retrieve role-menu-permission relationships', 500);
