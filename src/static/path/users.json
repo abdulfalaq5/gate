@@ -1,112 +1,75 @@
 {
-	"/users": {
-		"get": {
-			"tags": [
-				"Users"
-			],
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "query",
-					"name": "limit",
-					"required": false,
-					"schema": {
-						"type": "integer"
-					},
-					"description": "Limit value is number by default limit is 10. ex : ?limit=100"
-				},
-				{
-					"in": "query",
-					"name": "page",
-					"required": false,
-					"schema": {
-						"type": "number"
-					},
-					"description": "Page value is number. ex : ?page=1"
-				},
-				{
-					"in": "query",
-					"name": "direction",
-					"required": false,
-					"schema": {
-						"type": "array or string"
-					},
-					"description": "Direction value is array / string with rule if array ex : ?direction[]=id&direction[]=name. if string ex : ?direction=id"
-				},
-				{
-					"in": "query",
-					"name": "order",
-					"required": false,
-					"schema": {
-						"type": "array or string"
-					},
-					"description": "Direction value is array / string with rule if array ex : ?order[]=asc&order[]=desc. if string ex : ?order=asc"
-				},
-				{
-					"in": "query",
-					"name": "status",
-					"required": false,
-					"schema": {
-						"type": "string"
-					},
-					"description": "Filter value is string with rule ex : ?group_type=1,0"
-				},
-				{
-					"in": "query",
-					"name": "search",
-					"required": false,
-					"schema": {
-						"type": "string"
-					},
-					"description": "Search value is string with rule ex : ?search=Hitam"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaPaginationResponse"
-							}
-						}
-					}
-				}
-			}
-		},
+	"/users/get": {
 		"post": {
-			"tags": [
-				"Users"
-			],
+			"tags": ["Users"],
 			"security": [
 				{
 					"bearerAuth": []
 				}
 			],
+			"description": "Retrieve a paginated list of users with advanced filtering using POST method for complex queries",
 			"requestBody": {
 				"required": false,
 				"content": {
 					"application/json": {
 						"schema": {
-							"$ref": "#/components/schemas/SchemaPostUsers"
+							"$ref": "#/components/schemas/SchemaPostUsersGet"
 						}
 					}
 				}
 			},
 			"responses": {
 				"200": {
-					"description": "OK",
+					"description": "Users retrieved successfully",
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
+								"$ref": "#/components/schemas/SchemaUsersPaginatedResponse"
 							}
 						}
 					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/users/create": {
+		"post": {
+			"tags": ["Users"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Create a new user with the provided information",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaCreateUser"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "User created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaUser"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
 				}
 			}
 		}
@@ -205,40 +168,6 @@
 					}
 				}
 			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"/users/change-password": {
-		"post": {
-			"tags": [
-				"Users"
-			],
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"requestBody": {
-				"required": false,
-				"content": {
-					"application/json": {
-						"schema": {
-							"$ref": "#/components/schemas/SchemaPostChangePasswordUsers"
-						}
-					}
-				}
-			},
 			"responses": {
 				"200": {
 					"description": "OK",

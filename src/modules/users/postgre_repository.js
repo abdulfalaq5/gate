@@ -84,21 +84,70 @@ class UsersRepository {
    * @returns {Object} Paginated response dengan data dan metadata
    */
   async findWithFilters(queryParams) {
-    // Base query untuk data
+    // Base query untuk users dengan JOIN ke employees
     const baseQuery = this.knex(this.tableName)
+      .leftJoin('employees', 'users.employee_id', 'employees.employee_id')
+      .select(
+        'users.*',
+        'employees.employee_name',
+        'employees.employee_email'
+      )
+      .where('users.is_delete', false);
+
+    // Pisahkan filter relasi dari filter standar
+    const { filters } = queryParams
+    const relationFilters = {}
+    const standardFilters = {}
+    
+    Object.keys(filters).forEach(key => {
+      if (['employee_name', 'employee_email'].includes(key)) {
+        relationFilters[key] = filters[key]
+      } else {
+        standardFilters[key] = filters[key]
+      }
+    })
+    
+    // Update queryParams untuk filter standar
+    const modifiedQueryParams = {
+      ...queryParams,
+      filters: standardFilters
+    }
+
+    // Apply filter standar (tanpa relasi)
+    let dataQuery = applyStandardFilters(baseQuery.clone(), modifiedQueryParams)
+    
+    // Apply filter relasi secara manual
+    if (relationFilters.employee_name) {
+      dataQuery = dataQuery.where('employees.employee_name', 'ilike', `%${relationFilters.employee_name}%`)
+    }
+    if (relationFilters.employee_email) {
+      dataQuery = dataQuery.where('employees.employee_email', 'ilike', `%${relationFilters.employee_email}%`)
+    }
+
+    // Build count query untuk pagination metadata dengan filter relasi yang sama
+    let countBaseQuery = this.knex(this.tableName)
+      .leftJoin('employees', 'users.employee_id', 'employees.employee_id')
       .select('*')
-      .where('is_delete', false);
+      .where('users.is_delete', false);
+    
+    let countQuery = buildCountQuery(countBaseQuery, modifiedQueryParams)
+    
+    // Apply filter relasi ke count query juga
+    if (relationFilters.employee_name) {
+      countQuery = countQuery.where('employees.employee_name', 'ilike', `%${relationFilters.employee_name}%`)
+    }
+    if (relationFilters.employee_email) {
+      countQuery = countQuery.where('employees.employee_email', 'ilike', `%${relationFilters.employee_email}%`)
+    }
 
-    // Query untuk count total records
-    const countQuery = buildCountQuery(baseQuery, queryParams);
-    const [{ total }] = await countQuery;
-
-    // Apply filters dan pagination ke base query
-    const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams);
-    const data = await dataQuery;
+    // Execute queries secara parallel
+    const [data, countResult] = await Promise.all([
+      dataQuery,
+      countQuery.first()
+    ])
 
     // Format response dengan pagination metadata
-    return formatPaginatedResponse(data, queryParams.pagination, total);
+    return formatPaginatedResponse(data, queryParams.pagination, countResult.total);
   }
 
   /**

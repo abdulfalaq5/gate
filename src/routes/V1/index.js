@@ -23,7 +23,6 @@ routing.use(`${API_TAG}/auth`, auth)
 
 // Other User Management routes (SSO System)
 routing.use(`${API_TAG}/titles`, titles)
-routing.use(`${API_TAG}/employees`, employeesRouter)
 
 // Import routes
 routing.use(`${API_TAG}/import`, importModule)

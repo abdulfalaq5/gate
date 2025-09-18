@@ -101,14 +101,14 @@ router.put('/roles/:id', verifySSOToken, rolesRoutes.updateRole);
 router.delete('/roles/:id', verifySSOToken, rolesRoutes.deleteRole);
 
 // Users
-router.post('/users', usersRoutes.createUser);
-router.get('/users', usersRoutes.listUsers);
-router.get('/users/:id', usersRoutes.getUser);
-router.get('/users/:id/permissions', usersRoutes.getUserPermissions);
+router.post('/users/get', verifySSOToken, usersRoutes.listUsers);
+router.post('/users/create', verifySSOToken, usersRoutes.createUser);
+router.get('/users/:id', verifySSOToken, usersRoutes.getUser);
+router.get('/users/:id/permissions', verifySSOToken, usersRoutes.getUserPermissions);
 router.post('/users/login', usersRoutes.login);
-router.put('/users/:id', usersRoutes.updateUser);
-router.delete('/users/:id', usersRoutes.deleteUser);
-router.post('/users/change-password', usersRoutes.changePassword);
+router.put('/users/:id', verifySSOToken, usersRoutes.updateUser);
+router.delete('/users/:id', verifySSOToken, usersRoutes.deleteUser);
+router.post('/users/change-password', verifySSOToken, usersRoutes.changePassword);
 
 // System Has Menus
 router.post('/system-has-menus', systemHasMenusRoutes.createSystemHasMenu);

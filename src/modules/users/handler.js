@@ -54,12 +54,34 @@ class UsersHandler {
 
   async listUsers(req, res) {
     try {
+      // Support parameters from both query string (GET) and body (POST)
+      const requestParams = {
+        ...req.query,  // GET parameters
+        ...req.body    // POST parameters
+      };
+      
+      // Create a modified request object for parseStandardQuery
+      const modifiedReq = {
+        ...req,
+        query: requestParams
+      };
+
       // Parse query parameters dengan konfigurasi untuk users
-      const queryParams = parseStandardQuery(req, {
+      const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['user_name', 'user_email', 'employee_id', 'role_id', 'created_at', 'updated_at'],
         defaultSort: ['user_name', 'asc'],
         searchableColumns: ['user_name', 'user_email'],
-        allowedFilters: ['employee_id', 'role_id', 'is_delete'],
+        allowedFilters: [
+          'employee_id',
+          'role_id', 
+          'is_delete',
+          'created_by',
+          'updated_by',
+          'user_name',
+          'user_email',
+          'employee_name',
+          'employee_email'
+        ],
         dateColumn: 'created_at'
       });
 
