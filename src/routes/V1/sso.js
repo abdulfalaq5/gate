@@ -14,6 +14,7 @@ const roleHasMenuPermissionsRoutes = require('../../modules/role_has_menu_permis
 const companiesRoutes = require('../../modules/companies');
 const departmentsRoutes = require('../../modules/departments');
 const employeesRoutes = require('../../modules/employees');
+const titlesRoutes = require('../../modules/titles');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
 
@@ -83,6 +84,14 @@ router.post('/employees/create', verifySSOToken, employeesRoutes.createEmployee)
 router.get('/employees/:id', verifySSOToken, employeesRoutes.getEmployeeById);
 router.put('/employees/:id', verifySSOToken, employeesRoutes.updateEmployee);
 router.delete('/employees/:id', verifySSOToken, employeesRoutes.deleteEmployee);
+
+// Titles
+router.post('/titles/get', verifySSOToken, titlesRoutes.getTitles);
+router.post('/titles/create', verifySSOToken, titlesRoutes.createTitle);
+router.get('/titles/:id', verifySSOToken, titlesRoutes.getTitleById);
+router.get('/titles/department/:departmentId', verifySSOToken, titlesRoutes.getTitlesByDepartment);
+router.put('/titles/:id', verifySSOToken, titlesRoutes.updateTitle);
+router.delete('/titles/:id', verifySSOToken, titlesRoutes.deleteTitle);
 
 // Systems
 router.post('/systems', verifySSOToken, systemsRoutes.createSystem);

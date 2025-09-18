@@ -13,6 +13,7 @@ const systemHasMenus = require('./system_has_menus.json')
 const menuHasPermissions = require('./menu_has_permissions.json')
 const roleHasMenuPermissions = require('./role_has_menu_permissions.json')
 const ssoProfile = require('./sso_profile.json')
+const titles = require('./titles.json')
 
 module.exports = {
   ...auth,
@@ -29,5 +30,6 @@ module.exports = {
   ...systemHasMenus,
   ...menuHasPermissions,
   ...roleHasMenuPermissions,
-  ...ssoProfile
+  ...ssoProfile,
+  ...titles
 }
