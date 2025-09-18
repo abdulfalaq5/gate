@@ -54,9 +54,8 @@ router.put('/permissions/:id', permissionsRoutes.updatePermission);
 router.delete('/permissions/:id', permissionsRoutes.deletePermission);
 
 // Menus
-router.post('/menus', menusRoutes.createMenu);
-router.get('/menus', menusRoutes.listMenus);
-router.get('/menus/tree', menusRoutes.getMenuTree);
+router.post('/menus/create', menusRoutes.createMenu);
+router.post('/menus/get', menusRoutes.listMenus);
 router.get('/menus/:id', menusRoutes.getMenu);
 router.put('/menus/:id', menusRoutes.updateMenu);
 router.delete('/menus/:id', menusRoutes.deleteMenu);

@@ -10,7 +10,13 @@ class MenusHandler {
 
   async createMenu(req, res) {
     try {
-      const { menu_name, menu_url, menu_icon, menu_order } = req.body;
+      // Support parameters from both query string (GET) and body (POST)
+      const requestParams = {
+        ...req.query,  // GET parameters
+        ...req.body    // POST parameters
+      };
+      
+      const { menu_name, menu_parent_id, menu_url, menu_icon, menu_order } = requestParams;
       const createdBy = req.user?.user_id;
 
       if (!menu_name) {
@@ -19,9 +25,10 @@ class MenusHandler {
 
       const menuData = {
         menu_name,
+        menu_parent_id,
         menu_url,
         menu_icon,
-        menu_order,
+        menu_order: menu_order ? parseInt(menu_order) : undefined,
         created_by: createdBy,
       };
 
@@ -53,12 +60,33 @@ class MenusHandler {
 
   async listMenus(req, res) {
     try {
+      // Support parameters from both query string (GET) and body (POST)
+      const requestParams = {
+        ...req.query,  // GET parameters
+        ...req.body    // POST parameters
+      };
+      
+      // Create a modified request object for parseStandardQuery
+      const modifiedReq = {
+        ...req,
+        query: requestParams
+      };
+
       // Parse query parameters dengan konfigurasi untuk menus
-      const queryParams = parseStandardQuery(req, {
+      const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['menu_name', 'menu_order', 'created_at', 'updated_at'],
         defaultSort: ['menu_order', 'asc'],
         searchableColumns: ['menu_name', 'menu_url'],
-        allowedFilters: ['menu_name', 'menu_url', 'menu_icon'],
+        allowedFilters: [
+          'menu_name', 
+          'menu_url', 
+          'menu_icon', 
+          'menu_parent_id',
+          'menu_order',
+          'created_by',
+          'updated_by',
+          'is_delete'
+        ],
         dateColumn: 'created_at'
       });
 
@@ -74,12 +102,18 @@ class MenusHandler {
 
   async getMenuTree(req, res) {
     try {
+      // Support parameters from both query string (GET) and body (POST)
+      const requestParams = {
+        ...req.query,  // GET parameters
+        ...req.body    // POST parameters
+      };
+      
       // Untuk menu tree, kita tidak perlu pagination, hanya filter sederhana
       const filters = {};
       
-      // Parse filter sederhana dari query
-      if (req.query.menu_name) filters.menu_name = req.query.menu_name;
-      if (req.query.menu_url) filters.menu_url = req.query.menu_url;
+      // Parse filter sederhana dari requestParams
+      if (requestParams.menu_name) filters.menu_name = requestParams.menu_name;
+      if (requestParams.menu_url) filters.menu_url = requestParams.menu_url;
       
       const menus = await this.menusRepository.findWithSimpleFilters(filters);
       
@@ -93,7 +127,7 @@ class MenusHandler {
   async updateMenu(req, res) {
     try {
       const { id } = req.params;
-      const { menu_name, menu_url, menu_icon, menu_order } = req.body;
+      const { menu_name, menu_parent_id, menu_url, menu_icon, menu_order } = req.body;
       const updatedBy = req.user?.user_id;
 
       const menu = await this.menusRepository.findById(id);
@@ -107,6 +141,7 @@ class MenusHandler {
       };
 
       if (menu_name) updateData.menu_name = menu_name;
+      if (menu_parent_id !== undefined) updateData.menu_parent_id = menu_parent_id;
       if (menu_url) updateData.menu_url = menu_url;
       if (menu_icon) updateData.menu_icon = menu_icon;
       if (menu_order) updateData.menu_order = menu_order;
