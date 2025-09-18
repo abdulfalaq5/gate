@@ -38,6 +38,11 @@ exports.seed = async function(knex) {
     const titleCache = new Map();
 
     // Helper functions
+    const truncateField = (value, maxLength) => {
+      if (!value) return value;
+      return value.length > maxLength ? value.substring(0, maxLength) : value;
+    };
+
     const getOrCreateIsland = async (islandName) => {
       if (!islandName || !islandName.trim()) return null;
       
@@ -172,7 +177,11 @@ exports.seed = async function(knex) {
     };
 
     const getOrCreateTitle = async (titleName, departmentId) => {
-      if (!titleName || !titleName.trim() || !departmentId) return null;
+      // Jika titleName kosong, berikan default title
+      if (!titleName || !titleName.trim()) {
+        titleName = 'General Employee';
+      }
+      if (!departmentId) return null;
       
       const cleanName = titleName.trim();
       const cacheKey = `${cleanName}|${departmentId}`;
@@ -2767,9 +2776,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
@@ -5370,9 +5379,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
@@ -7973,9 +7982,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
@@ -10576,9 +10585,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
@@ -13179,9 +13188,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
@@ -15782,9 +15791,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
@@ -17835,9 +17844,9 @@ exports.seed = async function(knex) {
           employee_id: employeeId,
           employee_name: emp.nama,
           employee_email: employeeEmail,
-          employee_phone: emp.phoneNo || null,
-          employee_mobile: emp.mobile || null,
-          employee_office_number: emp.officeNumber || null,
+          employee_phone: truncateField(emp.phoneNo, 50) || null,
+          employee_mobile: truncateField(emp.mobile, 50) || null,
+          employee_office_number: truncateField(emp.officeNumber, 50) || null,
           employee_address: emp.address || null,
           employee_exmail_account: emp.exmailAccount || null,
           employee_channel: emp.channel || null,
