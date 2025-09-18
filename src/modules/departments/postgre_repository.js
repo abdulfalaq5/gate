@@ -6,14 +6,27 @@ const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = requi
  * Get departments with pagination and filtering menggunakan sistem filter standar
  */
 const getDepartments = async (queryParams) => {
-  // Base query untuk departments
-  const baseQuery = pgCore('departments').select('*')
+  // Base query untuk departments dengan JOIN ke companies untuk mendapatkan company_name
+  const baseQuery = pgCore('departments')
+    .select([
+      'departments.*',
+      'companies.company_name'
+    ])
+    .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+  
+  // Clone queryParams dan modifikasi filter company_name untuk menggunakan qualified column name
+  const modifiedQueryParams = { ...queryParams }
+  if (modifiedQueryParams.filters && modifiedQueryParams.filters.company_name) {
+    // Pindahkan filter company_name ke qualified column name
+    modifiedQueryParams.filters['companies.company_name'] = modifiedQueryParams.filters.company_name
+    delete modifiedQueryParams.filters.company_name
+  }
   
   // Apply semua filter standar
-  const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
+  const dataQuery = applyStandardFilters(baseQuery.clone(), modifiedQueryParams)
   
   // Build count query untuk pagination metadata
-  const countQuery = buildCountQuery(baseQuery, queryParams)
+  const countQuery = buildCountQuery(baseQuery, modifiedQueryParams)
   
   // Execute queries secara parallel
   const [departments, countResult] = await Promise.all([
@@ -30,9 +43,13 @@ const getDepartments = async (queryParams) => {
  */
 const getDepartmentById = async (id) => {
   const [department] = await pgCore('departments')
-    .select('*')
-    .where('department_id', id)
-    .where('is_delete', false)
+    .select([
+      'departments.*',
+      'companies.company_name'
+    ])
+    .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+    .where('departments.department_id', id)
+    .where('departments.is_delete', false)
   
   return department
 }
@@ -96,10 +113,14 @@ const getDepartmentByName = async (name) => {
  */
 const getDepartmentsByCompanyId = async (companyId) => {
   return await pgCore('departments')
-    .select('*')
-    .where('company_id', companyId)
-    .where('is_delete', false)
-    .orderBy('department_name')
+    .select([
+      'departments.*',
+      'companies.company_name'
+    ])
+    .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+    .where('departments.company_id', companyId)
+    .where('departments.is_delete', false)
+    .orderBy('departments.department_name')
 }
 
 /**

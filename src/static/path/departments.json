@@ -1,119 +1,98 @@
 {
-	"/departments": {
-		"get": {
+	"/departments/get": {
+		"post": {
 			"tags": ["Departments"],
 			"security": [
 			{
 				"bearerAuth": []
 			}
 		],
-			"description": "Retrieve a paginated list of departments with optional filtering",
-			"parameters": [
-				{
-					"name": "page",
-					"in": "query",
-					"description": "Page number for pagination",
-					"required": false,
-					"schema": {
-						"type": "integer",
-						"default": 1,
-						"minimum": 1
-					}
-				},
-				{
-					"name": "limit",
-					"in": "query",
-					"description": "Number of items per page (max 100)",
-					"required": false,
-					"schema": {
-						"type": "integer",
-						"default": 10,
-						"minimum": 1,
-						"maximum": 100
-					}
-				},
-				{
-					"name": "search",
-					"in": "query",
-					"description": "Search term for department name",
-					"required": false,
-					"schema": {
-						"type": "string"
-					}
-				},
-				{
-					"name": "sort_by",
-					"in": "query",
-					"description": "Column to sort by",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"enum": ["department_name", "company_id", "department_parent_id", "created_at", "updated_at"],
-						"default": "department_name"
-					}
-				},
-				{
-					"name": "sort_order",
-					"in": "query",
-					"description": "Sort order",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"enum": ["asc", "desc"],
-						"default": "asc"
-					}
-				},
-				{
-					"name": "company_id",
-					"in": "query",
-					"description": "Filter by company ID",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					}
-				},
-				{
-					"name": "department_parent_id",
-					"in": "query",
-					"description": "Filter by parent department ID",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					}
-				},
-				{
-					"name": "is_delete",
-					"in": "query",
-					"description": "Filter by deletion status",
-					"required": false,
-					"schema": {
-						"type": "boolean",
-						"default": false
-					}
-				},
-				{
-					"name": "start_date",
-					"in": "query",
-					"description": "Filter departments created from this date (ISO 8601 format)",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "date-time"
-					}
-				},
-				{
-					"name": "end_date",
-					"in": "query",
-					"description": "Filter departments created until this date (ISO 8601 format)",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "date-time"
+			"description": "Retrieve a paginated list of departments with optional filtering via POST method",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"default": 1,
+									"minimum": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"default": 10,
+									"minimum": 1,
+									"maximum": 100,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for department name"
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["department_name", "company_id", "department_parent_id", "created_at", "updated_at"],
+									"default": "department_name",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "asc",
+									"description": "Sort order"
+								},
+								"company_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by company ID"
+								},
+								"company_name": {
+									"type": "string",
+									"description": "Filter by company name (exact match)"
+								},
+								"department_parent_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by parent department ID"
+								},
+								"department_name": {
+									"type": "string",
+									"description": "Filter by department name (exact match)"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								},
+								"start_date": {
+									"type": "string",
+									"format": "date-time",
+									"description": "Filter departments created from this date (ISO 8601 format)"
+								},
+								"end_date": {
+									"type": "string",
+									"format": "date-time",
+									"description": "Filter departments created until this date (ISO 8601 format)"
+								}
+							},
+							"example": {
+								"page": 1,
+								"limit": 10,
+								"search": "IT",
+								"sort_by": "department_name",
+								"sort_order": "asc",
+								"company_id": "123e4567-e89b-12d3-a456-426614174000",
+								"company_name": "PT. MSI Technology",
+								"department_parent_id": "123e4567-e89b-12d3-a456-426614174001",
+								"department_name": "IT Department"
+							}
+						}
 					}
 				}
-			],
+			},
 			"responses": {
 				"200": {
 					"description": "Departments retrieved successfully",
@@ -129,7 +108,9 @@
 					"description": "Internal server error"
 				}
 			}
-		},
+		}
+	},
+	"/departments/create": {
 		"post": {
 			"tags": ["Departments"],
 			"security": [

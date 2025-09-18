@@ -22,7 +22,6 @@ routing.use(`${API_TAG}`, ssoRoutes)
 routing.use(`${API_TAG}/auth`, auth)
 
 // Other User Management routes (SSO System)
-routing.use(`${API_TAG}/departments`, departments)
 routing.use(`${API_TAG}/titles`, titles)
 routing.use(`${API_TAG}/employees`, employees)
 

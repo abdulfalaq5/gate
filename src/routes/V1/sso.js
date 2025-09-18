@@ -12,6 +12,7 @@ const systemHasMenusRoutes = require('../../modules/system_has_menus');
 const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
 const roleHasMenuPermissionsRoutes = require('../../modules/role_has_menu_permissions');
 const companiesRoutes = require('../../modules/companies');
+const departmentsRoutes = require('../../modules/departments');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
 
@@ -67,6 +68,13 @@ router.post('/companies/create', verifySSOToken, companiesRoutes.createCompany);
 router.get('/companies/:id', verifySSOToken, companiesRoutes.getCompanyById);
 router.put('/companies/:id', verifySSOToken, companiesRoutes.updateCompany);
 router.delete('/companies/:id', verifySSOToken, companiesRoutes.deleteCompany);
+
+// Departments
+router.post('/departments/get', verifySSOToken, departmentsRoutes.getDepartments);
+router.post('/departments/create', verifySSOToken, departmentsRoutes.createDepartment);
+router.get('/departments/:id', verifySSOToken, departmentsRoutes.getDepartmentById);
+router.put('/departments/:id', verifySSOToken, departmentsRoutes.updateDepartment);
+router.delete('/departments/:id', verifySSOToken, departmentsRoutes.deleteDepartment);
 
 // Systems
 router.post('/systems', verifySSOToken, systemsRoutes.createSystem);
