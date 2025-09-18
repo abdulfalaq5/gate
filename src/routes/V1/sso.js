@@ -50,8 +50,8 @@ router.post('/auth/sso/scopes/check-permission', ssoRoutes.checkPermission);
 
 // User Management Routes
 // Permissions
-router.post('/permissions', verifySSOToken, permissionsRoutes.createPermission);
-router.get('/permissions', verifySSOToken, permissionsRoutes.listPermissions);
+router.post('/permissions/get', verifySSOToken, permissionsRoutes.listPermissions);
+router.post('/permissions/create', verifySSOToken, permissionsRoutes.createPermission);
 router.get('/permissions/:id', verifySSOToken, permissionsRoutes.getPermission);
 router.put('/permissions/:id', verifySSOToken, permissionsRoutes.updatePermission);
 router.delete('/permissions/:id', verifySSOToken, permissionsRoutes.deletePermission);
