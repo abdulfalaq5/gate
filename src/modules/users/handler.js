@@ -80,7 +80,8 @@ class UsersHandler {
           'user_name',
           'user_email',
           'employee_name',
-          'employee_email'
+          'employee_email',
+          'role_name'
         ],
         dateColumn: 'created_at'
       });

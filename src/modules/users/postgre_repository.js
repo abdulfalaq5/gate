@@ -84,13 +84,15 @@ class UsersRepository {
    * @returns {Object} Paginated response dengan data dan metadata
    */
   async findWithFilters(queryParams) {
-    // Base query untuk users dengan JOIN ke employees
+    // Base query untuk users dengan JOIN ke employees dan roles
     const baseQuery = this.knex(this.tableName)
       .leftJoin('employees', 'users.employee_id', 'employees.employee_id')
+      .leftJoin('roles', 'users.role_id', 'roles.role_id')
       .select(
         'users.*',
         'employees.employee_name',
-        'employees.employee_email'
+        'employees.employee_email',
+        'roles.role_name'
       )
       .where('users.is_delete', false);
 
@@ -100,7 +102,7 @@ class UsersRepository {
     const standardFilters = {}
     
     Object.keys(filters).forEach(key => {
-      if (['employee_name', 'employee_email'].includes(key)) {
+      if (['employee_name', 'employee_email', 'role_name'].includes(key)) {
         relationFilters[key] = filters[key]
       } else {
         standardFilters[key] = filters[key]
@@ -123,10 +125,14 @@ class UsersRepository {
     if (relationFilters.employee_email) {
       dataQuery = dataQuery.where('employees.employee_email', 'ilike', `%${relationFilters.employee_email}%`)
     }
+    if (relationFilters.role_name) {
+      dataQuery = dataQuery.where('roles.role_name', 'ilike', `%${relationFilters.role_name}%`)
+    }
 
     // Build count query untuk pagination metadata dengan filter relasi yang sama
     let countBaseQuery = this.knex(this.tableName)
       .leftJoin('employees', 'users.employee_id', 'employees.employee_id')
+      .leftJoin('roles', 'users.role_id', 'roles.role_id')
       .select('*')
       .where('users.is_delete', false);
     
@@ -138,6 +144,9 @@ class UsersRepository {
     }
     if (relationFilters.employee_email) {
       countQuery = countQuery.where('employees.employee_email', 'ilike', `%${relationFilters.employee_email}%`)
+    }
+    if (relationFilters.role_name) {
+      countQuery = countQuery.where('roles.role_name', 'ilike', `%${relationFilters.role_name}%`)
     }
 
     // Execute queries secara parallel

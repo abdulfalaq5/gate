@@ -112,6 +112,10 @@
 				"format": "uuid",
 				"description": "Role ID assigned to the user"
 			},
+			"role_name": {
+				"type": "string",
+				"description": "Role name from roles table"
+			},
 			"created_at": {
 				"type": "string",
 				"format": "date-time",
@@ -301,6 +305,10 @@
 			"employee_email": {
 				"type": "string",
 				"description": "Filter by employee email"
+			},
+			"role_name": {
+				"type": "string",
+				"description": "Filter by role name"
 			}
 		},
 		"example": {
