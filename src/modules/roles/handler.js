@@ -50,12 +50,30 @@ class RolesHandler {
 
   async listRoles(req, res) {
     try {
+      // Support parameters from both query string (GET) and body (POST)
+      const requestParams = {
+        ...req.query,  // GET parameters
+        ...req.body    // POST parameters
+      };
+      
+      // Create a modified request object for parseStandardQuery
+      const modifiedReq = {
+        ...req,
+        query: requestParams
+      };
+
       // Parse query parameters dengan konfigurasi untuk roles
-      const queryParams = parseStandardQuery(req, {
+      const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['role_name', 'created_at', 'updated_at'],
         defaultSort: ['role_name', 'asc'],
         searchableColumns: ['role_name'],
-        allowedFilters: ['role_name'],
+        allowedFilters: [
+          'role_name', 
+          'role_parent_id',
+          'created_by',
+          'updated_by',
+          'is_delete'
+        ],
         dateColumn: 'created_at'
       });
 

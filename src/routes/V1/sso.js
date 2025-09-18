@@ -92,8 +92,8 @@ router.put('/systems/:id', verifySSOToken, systemsRoutes.updateSystem);
 router.delete('/systems/:id', verifySSOToken, systemsRoutes.deleteSystem);
 
 // Roles
-router.post('/roles', verifySSOToken, rolesRoutes.createRole);
-router.get('/roles', verifySSOToken, rolesRoutes.listRoles);
+router.post('/roles/get', verifySSOToken, rolesRoutes.listRoles);
+router.post('/roles/create', verifySSOToken, rolesRoutes.createRole);
 router.get('/roles/:id', verifySSOToken, rolesRoutes.getRole);
 router.get('/roles/:id/permissions', verifySSOToken, rolesRoutes.getRolePermissions);
 router.post('/roles/:id/permissions', verifySSOToken, rolesRoutes.assignPermissions);
