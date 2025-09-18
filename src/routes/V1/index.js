@@ -6,7 +6,7 @@ const titles = require('../../modules/titles')
 const employees = require('../../modules/employees')
 const importModule = require('../../modules/import')
 const ssoRoutes = require('./sso')
-const { verifyToken } = require('../../middlewares')
+const { verifyToken, verifySSOToken } = require('../../middlewares')
 
 const routing = express();
 const API_TAG = '/api';
@@ -21,8 +21,7 @@ routing.use(`${API_TAG}`, ssoRoutes)
 // Authentication routes
 routing.use(`${API_TAG}/auth`, auth)
 
-// User Management routes (SSO System)
-routing.use(`${API_TAG}/companies`, companies)
+// Other User Management routes (SSO System)
 routing.use(`${API_TAG}/departments`, departments)
 routing.use(`${API_TAG}/titles`, titles)
 routing.use(`${API_TAG}/employees`, employees)

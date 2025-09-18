@@ -11,6 +11,7 @@ const ssoRoutes = require('../../modules/sso');
 const systemHasMenusRoutes = require('../../modules/system_has_menus');
 const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
 const roleHasMenuPermissionsRoutes = require('../../modules/role_has_menu_permissions');
+const companiesRoutes = require('../../modules/companies');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
 
@@ -47,34 +48,41 @@ router.post('/auth/sso/scopes/check-permission', ssoRoutes.checkPermission);
 
 // User Management Routes
 // Permissions
-router.post('/permissions', permissionsRoutes.createPermission);
-router.get('/permissions', permissionsRoutes.listPermissions);
-router.get('/permissions/:id', permissionsRoutes.getPermission);
-router.put('/permissions/:id', permissionsRoutes.updatePermission);
-router.delete('/permissions/:id', permissionsRoutes.deletePermission);
+router.post('/permissions', verifySSOToken, permissionsRoutes.createPermission);
+router.get('/permissions', verifySSOToken, permissionsRoutes.listPermissions);
+router.get('/permissions/:id', verifySSOToken, permissionsRoutes.getPermission);
+router.put('/permissions/:id', verifySSOToken, permissionsRoutes.updatePermission);
+router.delete('/permissions/:id', verifySSOToken, permissionsRoutes.deletePermission);
 
 // Menus
-router.post('/menus/create', menusRoutes.createMenu);
-router.post('/menus/get', menusRoutes.listMenus);
-router.get('/menus/:id', menusRoutes.getMenu);
-router.put('/menus/:id', menusRoutes.updateMenu);
-router.delete('/menus/:id', menusRoutes.deleteMenu);
+router.post('/menus/create', verifySSOToken, menusRoutes.createMenu);
+router.post('/menus/get', verifySSOToken, menusRoutes.listMenus);
+router.get('/menus/:id', verifySSOToken, menusRoutes.getMenu);
+router.put('/menus/:id', verifySSOToken, menusRoutes.updateMenu);
+router.delete('/menus/:id', verifySSOToken, menusRoutes.deleteMenu);
+
+// Companies
+router.post('/companies/get', verifySSOToken, companiesRoutes.getCompanies);
+router.post('/companies/create', verifySSOToken, companiesRoutes.createCompany);
+router.get('/companies/:id', verifySSOToken, companiesRoutes.getCompanyById);
+router.put('/companies/:id', verifySSOToken, companiesRoutes.updateCompany);
+router.delete('/companies/:id', verifySSOToken, companiesRoutes.deleteCompany);
 
 // Systems
-router.post('/systems', systemsRoutes.createSystem);
-router.get('/systems', systemsRoutes.listSystems);
-router.get('/systems/:id', systemsRoutes.getSystem);
-router.put('/systems/:id', systemsRoutes.updateSystem);
-router.delete('/systems/:id', systemsRoutes.deleteSystem);
+router.post('/systems', verifySSOToken, systemsRoutes.createSystem);
+router.get('/systems', verifySSOToken, systemsRoutes.listSystems);
+router.get('/systems/:id', verifySSOToken, systemsRoutes.getSystem);
+router.put('/systems/:id', verifySSOToken, systemsRoutes.updateSystem);
+router.delete('/systems/:id', verifySSOToken, systemsRoutes.deleteSystem);
 
 // Roles
-router.post('/roles', rolesRoutes.createRole);
-router.get('/roles', rolesRoutes.listRoles);
-router.get('/roles/:id', rolesRoutes.getRole);
-router.get('/roles/:id/permissions', rolesRoutes.getRolePermissions);
-router.post('/roles/:id/permissions', rolesRoutes.assignPermissions);
-router.put('/roles/:id', rolesRoutes.updateRole);
-router.delete('/roles/:id', rolesRoutes.deleteRole);
+router.post('/roles', verifySSOToken, rolesRoutes.createRole);
+router.get('/roles', verifySSOToken, rolesRoutes.listRoles);
+router.get('/roles/:id', verifySSOToken, rolesRoutes.getRole);
+router.get('/roles/:id/permissions', verifySSOToken, rolesRoutes.getRolePermissions);
+router.post('/roles/:id/permissions', verifySSOToken, rolesRoutes.assignPermissions);
+router.put('/roles/:id', verifySSOToken, rolesRoutes.updateRole);
+router.delete('/roles/:id', verifySSOToken, rolesRoutes.deleteRole);
 
 // Users
 router.post('/users', usersRoutes.createUser);
