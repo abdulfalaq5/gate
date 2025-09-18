@@ -14,14 +14,24 @@ class EmployeesRepository {
    * Get employees with pagination and filtering menggunakan sistem filter standar
    */
   async getEmployees(queryParams) {
-    // Base query untuk employees
-    const baseQuery = this.knex(this.tableName).select('*')
+    // Base query untuk employees dengan JOIN ke titles, departments, dan companies
+    const baseQuery = this.knex(this.tableName)
+      .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+      .leftJoin('departments', 'titles.department_id', 'departments.department_id')
+      .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+      .select(
+        'employees.*',
+        'titles.title_name',
+        'departments.department_name',
+        'companies.company_name'
+      )
     
     // Apply semua filter standar
     const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
     
-    // Build count query untuk pagination metadata
-    const countQuery = buildCountQuery(baseQuery, queryParams)
+    // Build count query untuk pagination metadata (tanpa JOIN untuk performa)
+    const countBaseQuery = this.knex(this.tableName).select('*')
+    const countQuery = buildCountQuery(countBaseQuery, queryParams)
     
     // Execute queries secara parallel
     const [employees, countResult] = await Promise.all([
@@ -38,9 +48,17 @@ class EmployeesRepository {
    */
   async getEmployeeById(id) {
     const [employee] = await this.knex(this.tableName)
-      .select('*')
-      .where('employee_id', id)
-      .where('is_delete', false)
+      .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+      .leftJoin('departments', 'titles.department_id', 'departments.department_id')
+      .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+      .select(
+        'employees.*',
+        'titles.title_name',
+        'departments.department_name',
+        'companies.company_name'
+      )
+      .where('employees.employee_id', id)
+      .where('employees.is_delete', false)
     
     return employee
   }
@@ -76,10 +94,18 @@ class EmployeesRepository {
    */
   async getEmployeesByTitleId(titleId) {
     return await this.knex(this.tableName)
-      .select('*')
-      .where('title_id', titleId)
-      .where('is_delete', false)
-      .orderBy('employee_name')
+      .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+      .leftJoin('departments', 'titles.department_id', 'departments.department_id')
+      .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+      .select(
+        'employees.*',
+        'titles.title_name',
+        'departments.department_name',
+        'companies.company_name'
+      )
+      .where('employees.title_id', titleId)
+      .where('employees.is_delete', false)
+      .orderBy('employees.employee_name')
   }
 
   /**

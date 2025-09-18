@@ -8,12 +8,24 @@ const EmployeesRepository = require('./postgre_repository')
 const employeesRepository = new EmployeesRepository(pgCore)
 
 /**
- * Get all employees with pagination and filtering
+ * Get all employees with pagination and filtering (POST method for complex queries)
  */
 const getEmployees = async (req, res) => {
   try {
+    // Support parameters from both query string (GET) and body (POST)
+    const requestParams = {
+      ...req.query,  // GET parameters
+      ...req.body    // POST parameters
+    };
+    
+    // Create a modified request object for parseStandardQuery
+    const modifiedReq = {
+      ...req,
+      query: requestParams
+    };
+
     // Parse query parameters menggunakan sistem filter standar
-    const queryParams = parseStandardQuery(req, {
+    const queryParams = parseStandardQuery(modifiedReq, {
       allowedSortColumns: ['employee_name', 'employee_email', 'title_id', 'created_at', 'updated_at'],
       defaultSort: ['employee_name', 'asc'],
       searchableColumns: ['employee_name', 'employee_email'],
@@ -61,7 +73,10 @@ const createEmployee = async (req, res) => {
     
     const employee = await employeesRepository.createEmployee(employeeData)
     
-    return successResponse(res, employee, 'Employee created successfully', 201)
+    // Ambil data employee lengkap dengan relasi setelah dibuat
+    const employeeWithRelations = await employeesRepository.getEmployeeById(employee.employee_id)
+    
+    return successResponse(res, employeeWithRelations, 'Employee created successfully', 201)
   } catch (error) {
     console.error('Error creating employee:', error)
     return errorResponse(res, 'Failed to create employee', 500)
@@ -86,9 +101,12 @@ const updateEmployee = async (req, res) => {
       updated_at: new Date()
     }
     
-    const employee = await employeesRepository.updateEmployee(id, updateData)
+    await employeesRepository.updateEmployee(id, updateData)
     
-    return successResponse(res, employee, 'Employee updated successfully')
+    // Ambil data employee lengkap dengan relasi setelah diupdate
+    const employeeWithRelations = await employeesRepository.getEmployeeById(id)
+    
+    return successResponse(res, employeeWithRelations, 'Employee updated successfully')
   } catch (error) {
     console.error('Error updating employee:', error)
     return errorResponse(res, 'Failed to update employee', 500)

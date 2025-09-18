@@ -3,7 +3,7 @@ const auth = require('../../modules/auth')
 const companies = require('../../modules/companies')
 const departments = require('../../modules/departments')
 const titles = require('../../modules/titles')
-const employees = require('../../modules/employees')
+const employeesRouter = require('../../modules/employees/router')
 const importModule = require('../../modules/import')
 const ssoRoutes = require('./sso')
 const { verifyToken, verifySSOToken } = require('../../middlewares')
@@ -23,7 +23,7 @@ routing.use(`${API_TAG}/auth`, auth)
 
 // Other User Management routes (SSO System)
 routing.use(`${API_TAG}/titles`, titles)
-routing.use(`${API_TAG}/employees`, employees)
+routing.use(`${API_TAG}/employees`, employeesRouter)
 
 // Import routes
 routing.use(`${API_TAG}/import`, importModule)

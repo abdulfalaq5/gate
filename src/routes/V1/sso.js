@@ -13,6 +13,7 @@ const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
 const roleHasMenuPermissionsRoutes = require('../../modules/role_has_menu_permissions');
 const companiesRoutes = require('../../modules/companies');
 const departmentsRoutes = require('../../modules/departments');
+const employeesRoutes = require('../../modules/employees');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
 
@@ -75,6 +76,13 @@ router.post('/departments/create', verifySSOToken, departmentsRoutes.createDepar
 router.get('/departments/:id', verifySSOToken, departmentsRoutes.getDepartmentById);
 router.put('/departments/:id', verifySSOToken, departmentsRoutes.updateDepartment);
 router.delete('/departments/:id', verifySSOToken, departmentsRoutes.deleteDepartment);
+
+// Employees
+router.post('/employees/get', verifySSOToken, employeesRoutes.getEmployees);
+router.post('/employees/create', verifySSOToken, employeesRoutes.createEmployee);
+router.get('/employees/:id', verifySSOToken, employeesRoutes.getEmployeeById);
+router.put('/employees/:id', verifySSOToken, employeesRoutes.updateEmployee);
+router.delete('/employees/:id', verifySSOToken, employeesRoutes.deleteEmployee);
 
 // Systems
 router.post('/systems', verifySSOToken, systemsRoutes.createSystem);

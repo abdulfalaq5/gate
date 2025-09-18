@@ -81,13 +81,13 @@
 							"example": {
 								"page": 1,
 								"limit": 10,
-								"search": "IT",
+								"search": "",
 								"sort_by": "department_name",
 								"sort_order": "asc",
-								"company_id": "123e4567-e89b-12d3-a456-426614174000",
-								"company_name": "PT. MSI Technology",
-								"department_parent_id": "123e4567-e89b-12d3-a456-426614174001",
-								"department_name": "IT Department"
+								"company_id": "",
+								"company_name": "",
+								"department_parent_id": "",
+								"department_name": ""
 							}
 						}
 					}

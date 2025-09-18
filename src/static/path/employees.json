@@ -1,109 +1,23 @@
 {
-	"/employees": {
-		"get": {
+	"/employees/get": {
+		"post": {
 			"tags": ["Employees"],
 			"security": [
-			{
-				"bearerAuth": []
-			}
-		],
-			"description": "Retrieve a paginated list of employees with optional filtering",
-			"parameters": [
 				{
-					"name": "page",
-					"in": "query",
-					"description": "Page number for pagination",
-					"required": false,
-					"schema": {
-						"type": "integer",
-						"default": 1,
-						"minimum": 1
-					}
-				},
-				{
-					"name": "limit",
-					"in": "query",
-					"description": "Number of items per page (max 100)",
-					"required": false,
-					"schema": {
-						"type": "integer",
-						"default": 10,
-						"minimum": 1,
-						"maximum": 100
-					}
-				},
-				{
-					"name": "search",
-					"in": "query",
-					"description": "Search term for employee name or email",
-					"required": false,
-					"schema": {
-						"type": "string"
-					}
-				},
-				{
-					"name": "sort_by",
-					"in": "query",
-					"description": "Column to sort by",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"enum": ["employee_name", "employee_email", "title_id", "created_at", "updated_at"],
-						"default": "employee_name"
-					}
-				},
-				{
-					"name": "sort_order",
-					"in": "query",
-					"description": "Sort order",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"enum": ["asc", "desc"],
-						"default": "asc"
-					}
-				},
-				{
-					"name": "title_id",
-					"in": "query",
-					"description": "Filter by title ID",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					}
-				},
-				{
-					"name": "is_delete",
-					"in": "query",
-					"description": "Filter by deletion status",
-					"required": false,
-					"schema": {
-						"type": "boolean",
-						"default": false
-					}
-				},
-				{
-					"name": "start_date",
-					"in": "query",
-					"description": "Filter employees created from this date (ISO 8601 format)",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "date-time"
-					}
-				},
-				{
-					"name": "end_date",
-					"in": "query",
-					"description": "Filter employees created until this date (ISO 8601 format)",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "date-time"
-					}
+					"bearerAuth": []
 				}
 			],
+			"description": "Retrieve a paginated list of employees with advanced filtering using POST method for complex queries",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostEmployeesGet"
+						}
+					}
+				}
+			},
 			"responses": {
 				"200": {
 					"description": "Employees retrieved successfully",
@@ -119,14 +33,16 @@
 					"description": "Internal server error"
 				}
 			}
-		},
+		}
+	},
+	"/employees/create": {
 		"post": {
 			"tags": ["Employees"],
 			"security": [
-			{
-				"bearerAuth": []
-			}
-		],
+				{
+					"bearerAuth": []
+				}
+			],
 			"description": "Create a new employee with the provided information",
 			"requestBody": {
 				"required": true,
@@ -276,47 +192,6 @@
 				},
 				"404": {
 					"description": "Employee not found"
-				},
-				"500": {
-					"description": "Internal server error"
-				}
-			}
-		}
-	},
-	"/employees/title/{titleId}": {
-		"get": {
-			"tags": ["Employees"],
-			"security": [
-			{
-				"bearerAuth": []
-			}
-		],
-			"description": "Retrieve all employees belonging to a specific title",
-			"parameters": [
-				{
-					"name": "titleId",
-					"in": "path",
-					"required": true,
-					"description": "Title ID",
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					}
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "Employees retrieved successfully",
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "array",
-								"items": {
-									"$ref": "#/components/schemas/SchemaResponseEmployees"
-								}
-							}
-						}
-					}
 				},
 				"500": {
 					"description": "Internal server error"
