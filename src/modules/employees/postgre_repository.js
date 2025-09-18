@@ -26,12 +26,58 @@ class EmployeesRepository {
         'companies.company_name'
       )
     
-    // Apply semua filter standar
-    const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
+    // Pisahkan filter relasi dari filter standar
+    const { filters } = queryParams
+    const relationFilters = {}
+    const standardFilters = {}
     
-    // Build count query untuk pagination metadata (tanpa JOIN untuk performa)
-    const countBaseQuery = this.knex(this.tableName).select('*')
-    const countQuery = buildCountQuery(countBaseQuery, queryParams)
+    Object.keys(filters).forEach(key => {
+      if (['company_name', 'department_name', 'title_name'].includes(key)) {
+        relationFilters[key] = filters[key]
+      } else {
+        standardFilters[key] = filters[key]
+      }
+    })
+    
+    // Update queryParams untuk filter standar
+    const modifiedQueryParams = {
+      ...queryParams,
+      filters: standardFilters
+    }
+    
+    // Apply filter standar (tanpa relasi)
+    let dataQuery = applyStandardFilters(baseQuery.clone(), modifiedQueryParams)
+    
+    // Apply filter relasi secara manual
+    if (relationFilters.company_name) {
+      dataQuery = dataQuery.where('companies.company_name', 'ilike', `%${relationFilters.company_name}%`)
+    }
+    if (relationFilters.department_name) {
+      dataQuery = dataQuery.where('departments.department_name', 'ilike', `%${relationFilters.department_name}%`)
+    }
+    if (relationFilters.title_name) {
+      dataQuery = dataQuery.where('titles.title_name', 'ilike', `%${relationFilters.title_name}%`)
+    }
+    
+    // Build count query untuk pagination metadata dengan filter relasi yang sama
+    let countBaseQuery = this.knex(this.tableName)
+      .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+      .leftJoin('departments', 'titles.department_id', 'departments.department_id')
+      .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+      .select('*')
+    
+    let countQuery = buildCountQuery(countBaseQuery, modifiedQueryParams)
+    
+    // Apply filter relasi ke count query juga
+    if (relationFilters.company_name) {
+      countQuery = countQuery.where('companies.company_name', 'ilike', `%${relationFilters.company_name}%`)
+    }
+    if (relationFilters.department_name) {
+      countQuery = countQuery.where('departments.department_name', 'ilike', `%${relationFilters.department_name}%`)
+    }
+    if (relationFilters.title_name) {
+      countQuery = countQuery.where('titles.title_name', 'ilike', `%${relationFilters.title_name}%`)
+    }
     
     // Execute queries secara parallel
     const [employees, countResult] = await Promise.all([
