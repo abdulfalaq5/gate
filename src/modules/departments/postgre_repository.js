@@ -32,6 +32,11 @@ const getDepartments = async (queryParams) => {
     })
   }
   
+  // Modifikasi sorting untuk menggunakan qualified column name
+  if (modifiedQueryParams.sorting && modifiedQueryParams.sorting.sortBy === 'company_name') {
+    modifiedQueryParams.sorting.sortBy = 'companies.company_name'
+  }
+  
   // Apply semua filter standar
   const dataQuery = applyStandardFilters(baseQuery.clone(), modifiedQueryParams)
   
