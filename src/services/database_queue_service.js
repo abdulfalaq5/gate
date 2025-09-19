@@ -7,18 +7,23 @@ const { publishToRabbitMqQueueSingle } = require('../config/rabbitmq');
 class DatabaseQueueService {
   constructor() {
     this.exchangeName = 'database_operations';
-    this.queueName = 'database_changes_queue_sso'; // sesuaikan dengan nama queue yang ada di rabbitmq
+    this.queueName = 'database_changes_queue_sso';
   }
 
   /**
-   * Generate SQL query untuk operasi CREATE
+   * Generate SQL query untuk operasi CREATE dengan ID
    * @param {string} tableName - Nama tabel
+   * @param {string} primaryKey - Nama kolom primary key
    * @param {object} data - Data yang akan diinsert
+   * @param {string} recordId - ID record yang di-generate
    * @returns {string} - SQL query
    */
-  generateInsertQuery(tableName, data) {
-    const columns = Object.keys(data);
-    const values = Object.values(data).map(val => 
+  generateInsertQuery(tableName, primaryKey, data, recordId = null) {
+    // Jika ada recordId, masukkan ke dalam data untuk SQL query
+    const dataWithId = recordId ? { [primaryKey]: recordId, ...data } : data;
+    
+    const columns = Object.keys(dataWithId);
+    const values = Object.values(dataWithId).map(val => 
       val === null ? 'NULL' : 
       typeof val === 'string' ? `'${val.replace(/'/g, "''")}'` :
       typeof val === 'boolean' ? val :
@@ -65,12 +70,18 @@ class DatabaseQueueService {
   /**
    * Kirim queue untuk operasi CREATE
    * @param {string} tableName - Nama tabel
+   * @param {string} primaryKey - Nama kolom primary key
    * @param {object} data - Data yang dibuat
    * @param {object} result - Result dari operasi database
    */
-  async sendCreateQueue(tableName, data, result = null) {
+  async sendCreateQueue(tableName, primaryKey, data, result = null) {
     try {
-      const querySQL = this.generateInsertQuery(tableName, data);
+      // Extract record_id dari result jika ada, atau dari data jika sudah ada ID
+      const recordId = result && result[primaryKey] ? result[primaryKey] : 
+                       data && data[primaryKey] ? data[primaryKey] : null;
+      
+      // Generate SQL query dengan ID yang sudah ada
+      const querySQL = this.generateInsertQuery(tableName, primaryKey, data, recordId);
       
       const payload = {
         database: process.env.DB_NAME || 'gate_db',
@@ -79,12 +90,15 @@ class DatabaseQueueService {
         query_sql: querySQL,
         data: data,
         result: result,
+        record_id: recordId,
+        primary_key: primaryKey,
+        primary_key_value: recordId, // Nilai ID untuk database mirroring
         timestamp: new Date().toISOString(),
         operation_id: this.generateOperationId()
       };
 
       await publishToRabbitMqQueueSingle(this.exchangeName, this.queueName, payload);
-      console.log(`✅ Queue sent for CREATE operation on table: ${tableName}`);
+      console.log(`✅ Queue sent for CREATE operation on table: ${tableName}, ID: ${recordId}`);
     } catch (error) {
       console.error(`❌ Failed to send CREATE queue for table ${tableName}:`, error);
     }
@@ -110,6 +124,7 @@ class DatabaseQueueService {
         data: data,
         record_id: id,
         primary_key: primaryKey,
+        primary_key_value: id, // Nilai ID untuk database mirroring
         result: result,
         timestamp: new Date().toISOString(),
         operation_id: this.generateOperationId()
@@ -142,6 +157,7 @@ class DatabaseQueueService {
         data: deleteData,
         record_id: id,
         primary_key: primaryKey,
+        primary_key_value: id, // Nilai ID untuk database mirroring
         result: result,
         timestamp: new Date().toISOString(),
         operation_id: this.generateOperationId()
@@ -166,7 +182,7 @@ class DatabaseQueueService {
    * Kirim queue khusus untuk companies
    */
   async sendCompaniesCreateQueue(data, result) {
-    return this.sendCreateQueue('companies', data, result);
+    return this.sendCreateQueue('companies', 'company_id', data, result);
   }
 
   async sendCompaniesUpdateQueue(id, data, result) {
@@ -181,7 +197,7 @@ class DatabaseQueueService {
    * Kirim queue khusus untuk departments
    */
   async sendDepartmentsCreateQueue(data, result) {
-    return this.sendCreateQueue('departments', data, result);
+    return this.sendCreateQueue('departments', 'department_id', data, result);
   }
 
   async sendDepartmentsUpdateQueue(id, data, result) {
@@ -196,7 +212,7 @@ class DatabaseQueueService {
    * Kirim queue khusus untuk titles
    */
   async sendTitlesCreateQueue(data, result) {
-    return this.sendCreateQueue('titles', data, result);
+    return this.sendCreateQueue('titles', 'title_id', data, result);
   }
 
   async sendTitlesUpdateQueue(id, data, result) {
@@ -211,7 +227,7 @@ class DatabaseQueueService {
    * Kirim queue khusus untuk employees
    */
   async sendEmployeesCreateQueue(data, result) {
-    return this.sendCreateQueue('employees', data, result);
+    return this.sendCreateQueue('employees', 'employee_id', data, result);
   }
 
   async sendEmployeesUpdateQueue(id, data, result) {

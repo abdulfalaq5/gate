@@ -47,7 +47,7 @@ const setupQueueListener = async () => {
     const channel = await connection.createChannel();
     
     const exchangeName = 'database_operations';
-    const queueName = 'database_changes_queue';
+    const queueName = 'database_changes_queue_sso';
     
     await channel.assertExchange(exchangeName, 'fanout', { durable: true });
     await channel.assertQueue(queueName, { durable: true });
@@ -64,6 +64,9 @@ const setupQueueListener = async () => {
         console.log(`📨 Queue message received:`, {
           table: payload.table,
           method: payload.method,
+          record_id: payload.record_id,
+          primary_key: payload.primary_key,
+          primary_key_value: payload.primary_key_value,
           operation_id: payload.operation_id,
           timestamp: payload.timestamp
         });
@@ -266,12 +269,42 @@ const analyzeQueueMessages = () => {
     console.log(`\n⚠️  Expected ${expectedMessages} messages, received ${queueMessages.length}`);
   }
   
-  // Show sample messages
-  console.log('\nSample Queue Messages:');
+  // Show sample messages with ID information
+  console.log('\nSample Queue Messages with IDs:');
   queueMessages.slice(0, 3).forEach((msg, index) => {
-    console.log(`  ${index + 1}. ${msg.table} - ${msg.method.toUpperCase()} - ${msg.operation_id}`);
-    console.log(`     SQL: ${msg.query_sql.substring(0, 80)}...`);
+    console.log(`  ${index + 1}. ${msg.table} - ${msg.method.toUpperCase()} - ID: ${msg.record_id}`);
+    console.log(`     Primary Key: ${msg.primary_key}`);
+    console.log(`     Operation ID: ${msg.operation_id}`);
+    console.log(`     SQL: ${msg.query_sql.substring(0, 100)}...`);
+    
+    // Check if SQL query contains the ID
+    const containsId = msg.query_sql.includes(msg.primary_key_value);
+    console.log(`     SQL Contains ID: ${containsId ? '✅' : '❌'}`);
   });
+  
+  // Validate that all messages have record_id and primary_key_value
+  const messagesWithoutId = queueMessages.filter(msg => !msg.record_id || !msg.primary_key_value);
+  const messagesWithMismatchedId = queueMessages.filter(msg => msg.record_id !== msg.primary_key_value);
+  
+  if (messagesWithoutId.length === 0) {
+    console.log('\n✅ All messages contain record_id and primary_key_value for database mirroring!');
+  } else {
+    console.log(`\n⚠️  ${messagesWithoutId.length} messages missing record_id or primary_key_value`);
+  }
+  
+  if (messagesWithMismatchedId.length === 0) {
+    console.log('✅ All record_id and primary_key_value values match!');
+  } else {
+    console.log(`⚠️  ${messagesWithMismatchedId.length} messages have mismatched record_id and primary_key_value`);
+  }
+  
+  // Validate that all SQL queries contain the ID
+  const messagesWithoutIdInSQL = queueMessages.filter(msg => !msg.query_sql.includes(msg.primary_key_value));
+  if (messagesWithoutIdInSQL.length === 0) {
+    console.log('✅ All SQL queries contain the ID for database mirroring!');
+  } else {
+    console.log(`⚠️  ${messagesWithoutIdInSQL.length} messages have SQL queries without ID`);
+  }
 };
 
 // Main test function
