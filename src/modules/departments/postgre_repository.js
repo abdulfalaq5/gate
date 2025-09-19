@@ -22,6 +22,16 @@ const getDepartments = async (queryParams) => {
     delete modifiedQueryParams.filters.company_name
   }
   
+  // Modifikasi searchableColumns untuk menggunakan qualified column name
+  if (modifiedQueryParams.search && modifiedQueryParams.search.searchableColumns) {
+    modifiedQueryParams.search.searchableColumns = modifiedQueryParams.search.searchableColumns.map(column => {
+      if (column === 'company_name') {
+        return 'companies.company_name'
+      }
+      return column
+    })
+  }
+  
   // Apply semua filter standar
   const dataQuery = applyStandardFilters(baseQuery.clone(), modifiedQueryParams)
   
