@@ -1,4 +1,4 @@
-const { employeesColumns } = require('./column')
+const { employeesColumns, employeesValidationRules } = require('./column')
 const { validateRequest } = require('../../utils/validation')
 const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
@@ -67,6 +67,12 @@ const getEmployeeById = async (req, res) => {
  */
 const createEmployee = async (req, res) => {
   try {
+    // Validate request
+    const validation = validateRequest(req.body, employeesValidationRules.create, employeesColumns)
+    if (!validation.isValid) {
+      return errorResponse(res, validation.errors, 400)
+    }
+
     const employeeData = {
       ...req.body,
       created_by: req.user?.user_id
@@ -83,6 +89,15 @@ const createEmployee = async (req, res) => {
     return successResponse(res, employeeWithRelations, 'Employee created successfully', 201)
   } catch (error) {
     console.error('Error creating employee:', error)
+    
+    // Provide more specific error message
+    if (error.code === '23503') { // Foreign key constraint violation
+      return errorResponse(res, 'Invalid title_id. Title does not exist.', 400)
+    }
+    if (error.code === '23505') { // Unique constraint violation
+      return errorResponse(res, 'Employee with this email already exists.', 400)
+    }
+    
     return errorResponse(res, 'Failed to create employee', 500)
   }
 }

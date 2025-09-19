@@ -78,4 +78,19 @@ const employeesColumns = {
   }
 }
 
-module.exports = { employeesColumns }
+// Validation rules for different operations
+const employeesValidationRules = {
+  create: {
+    required: ['employee_name', 'employee_email', 'title_id'],
+    optional: []
+  },
+  update: {
+    required: [],
+    optional: ['employee_name', 'employee_email', 'title_id']
+  }
+}
+
+module.exports = { 
+  employeesColumns,
+  employeesValidationRules 
+}
