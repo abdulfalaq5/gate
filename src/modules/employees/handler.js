@@ -4,6 +4,7 @@ const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const { pgCore } = require('../../config/database')
 const EmployeesRepository = require('./postgre_repository')
+const databaseQueueService = require('../../services/database_queue_service')
 
 const employeesRepository = new EmployeesRepository(pgCore)
 
@@ -73,6 +74,9 @@ const createEmployee = async (req, res) => {
     
     const employee = await employeesRepository.createEmployee(employeeData)
     
+    // Kirim queue ke RabbitMQ untuk operasi CREATE
+    await databaseQueueService.sendEmployeesCreateQueue(employeeData, employee)
+    
     // Ambil data employee lengkap dengan relasi setelah dibuat
     const employeeWithRelations = await employeesRepository.getEmployeeById(employee.employee_id)
     
@@ -101,7 +105,10 @@ const updateEmployee = async (req, res) => {
       updated_at: new Date()
     }
     
-    await employeesRepository.updateEmployee(id, updateData)
+    const result = await employeesRepository.updateEmployee(id, updateData)
+    
+    // Kirim queue ke RabbitMQ untuk operasi UPDATE
+    await databaseQueueService.sendEmployeesUpdateQueue(id, updateData, result)
     
     // Ambil data employee lengkap dengan relasi setelah diupdate
     const employeeWithRelations = await employeesRepository.getEmployeeById(id)
@@ -131,7 +138,10 @@ const deleteEmployee = async (req, res) => {
       deleted_by: req.user?.user_id
     }
     
-    await employeesRepository.updateEmployee(id, deleteData)
+    const result = await employeesRepository.updateEmployee(id, deleteData)
+    
+    // Kirim queue ke RabbitMQ untuk operasi DELETE
+    await databaseQueueService.sendEmployeesDeleteQueue(id, deleteData, result)
     
     return successResponse(res, null, 'Employee deleted successfully')
   } catch (error) {

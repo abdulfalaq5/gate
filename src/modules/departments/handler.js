@@ -3,6 +3,7 @@ const { validateRequest } = require('../../utils/validation')
 const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const departmentsRepository = require('./postgre_repository')
+const databaseQueueService = require('../../services/database_queue_service')
 
 class DepartmentsHandler {
   /**
@@ -83,6 +84,9 @@ class DepartmentsHandler {
       
       const department = await departmentsRepository.createDepartment(departmentData)
       
+      // Kirim queue ke RabbitMQ untuk operasi CREATE
+      await databaseQueueService.sendDepartmentsCreateQueue(departmentData, department)
+      
       return successResponse(res, department, 'Department created successfully', 201)
     } catch (error) {
       console.error('Error creating department:', error)
@@ -116,6 +120,9 @@ class DepartmentsHandler {
       
       const department = await departmentsRepository.updateDepartment(id, updateData)
       
+      // Kirim queue ke RabbitMQ untuk operasi UPDATE
+      await databaseQueueService.sendDepartmentsUpdateQueue(id, updateData, department)
+      
       return successResponse(res, department, 'Department updated successfully')
     } catch (error) {
       console.error('Error updating department:', error)
@@ -141,7 +148,10 @@ class DepartmentsHandler {
         deleted_by: req.user?.user_id
       }
       
-      await departmentsRepository.updateDepartment(id, deleteData)
+      const result = await departmentsRepository.updateDepartment(id, deleteData)
+      
+      // Kirim queue ke RabbitMQ untuk operasi DELETE
+      await databaseQueueService.sendDepartmentsDeleteQueue(id, deleteData, result)
       
       return successResponse(res, null, 'Department deleted successfully')
     } catch (error) {

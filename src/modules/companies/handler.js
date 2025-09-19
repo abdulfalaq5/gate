@@ -3,6 +3,7 @@ const { validateRequest } = require('../../utils/validation')
 const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const companiesRepository = require('./postgre_repository')
+const databaseQueueService = require('../../services/database_queue_service')
 
 class CompaniesHandler {
   /**
@@ -83,6 +84,9 @@ class CompaniesHandler {
       
       const company = await companiesRepository.createCompany(companyData)
       
+      // Kirim queue ke RabbitMQ untuk operasi CREATE
+      await databaseQueueService.sendCompaniesCreateQueue(companyData, company)
+      
       return successResponse(res, company, 'Company created successfully', 201)
     } catch (error) {
       console.error('Error creating company:', error)
@@ -117,6 +121,9 @@ class CompaniesHandler {
       
       const company = await companiesRepository.updateCompany(id, updateData)
       
+      // Kirim queue ke RabbitMQ untuk operasi UPDATE
+      await databaseQueueService.sendCompaniesUpdateQueue(id, updateData, company)
+      
       return successResponse(res, company, 'Company updated successfully')
     } catch (error) {
       console.error('Error updating company:', error)
@@ -143,7 +150,10 @@ class CompaniesHandler {
         deleted_by: req.user?.user_id
       }
       
-      await companiesRepository.updateCompany(id, deleteData)
+      const result = await companiesRepository.updateCompany(id, deleteData)
+      
+      // Kirim queue ke RabbitMQ untuk operasi DELETE
+      await databaseQueueService.sendCompaniesDeleteQueue(id, deleteData, result)
       
       return successResponse(res, null, 'Company deleted successfully')
     } catch (error) {

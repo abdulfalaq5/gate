@@ -2,6 +2,7 @@ const TitlesRepository = require('./postgre_repository')
 const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const { pgCore } = require('../../config/database')
+const databaseQueueService = require('../../services/database_queue_service')
 
 class TitlesHandler {
   constructor() {
@@ -82,6 +83,9 @@ class TitlesHandler {
       
       const title = await this.titlesRepository.createTitle(titleData)
       
+      // Kirim queue ke RabbitMQ untuk operasi CREATE
+      await databaseQueueService.sendTitlesCreateQueue(titleData, title)
+      
       return successResponse(res, title, 'Title created successfully', 201)
     } catch (error) {
       console.error('Error creating title:', error)
@@ -109,6 +113,9 @@ class TitlesHandler {
       
       const title = await this.titlesRepository.updateTitle(id, updateData)
       
+      // Kirim queue ke RabbitMQ untuk operasi UPDATE
+      await databaseQueueService.sendTitlesUpdateQueue(id, updateData, title)
+      
       return successResponse(res, title, 'Title updated successfully')
     } catch (error) {
       console.error('Error updating title:', error)
@@ -134,7 +141,10 @@ class TitlesHandler {
         deleted_by: req.user?.user_id
       }
       
-      await this.titlesRepository.updateTitle(id, deleteData)
+      const result = await this.titlesRepository.updateTitle(id, deleteData)
+      
+      // Kirim queue ke RabbitMQ untuk operasi DELETE
+      await databaseQueueService.sendTitlesDeleteQueue(id, deleteData, result)
       
       return successResponse(res, null, 'Title deleted successfully')
     } catch (error) {
