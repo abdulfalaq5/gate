@@ -69,7 +69,7 @@ class UsersHandler {
       // Parse query parameters dengan konfigurasi untuk users
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['user_name', 'user_email', 'employee_id', 'role_id', 'created_at', 'updated_at'],
-        defaultSort: ['user_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['user_name', 'user_email'],
         allowedFilters: [
           'employee_id',

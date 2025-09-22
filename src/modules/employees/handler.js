@@ -28,7 +28,7 @@ const getEmployees = async (req, res) => {
     // Parse query parameters menggunakan sistem filter standar
     const queryParams = parseStandardQuery(modifiedReq, {
       allowedSortColumns: ['employee_name', 'employee_email', 'title_id', 'created_at', 'updated_at'],
-      defaultSort: ['employee_name', 'asc'],
+      defaultSort: ['created_at', 'desc'],
       searchableColumns: ['employee_name', 'employee_email'],
       allowedFilters: ['title_id', 'is_delete', 'company_name', 'department_name', 'title_name'],
       dateColumn: 'created_at'

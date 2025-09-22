@@ -75,7 +75,7 @@ class MenusHandler {
       // Parse query parameters dengan konfigurasi untuk menus
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['menu_name', 'menu_order', 'created_at', 'updated_at'],
-        defaultSort: ['menu_order', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['menu_name', 'menu_url'],
         allowedFilters: [
           'menu_name', 

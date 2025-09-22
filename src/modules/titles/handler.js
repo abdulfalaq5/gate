@@ -29,7 +29,7 @@ class TitlesHandler {
       // Parse query parameters dengan konfigurasi untuk titles
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['title_name', 'department_id', 'created_at', 'updated_at'],
-        defaultSort: ['title_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['title_name'],
         allowedFilters: [
           'title_name',

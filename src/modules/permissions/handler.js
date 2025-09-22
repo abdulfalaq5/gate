@@ -65,7 +65,7 @@ class PermissionsHandler {
       // Parse query parameters dengan konfigurasi untuk permissions
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['permission_name', 'created_at', 'updated_at'],
-        defaultSort: ['permission_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['permission_name'],
         allowedFilters: [
           'permission_name',

@@ -26,7 +26,7 @@ class CompaniesHandler {
       // Parse query parameters menggunakan sistem filter standar
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['company_name', 'company_address', 'company_email', 'created_at', 'updated_at'],
-        defaultSort: ['company_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['company_name', 'company_address', 'company_email'],
         allowedFilters: ['company_name', 'company_address', 'company_email', 'company_parent_id', 'is_delete'],
         dateColumn: 'created_at'

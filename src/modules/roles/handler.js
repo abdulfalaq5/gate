@@ -65,7 +65,7 @@ class RolesHandler {
       // Parse query parameters dengan konfigurasi untuk roles
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['role_name', 'created_at', 'updated_at'],
-        defaultSort: ['role_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['role_name'],
         allowedFilters: [
           'role_name', 

@@ -26,7 +26,7 @@ class DepartmentsHandler {
       // Parse query parameters menggunakan sistem filter standar
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['department_name', 'company_id', 'company_name', 'department_parent_id', 'created_at', 'updated_at'],
-        defaultSort: ['department_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['department_name', 'company_name'],
         allowedFilters: ['department_name', 'company_id', 'company_name', 'department_parent_id', 'is_delete'],
         dateColumn: 'created_at'
