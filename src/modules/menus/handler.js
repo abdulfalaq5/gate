@@ -25,7 +25,7 @@ class MenusHandler {
 
       const menuData = {
         menu_name,
-        menu_parent_id,
+        menu_parent_id: menu_parent_id === '' ? null : menu_parent_id,
         menu_url,
         menu_icon,
         menu_order: menu_order ? parseInt(menu_order) : undefined,
@@ -141,7 +141,7 @@ class MenusHandler {
       };
 
       if (menu_name) updateData.menu_name = menu_name;
-      if (menu_parent_id !== undefined) updateData.menu_parent_id = menu_parent_id;
+      if (menu_parent_id !== undefined) updateData.menu_parent_id = menu_parent_id === '' ? null : menu_parent_id;
       if (menu_url) updateData.menu_url = menu_url;
       if (menu_icon) updateData.menu_icon = menu_icon;
       if (menu_order) updateData.menu_order = menu_order;
