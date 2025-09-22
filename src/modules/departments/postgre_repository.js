@@ -13,6 +13,7 @@ const getDepartments = async (queryParams) => {
       'companies.company_name'
     ])
     .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+    .where('departments.is_delete', false)
   
   // Clone queryParams dan modifikasi filter company_name untuk menggunakan qualified column name
   const modifiedQueryParams = { ...queryParams }
@@ -54,7 +55,7 @@ const getDepartments = async (queryParams) => {
 }
 
 /**
- * Get department by ID
+ * Get department by ID (excluding soft deleted records)
  */
 const getDepartmentById = async (id) => {
   const [department] = await pgCore('departments')
@@ -65,6 +66,21 @@ const getDepartmentById = async (id) => {
     .leftJoin('companies', 'departments.company_id', 'companies.company_id')
     .where('departments.department_id', id)
     .where('departments.is_delete', false)
+  
+  return department
+}
+
+/**
+ * Get department by ID (including soft deleted records)
+ */
+const getDepartmentByIdIncludeDeleted = async (id) => {
+  const [department] = await pgCore('departments')
+    .select([
+      'departments.*',
+      'companies.company_name'
+    ])
+    .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+    .where('departments.department_id', id)
   
   return department
 }
@@ -154,6 +170,7 @@ const getDepartmentsStats = async () => {
 module.exports = {
   getDepartments,
   getDepartmentById,
+  getDepartmentByIdIncludeDeleted,
   createDepartment,
   updateDepartment,
   deleteDepartment,

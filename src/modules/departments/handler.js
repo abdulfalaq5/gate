@@ -137,9 +137,15 @@ class DepartmentsHandler {
     try {
       const { id } = req.params
       
-      const existingDepartment = await departmentsRepository.getDepartmentById(id)
+      // Check if department exists (including already deleted ones)
+      const existingDepartment = await departmentsRepository.getDepartmentByIdIncludeDeleted(id)
       if (!existingDepartment) {
         return errorResponse(res, 'Department not found', 404)
+      }
+      
+      // Check if department is already deleted
+      if (existingDepartment.is_delete) {
+        return errorResponse(res, 'Department already deleted', 400)
       }
       
       const deleteData = {

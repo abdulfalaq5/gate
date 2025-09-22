@@ -25,6 +25,7 @@ class EmployeesRepository {
         'departments.department_name',
         'companies.company_name'
       )
+      .where('employees.is_delete', false)
     
     // Pisahkan filter relasi dari filter standar
     const { filters } = queryParams
