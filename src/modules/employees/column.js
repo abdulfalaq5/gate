@@ -31,6 +31,12 @@ const employeesColumns = {
     description: 'Title ID assigned to this employee',
     example: '123e4567-e89b-12d3-a456-426614174000'
   },
+  department_id: {
+    type: 'uuid',
+    required: false,
+    description: 'Department ID assigned to this employee',
+    example: '123e4567-e89b-12d3-a456-426614174000'
+  },
   created_at: {
     type: 'timestamp',
     required: false,
@@ -82,11 +88,11 @@ const employeesColumns = {
 const employeesValidationRules = {
   create: {
     required: ['employee_name', 'employee_email', 'title_id'],
-    optional: []
+    optional: ['department_id']
   },
   update: {
     required: [],
-    optional: ['employee_name', 'employee_email', 'title_id']
+    optional: ['employee_name', 'employee_email', 'title_id', 'department_id']
   }
 }
 

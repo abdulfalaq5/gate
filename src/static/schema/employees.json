@@ -74,6 +74,10 @@
 			"title_id": {
 				"type": "string",
 				"format": "uuid"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid"
 			}
 		},
 		"required": ["employee_name", "employee_email", "title_id"]
@@ -92,6 +96,10 @@
 				"maxLength": 100
 			},
 			"title_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"department_id": {
 				"type": "string",
 				"format": "uuid"
 			}
@@ -160,6 +168,16 @@
 			"title_name": {
 				"type": "string",
 				"description": "Filter by title name"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Filter by department ID"
+			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Filter by company ID"
 			}
 		},
 		"example": {
@@ -171,7 +189,9 @@
 			"title_id": "",
 			"company_name": "",
 			"department_name": "",
-			"title_name": ""
+			"title_name": "",
+			"department_id": "",
+			"company_id": ""
 		}
 	},
 	"SchemaResponseEmployeesList": {
