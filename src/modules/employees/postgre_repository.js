@@ -28,7 +28,7 @@ class EmployeesRepository {
       .where('employees.is_delete', false)
     
     // Pisahkan filter relasi dari filter standar
-    const { filters } = queryParams
+    const { filters, search } = queryParams
     const relationFilters = {}
     const standardFilters = {}
     
@@ -40,14 +40,32 @@ class EmployeesRepository {
       }
     })
     
-    // Update queryParams untuk filter standar
-    const modifiedQueryParams = {
-      ...queryParams,
-      filters: standardFilters
-    }
+    // Pisahkan searchableColumns untuk tabel utama dan relasi
+    const { searchableColumns } = search
+    const mainTableSearchColumns = searchableColumns.filter(col => 
+      !['title_name', 'department_name', 'company_name'].includes(col)
+    )
+    const relationSearchColumns = searchableColumns.filter(col => 
+      ['title_name', 'department_name', 'company_name'].includes(col)
+    )
     
-    // Apply filter standar (tanpa relasi)
-    let dataQuery = applyStandardFilters(baseQuery.clone(), modifiedQueryParams)
+    // Apply filter standar dengan semua searchableColumns (termasuk relasi)
+    let dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
+    
+    // Tambahkan pencarian di kolom relasi jika ada searchTerm
+    if (search.searchTerm && relationSearchColumns.length > 0) {
+      dataQuery = dataQuery.orWhere(function() {
+        relationSearchColumns.forEach((column, index) => {
+          if (column === 'company_name') {
+            this.where('companies.company_name', 'ilike', `%${search.searchTerm}%`)
+          } else if (column === 'department_name') {
+            this.where('departments.department_name', 'ilike', `%${search.searchTerm}%`)
+          } else if (column === 'title_name') {
+            this.where('titles.title_name', 'ilike', `%${search.searchTerm}%`)
+          }
+        })
+      })
+    }
     
     // Apply filter relasi secara manual
     if (relationFilters.company_name) {
@@ -66,8 +84,24 @@ class EmployeesRepository {
       .leftJoin('departments', 'titles.department_id', 'departments.department_id')
       .leftJoin('companies', 'departments.company_id', 'companies.company_id')
       .select('*')
+      .where('employees.is_delete', false)
     
-    let countQuery = buildCountQuery(countBaseQuery, modifiedQueryParams)
+    let countQuery = buildCountQuery(countBaseQuery, queryParams)
+    
+    // Apply pencarian di kolom relasi ke count query juga
+    if (search.searchTerm && relationSearchColumns.length > 0) {
+      countQuery = countQuery.orWhere(function() {
+        relationSearchColumns.forEach((column, index) => {
+          if (column === 'company_name') {
+            this.where('companies.company_name', 'ilike', `%${search.searchTerm}%`)
+          } else if (column === 'department_name') {
+            this.where('departments.department_name', 'ilike', `%${search.searchTerm}%`)
+          } else if (column === 'title_name') {
+            this.where('titles.title_name', 'ilike', `%${search.searchTerm}%`)
+          }
+        })
+      })
+    }
     
     // Apply filter relasi ke count query juga
     if (relationFilters.company_name) {
