@@ -116,8 +116,10 @@ const updateEmployee = async (req, res) => {
       return errorResponse(res, 'Employee not found', 404)
     }
     
+    // Prepare update data - exclude company_id as it's not a direct column in employees table
+    const { company_id, ...updatePayload } = req.body
     const updateData = {
-      ...req.body,
+      ...updatePayload,
       updated_by: req.user?.user_id,
       updated_at: new Date()
     }
