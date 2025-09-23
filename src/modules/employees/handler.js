@@ -5,6 +5,7 @@ const { parseStandardQuery } = require('../../utils/pagination')
 const { pgCore } = require('../../config/database')
 const EmployeesRepository = require('./postgre_repository')
 const databaseQueueService = require('../../services/database_queue_service')
+const bcrypt = require('bcrypt')
 
 const employeesRepository = new EmployeesRepository(pgCore)
 
@@ -75,6 +76,12 @@ const createEmployee = async (req, res) => {
 
     // Prepare employee data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
     const { company_id, employeeHasPermissions, ...employeePayload } = req.body
+    
+    // Hash password if provided
+    if (employeePayload.password) {
+      employeePayload.password = await bcrypt.hash(employeePayload.password, 10)
+    }
+    
     const employeeData = {
       ...employeePayload,
       created_by: req.user?.user_id
@@ -125,8 +132,14 @@ const updateEmployee = async (req, res) => {
       return errorResponse(res, 'Employee not found', 404)
     }
     
-    // Prepare update data - exclude company_id as it's not a direct column in employees table
-    const { company_id, ...updatePayload } = req.body
+    // Prepare update data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
+    const { company_id, employeeHasPermissions, ...updatePayload } = req.body
+    
+    // Hash password if provided
+    if (updatePayload.password) {
+      updatePayload.password = await bcrypt.hash(updatePayload.password, 10)
+    }
+    
     const updateData = {
       ...updatePayload,
       updated_by: req.user?.user_id,
@@ -134,6 +147,19 @@ const updateEmployee = async (req, res) => {
     }
     
     const result = await employeesRepository.updateEmployee(id, updateData)
+    
+    // Update employee permissions if provided
+    if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
+      // Delete existing permissions first
+      await employeesRepository.deleteEmployeePermissions(id)
+      
+      // Create new permissions
+      await employeesRepository.createEmployeePermissions(
+        id, 
+        employeeHasPermissions, 
+        req.user?.user_id
+      )
+    }
     
     // Kirim queue ke RabbitMQ untuk operasi UPDATE
     await databaseQueueService.sendEmployeesUpdateQueue(id, updateData, result)
@@ -144,6 +170,15 @@ const updateEmployee = async (req, res) => {
     return successResponse(res, employeeWithRelations, 'Employee updated successfully')
   } catch (error) {
     console.error('Error updating employee:', error)
+    
+    // Provide more specific error message
+    if (error.code === '23503') { // Foreign key constraint violation
+      return errorResponse(res, 'Invalid title_id, department_id, gender_id, island_id, menu_id, or permission_id. One or more referenced records do not exist.', 400)
+    }
+    if (error.code === '23505') { // Unique constraint violation
+      return errorResponse(res, 'Employee with this email already exists.', 400)
+    }
+    
     return errorResponse(res, 'Failed to update employee', 500)
   }
 }

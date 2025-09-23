@@ -198,6 +198,15 @@ class EmployeesRepository {
   }
 
   /**
+   * Delete employee permissions
+   */
+  async deleteEmployeePermissions(employeeId) {
+    return await this.knex('employeeHasPermissions')
+      .where('employee_id', employeeId)
+      .del()
+  }
+
+  /**
    * Update employee
    */
   async updateEmployee(id, updateData) {

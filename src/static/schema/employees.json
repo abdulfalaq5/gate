@@ -13,15 +13,6 @@
 				"type": "string",
 				"format": "email"
 			},
-			"employee_exmail_account": {
-				"type": "string",
-				"format": "email",
-				"description": "Employee external mail account for login"
-			},
-			"password": {
-				"type": "string",
-				"description": "Employee password for authentication"
-			},
 			"title_id": {
 				"type": "string",
 				"format": "uuid"
@@ -47,6 +38,65 @@
 				"type": "string",
 				"format": "uuid",
 				"description": "Department ID from departments table"
+			},
+			"gender_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Gender ID from genders table"
+			},
+			"employee_mobile": {
+				"type": "string",
+				"maxLength": 50,
+				"description": "Employee mobile phone number"
+			},
+			"employee_office_number": {
+				"type": "string",
+				"maxLength": 50,
+				"description": "Employee office phone number"
+			},
+			"employee_address": {
+				"type": "string",
+				"description": "Employee home address"
+			},
+			"employee_exmail_account": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 100,
+				"description": "Employee external mail account for login"
+			},
+			"employee_channel": {
+				"type": "string",
+				"maxLength": 100,
+				"description": "Employee channel or source"
+			},
+			"employee_activation_status": {
+				"type": "string",
+				"maxLength": 50,
+				"description": "Employee activation status"
+			},
+			"employee_disabled": {
+				"type": "boolean",
+				"description": "Whether employee is disabled"
+			},
+			"employee_wechat_workplace": {
+				"type": "string",
+				"maxLength": 100,
+				"description": "Employee WeChat workplace ID"
+			},
+			"island_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Island ID from islands table"
+			},
+			"employee_phone": {
+				"type": "string",
+				"maxLength": 50,
+				"description": "Employee phone number"
+			},
+			"password": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Employee password for authentication"
 			},
 			"created_at": {
 				"type": "string",
@@ -97,6 +147,53 @@
 			"department_id": {
 				"type": "string",
 				"format": "uuid"
+			},
+			"gender_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_mobile": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"employee_office_number": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"employee_address": {
+				"type": "string"
+			},
+			"employee_exmail_account": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 100
+			},
+			"employee_channel": {
+				"type": "string",
+				"maxLength": 100
+			},
+			"employee_activation_status": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"employee_disabled": {
+				"type": "boolean"
+			},
+			"employee_wechat_workplace": {
+				"type": "string",
+				"maxLength": 100
+			},
+			"island_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_phone": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"password": {
+				"type": "string",
+				"maxLength": 255
 			},
 			"company_id": {
 				"type": "string",
@@ -153,11 +250,85 @@
 				"type": "string",
 				"format": "uuid"
 			},
+			"gender_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_mobile": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"employee_office_number": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"employee_address": {
+				"type": "string"
+			},
+			"employee_exmail_account": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 100
+			},
+			"employee_channel": {
+				"type": "string",
+				"maxLength": 100
+			},
+			"employee_activation_status": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"employee_disabled": {
+				"type": "boolean"
+			},
+			"employee_wechat_workplace": {
+				"type": "string",
+				"maxLength": 100
+			},
+			"island_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_phone": {
+				"type": "string",
+				"maxLength": 50
+			},
+			"password": {
+				"type": "string",
+				"maxLength": 255
+			},
 			"company_id": {
 				"type": "string",
 				"format": "uuid"
+			},
+			"employeeHasPermissions": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"menu_id": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"permission_detail": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"permission_id": {
+										"type": "string",
+										"format": "uuid"
+									}
+								},
+								"required": ["permission_id"]
+							}
+						}
+					},
+					"required": ["menu_id", "permission_detail"]
+				}
 			}
-		}
+		},
+		"description": "company_id is optional and will be ignored during update as it's derived from title->department->company relationship. employeeHasPermissions is optional and will replace all existing permissions for the employee."
 	},
 	"SchemaPostEmployeesGet": {
 		"type": "object",
