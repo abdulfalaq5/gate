@@ -23,7 +23,9 @@ class EmployeesRepository {
         'employees.*',
         'titles.title_name',
         'departments.department_name',
-        'companies.company_name'
+        'departments.department_id',
+        'companies.company_name',
+        'companies.company_id'
       )
       .where('employees.is_delete', false)
     
@@ -136,7 +138,9 @@ class EmployeesRepository {
         'employees.*',
         'titles.title_name',
         'departments.department_name',
-        'companies.company_name'
+        'departments.department_id',
+        'companies.company_name',
+        'companies.company_id'
       )
       .where('employees.employee_id', id)
       .where('employees.is_delete', false)
@@ -182,7 +186,9 @@ class EmployeesRepository {
         'employees.*',
         'titles.title_name',
         'departments.department_name',
-        'companies.company_name'
+        'departments.department_id',
+        'companies.company_name',
+        'companies.company_id'
       )
       .where('employees.title_id', titleId)
       .where('employees.is_delete', false)

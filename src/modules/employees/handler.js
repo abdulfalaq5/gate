@@ -73,8 +73,10 @@ const createEmployee = async (req, res) => {
       return errorResponse(res, validation.errors, 400)
     }
 
+    // Prepare employee data - exclude company_id as it's not a direct column in employees table
+    const { company_id, ...employeePayload } = req.body
     const employeeData = {
-      ...req.body,
+      ...employeePayload,
       created_by: req.user?.user_id
     }
     

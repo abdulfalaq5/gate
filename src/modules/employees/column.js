@@ -88,11 +88,11 @@ const employeesColumns = {
 const employeesValidationRules = {
   create: {
     required: ['employee_name', 'employee_email', 'title_id'],
-    optional: ['department_id']
+    optional: ['department_id', 'company_id'] // company_id is optional and will be ignored during insert
   },
   update: {
     required: [],
-    optional: ['employee_name', 'employee_email', 'title_id', 'department_id']
+    optional: ['employee_name', 'employee_email', 'title_id', 'department_id', 'company_id']
   }
 }
 

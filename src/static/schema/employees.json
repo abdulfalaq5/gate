@@ -29,6 +29,16 @@
 				"type": "string",
 				"description": "Company name from companies table"
 			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Company ID from companies table"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Department ID from departments table"
+			},
 			"created_at": {
 				"type": "string",
 				"format": "date-time"
@@ -78,9 +88,14 @@
 			"department_id": {
 				"type": "string",
 				"format": "uuid"
+			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid"
 			}
 		},
-		"required": ["employee_name", "employee_email", "title_id"]
+		"required": ["employee_name", "employee_email", "title_id"],
+		"description": "company_id is optional and will be ignored during insert as it's derived from title->department->company relationship"
 	},
 	"SchemaPutEmployees": {
 		"type": "object",
@@ -100,6 +115,10 @@
 				"format": "uuid"
 			},
 			"department_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"company_id": {
 				"type": "string",
 				"format": "uuid"
 			}
