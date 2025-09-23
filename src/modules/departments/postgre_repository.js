@@ -134,7 +134,7 @@ const getDepartmentByName = async (name) => {
   const [department] = await pgCore('departments')
     .select('*')
     .where('department_name', name)
-    .where('is_delete', false)
+    .where('departments.is_delete', false)
   
   return department
 }
@@ -160,7 +160,7 @@ const getDepartmentsByCompanyId = async (companyId) => {
 const getDepartmentsStats = async () => {
   const [stats] = await pgCore('departments')
     .count('* as total')
-    .where('is_delete', false)
+    .where('departments.is_delete', false)
   
   return {
     total: parseInt(stats.total)
