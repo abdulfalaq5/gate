@@ -5,12 +5,9 @@ const router = express.Router();
 const permissionsRoutes = require('../../modules/permissions');
 const menusRoutes = require('../../modules/menus');
 const systemsRoutes = require('../../modules/systems');
-const rolesRoutes = require('../../modules/roles');
-const usersRoutes = require('../../modules/users');
 const ssoRoutes = require('../../modules/sso');
 const systemHasMenusRoutes = require('../../modules/system_has_menus');
 const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
-const roleHasMenuPermissionsRoutes = require('../../modules/role_has_menu_permissions');
 const companiesRoutes = require('../../modules/companies');
 const departmentsRoutes = require('../../modules/departments');
 const employeesRoutes = require('../../modules/employees');
@@ -100,24 +97,8 @@ router.get('/systems/:id', verifySSOToken, systemsRoutes.getSystem);
 router.put('/systems/:id', verifySSOToken, systemsRoutes.updateSystem);
 router.delete('/systems/:id', verifySSOToken, systemsRoutes.deleteSystem);
 
-// Roles
-router.post('/roles/get', verifySSOToken, rolesRoutes.listRoles);
-router.post('/roles/create', verifySSOToken, rolesRoutes.createRole);
-router.get('/roles/:id', verifySSOToken, rolesRoutes.getRole);
-router.get('/roles/:id/permissions', verifySSOToken, rolesRoutes.getRolePermissions);
-router.post('/roles/:id/permissions', verifySSOToken, rolesRoutes.assignPermissions);
-router.put('/roles/:id', verifySSOToken, rolesRoutes.updateRole);
-router.delete('/roles/:id', verifySSOToken, rolesRoutes.deleteRole);
-
-// Users
-router.post('/users/get', verifySSOToken, usersRoutes.listUsers);
-router.post('/users/create', verifySSOToken, usersRoutes.createUser);
-router.get('/users/:id', verifySSOToken, usersRoutes.getUser);
-router.get('/users/:id/permissions', verifySSOToken, usersRoutes.getUserPermissions);
-router.post('/users/login', usersRoutes.login);
-router.put('/users/:id', verifySSOToken, usersRoutes.updateUser);
-router.delete('/users/:id', verifySSOToken, usersRoutes.deleteUser);
-router.post('/users/change-password', verifySSOToken, usersRoutes.changePassword);
+// Note: Roles and Users modules have been removed as part of database restructure
+// Authentication now uses employees table directly
 
 // System Has Menus
 router.post('/system-has-menus', systemHasMenusRoutes.createSystemHasMenu);
@@ -141,19 +122,7 @@ router.delete('/menu-has-permissions/:menu_id/:permission_id', menuHasPermission
 router.delete('/menu-has-permissions/menu/:menu_id', menuHasPermissionsRoutes.deleteByMenu);
 router.delete('/menu-has-permissions/permission/:permission_id', menuHasPermissionsRoutes.deleteByPermission);
 
-// Role Has Menu Permissions (Protected)
-router.post('/role-has-menu-permissions', verifySSOToken, roleHasMenuPermissionsRoutes.createRoleHasMenuPermission);
-router.get('/role-has-menu-permissions', verifySSOToken, roleHasMenuPermissionsRoutes.listRoleHasMenuPermissions);
-router.get('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.getRoleHasMenuPermission);
-router.get('/role-has-menu-permissions/role/:role_id', verifySSOToken, roleHasMenuPermissionsRoutes.getPermissionsByRole);
-router.get('/role-has-menu-permissions/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.getRolesByMenu);
-router.get('/role-has-menu-permissions/permission/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.getRolesByPermission);
-router.get('/role-has-menu-permissions/role/:role_id/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.getPermissionsByRoleAndMenu);
-router.put('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.updateRoleHasMenuPermission);
-router.delete('/role-has-menu-permissions/:role_id/:menu_id/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteRoleHasMenuPermission);
-router.delete('/role-has-menu-permissions/role/:role_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByRole);
-router.delete('/role-has-menu-permissions/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByMenu);
-router.delete('/role-has-menu-permissions/permission/:permission_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByPermission);
-router.delete('/role-has-menu-permissions/role/:role_id/menu/:menu_id', verifySSOToken, roleHasMenuPermissionsRoutes.deleteByRoleAndMenu);
+// Note: Role Has Menu Permissions module has been removed
+// Permission management now uses employeeHasPermissions table directly
 
 module.exports = router;

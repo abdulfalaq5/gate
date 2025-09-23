@@ -1,24 +1,9 @@
 const { body } = require('express-validator');
 
 /**
- * Validasi untuk endpoint update profil gabungan (user, employee, password)
+ * Validasi untuk endpoint update profil employee dan password
  */
 const updateProfileValidation = [
-  // User data validation
-  body('user_name')
-    .optional()
-    .isLength({ min: 3, max: 100 })
-    .withMessage('Username harus antara 3-100 karakter')
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage('Username hanya boleh mengandung huruf, angka, dan underscore'),
-  
-  body('user_email')
-    .optional()
-    .isEmail()
-    .withMessage('Format email tidak valid')
-    .isLength({ max: 100 })
-    .withMessage('Email maksimal 100 karakter'),
-
   // Employee data validation
   body('employee_name')
     .optional()
@@ -64,8 +49,6 @@ const updateProfileValidation = [
   // Custom validation untuk memastikan minimal satu field diisi
   body().custom((value, { req }) => {
     const { 
-      user_name, 
-      user_email, 
       employee_name, 
       employee_email, 
       title_id, 
@@ -74,11 +57,10 @@ const updateProfileValidation = [
       confirm_password 
     } = req.body;
 
-    const hasUserUpdate = user_name || user_email;
     const hasEmployeeUpdate = employee_name || employee_email || title_id;
     const hasPasswordUpdate = current_password || new_password || confirm_password;
 
-    if (!hasUserUpdate && !hasEmployeeUpdate && !hasPasswordUpdate) {
+    if (!hasEmployeeUpdate && !hasPasswordUpdate) {
       throw new Error('Minimal satu field harus diisi untuk update profil');
     }
 

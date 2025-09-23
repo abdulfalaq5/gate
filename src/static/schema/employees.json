@@ -13,6 +13,15 @@
 				"type": "string",
 				"format": "email"
 			},
+			"employee_exmail_account": {
+				"type": "string",
+				"format": "email",
+				"description": "Employee external mail account for login"
+			},
+			"password": {
+				"type": "string",
+				"description": "Employee password for authentication"
+			},
 			"title_id": {
 				"type": "string",
 				"format": "uuid"

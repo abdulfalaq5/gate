@@ -6,12 +6,10 @@ const departments = require('./departments.json')
 const employees = require('./employees.json')
 const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
-const roles = require('./roles.json')
 const permissions = require('./permissions.json')
-const users = require('./users.json')
 const systemHasMenus = require('./system_has_menus.json')
 const menuHasPermissions = require('./menu_has_permissions.json')
-const roleHasMenuPermissions = require('./role_has_menu_permissions.json')
+// employeeHasPermissions path removed
 const ssoProfile = require('./sso_profile.json')
 const titles = require('./titles.json')
 
@@ -24,12 +22,10 @@ module.exports = {
   ...employees,
   ...employeesImport,
   ...importModule,
-  ...roles,
   ...permissions,
-  ...users,
   ...systemHasMenus,
   ...menuHasPermissions,
-  ...roleHasMenuPermissions,
+  // employeeHasPermissions removed
   ...ssoProfile,
   ...titles
 }

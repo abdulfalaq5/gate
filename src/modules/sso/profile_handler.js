@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const UsersRepository = require('../users/postgre_repository');
+// UsersRepository removed - now using employees table directly
 const EmployeesRepository = require('../employees/postgre_repository');
 const { CustomException } = require('../../utils/exception');
 const { Logger } = require('../../utils/logger');
@@ -10,7 +10,7 @@ const { pgCore } = require('../../config/database');
  */
 class SSOProfileHandler {
   constructor() {
-    this.usersRepository = new UsersRepository(pgCore);
+    // UsersRepository removed - now using employees table directly
     this.employeesRepository = new EmployeesRepository(pgCore);
   }
 
@@ -27,24 +27,39 @@ class SSOProfileHandler {
 
       Logger.info('Getting user profile', { user_id: userId });
 
-      // Ambil data user dengan detail lengkap
-      const userProfile = await this.usersRepository.getUserWithDetails(userId);
+      // Ambil data employee dengan detail lengkap termasuk company melalui department
+      const employeeProfile = await pgCore('employees')
+        .select([
+          'employees.employee_id',
+          'employees.employee_name',
+          'employees.employee_email',
+          'employees.employee_exmail_account',
+          'employees.password',
+          'titles.title_name',
+          'departments.department_name',
+          'companies.company_name'
+        ])
+        .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+        .leftJoin('departments', 'employees.department_id', 'departments.department_id')
+        .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+        .where('employees.employee_id', userId)
+        .where('employees.is_delete', false)
+        .first();
       
-      if (!userProfile) {
-        throw new CustomException('Profil user tidak ditemukan', 404);
+      if (!employeeProfile) {
+        throw new CustomException('Profil employee tidak ditemukan', 404);
       }
 
-      // Format response tanpa password
+      // Format response tanpa password, user_id, user_name, user_email
       const profileData = {
-        user_id: userProfile.user_id,
-        user_name: userProfile.user_name,
-        user_email: userProfile.user_email,
-        employee_id: userProfile.employee_id,
-        employee_name: userProfile.employee_name,
-        role_id: userProfile.role_id,
-        role_name: userProfile.role_name,
-        created_at: userProfile.created_at,
-        updated_at: userProfile.updated_at
+        employee_id: employeeProfile.employee_id,
+        employee_name: employeeProfile.employee_name,
+        employee_email: employeeProfile.employee_email,
+        title_name: employeeProfile.title_name,
+        department_name: employeeProfile.department_name,
+        company_name: employeeProfile.company_name,
+        created_at: employeeProfile.created_at,
+        updated_at: employeeProfile.updated_at
       };
 
       return res.status(200).json({
@@ -76,15 +91,12 @@ class SSOProfileHandler {
   }
 
   /**
-   * PUT /auth/sso/profil - Update profil user, employee, dan password dalam satu endpoint
+   * PUT /auth/sso/profil - Update profil employee dan password
    */
   async updateProfile(req, res) {
     try {
       const userId = req.user?.user_id;
       const { 
-        // User data
-        user_name, 
-        user_email,
         // Employee data
         employee_name,
         employee_email,
@@ -99,11 +111,9 @@ class SSOProfileHandler {
         throw new CustomException('User tidak terautentikasi', 401);
       }
 
-      Logger.info('Updating user profile', { 
+      Logger.info('Updating employee profile', { 
         user_id: userId, 
         updates: { 
-          user_name, 
-          user_email, 
           employee_name, 
           employee_email, 
           title_id,
@@ -112,21 +122,31 @@ class SSOProfileHandler {
       });
 
       // Validasi minimal satu field harus diisi
-      const hasUserUpdate = user_name || user_email;
       const hasEmployeeUpdate = employee_name || employee_email || title_id;
       const hasPasswordUpdate = current_password || new_password || confirm_password;
 
-      if (!hasUserUpdate && !hasEmployeeUpdate && !hasPasswordUpdate) {
+      if (!hasEmployeeUpdate && !hasPasswordUpdate) {
         throw new CustomException('Minimal satu field harus diisi untuk update profil', 400);
       }
 
-      // Ambil data user dan employee yang ada
-      const userProfile = await this.usersRepository.getUserWithDetails(userId);
-      if (!userProfile) {
-        throw new CustomException('Profil user tidak ditemukan', 404);
+      // Ambil data employee yang ada (userId sekarang adalah employee_id)
+      const employeeProfile = await pgCore('employees')
+        .select([
+          'employees.employee_id',
+          'employees.employee_name',
+          'employees.employee_email',
+          'employees.password',
+          'employees.title_id'
+        ])
+        .where('employees.employee_id', userId)
+        .where('employees.is_delete', false)
+        .first();
+      
+      if (!employeeProfile) {
+        throw new CustomException('Profil employee tidak ditemukan', 404);
       }
 
-      const employeeId = userProfile.employee_id;
+      const employeeId = employeeProfile.employee_id;
 
       // Validasi password jika ada update password
       if (hasPasswordUpdate) {
@@ -143,32 +163,23 @@ class SSOProfileHandler {
         }
 
         // Verifikasi password lama
-        const isCurrentPasswordValid = await this.usersRepository.verifyPassword(current_password, userProfile.user_password);
+        const bcrypt = require('bcrypt');
+        const isCurrentPasswordValid = await bcrypt.compare(current_password, employeeProfile.password);
         if (!isCurrentPasswordValid) {
           throw new CustomException('Password lama tidak benar', 400);
         }
       }
 
-      // Validasi email duplikasi untuk user
-      if (user_email) {
-        const existingUser = await this.usersRepository.findByEmail(user_email);
-        if (existingUser && existingUser.user_id !== userId) {
-          throw new CustomException('Email sudah digunakan oleh user lain', 400);
-        }
-      }
-
-      // Validasi username duplikasi untuk user
-      if (user_name) {
-        const existingUser = await this.usersRepository.findByUsername(user_name);
-        if (existingUser && existingUser.user_id !== userId) {
-          throw new CustomException('Username sudah digunakan oleh user lain', 400);
-        }
-      }
-
       // Validasi email duplikasi untuk employee
       if (employee_email) {
-        const existingEmployee = await this.employeesRepository.findByEmail(employee_email);
-        if (existingEmployee && existingEmployee.employee_id !== employeeId) {
+        const existingEmployee = await pgCore('employees')
+          .select('employee_id', 'employee_email')
+          .where('employee_email', employee_email)
+          .where('employee_id', '!=', employeeId)
+          .where('is_delete', false)
+          .first();
+        
+        if (existingEmployee) {
           throw new CustomException('Email employee sudah digunakan oleh employee lain', 400);
         }
       }
@@ -177,68 +188,63 @@ class SSOProfileHandler {
       const trx = await pgCore.transaction();
 
       try {
-        // Update user data (username dan email)
-        if (hasUserUpdate) {
-          const userUpdateData = {};
-          if (user_name) userUpdateData.user_name = user_name;
-          if (user_email) userUpdateData.user_email = user_email;
-
-          await trx('users')
-            .where('user_id', userId)
-            .update({
-              ...userUpdateData,
-              updated_at: new Date(),
-              updated_by: userId
-            });
-        }
-
-        // Update password (terpisah dari update user data)
+        // Update employee data dan password
+        const employeeUpdateData = {};
+        
+        // Update employee fields
+        if (employee_name) employeeUpdateData.employee_name = employee_name;
+        if (employee_email) employeeUpdateData.employee_email = employee_email;
+        if (title_id) employeeUpdateData.title_id = title_id;
+        
+        // Update password jika ada
         if (hasPasswordUpdate) {
           const saltRounds = 10;
           const hashedPassword = await bcrypt.hash(new_password, saltRounds);
-
-          await trx('users')
-            .where('user_id', userId)
-            .update({
-              user_password: hashedPassword,
-              updated_at: new Date(),
-              updated_by: userId
-            });
+          employeeUpdateData.password = hashedPassword;
         }
 
-        // Update employee data
-        if (hasEmployeeUpdate) {
-          const employeeUpdateData = {};
-          if (employee_name) employeeUpdateData.employee_name = employee_name;
-          if (employee_email) employeeUpdateData.employee_email = employee_email;
-          if (title_id) employeeUpdateData.title_id = title_id;
+        // Update timestamp dan updated_by
+        employeeUpdateData.updated_at = new Date();
+        employeeUpdateData.updated_by = userId;
 
+        // Lakukan update jika ada data yang diubah
+        if (Object.keys(employeeUpdateData).length > 2) { // lebih dari updated_at dan updated_by
           await trx('employees')
             .where('employee_id', employeeId)
-            .update({
-              ...employeeUpdateData,
-              updated_at: new Date(),
-              updated_by: userId
-            });
+            .update(employeeUpdateData);
         }
 
         // Commit transaction
         await trx.commit();
 
-        // Ambil data yang sudah diupdate
-        const updatedProfile = await this.usersRepository.getUserWithDetails(userId);
+        // Ambil data employee yang sudah diupdate
+        const updatedProfile = await pgCore('employees')
+          .select([
+            'employees.employee_id',
+            'employees.employee_name',
+            'employees.employee_email',
+            'employees.title_id',
+            'titles.title_name',
+            'departments.department_name',
+            'companies.company_name',
+            'employees.created_at',
+            'employees.updated_at'
+          ])
+          .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+          .leftJoin('departments', 'employees.department_id', 'departments.department_id')
+          .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+          .where('employees.employee_id', employeeId)
+          .where('employees.is_delete', false)
+          .first();
 
-        // Format response tanpa password
+        // Format response tanpa password, user_id, user_name, user_email
         const profileData = {
-          user_id: updatedProfile.user_id,
-          user_name: updatedProfile.user_name,
-          user_email: updatedProfile.user_email,
           employee_id: updatedProfile.employee_id,
           employee_name: updatedProfile.employee_name,
           employee_email: updatedProfile.employee_email,
-          title_id: updatedProfile.title_id,
-          role_id: updatedProfile.role_id,
-          role_name: updatedProfile.role_name,
+          title_name: updatedProfile.title_name,
+          department_name: updatedProfile.department_name,
+          company_name: updatedProfile.company_name,
           created_at: updatedProfile.created_at,
           updated_at: updatedProfile.updated_at
         };

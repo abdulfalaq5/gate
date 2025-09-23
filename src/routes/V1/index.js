@@ -3,6 +3,7 @@ const auth = require('../../modules/auth')
 const companies = require('../../modules/companies')
 const departments = require('../../modules/departments')
 const importModule = require('../../modules/import')
+// employeeHasPermissions module removed
 const ssoRoutes = require('./sso')
 const { verifyToken, verifySSOToken } = require('../../middlewares')
 
@@ -21,5 +22,7 @@ routing.use(`${API_TAG}/auth`, auth)
 
 // Import routes
 routing.use(`${API_TAG}/import`, importModule)
+
+// Employee Has Permissions routes removed
 
 module.exports = routing;

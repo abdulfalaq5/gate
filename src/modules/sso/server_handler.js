@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const ssoConfig = require('../../config/sso');
-const UsersRepository = require('../users/postgre_repository');
+// UsersRepository removed - now using employees table directly
 const { CustomException } = require('../../utils/exception');
 const { Logger } = require('../../utils/logger');
 const { pgCore } = require('../../config/database');
 
 class SSOServerHandler {
   constructor() {
-    this.usersRepository = new UsersRepository(pgCore);
+    // UsersRepository removed - now using employees table directly
     this.authorizationCodes = new Map(); // In production, use Redis or database
   }
 
@@ -53,38 +53,75 @@ class SSOServerHandler {
         });
       }
 
-      // Find user by email
-      const user = await this.usersRepository.findByEmail(email);
+      // Find employee by email
+      const employee = await pgCore('employees')
+        .select([
+          'employee_id',
+          'employee_name',
+          'employee_exmail_account',
+          'password',
+          'is_delete'
+        ])
+        .where('employee_exmail_account', email)
+        .where('is_delete', false)
+        .first();
 
-      if (!user) {
-        console.log('User not found:', email);
+      if (!employee) {
+        console.log('Employee not found:', email);
         throw new CustomException('Invalid credentials', 401);
       }
 
-      console.log('User found:', user.user_name);
+      console.log('Employee found:', employee.employee_name);
 
       // Verify password
-      const isValidPassword = await this.usersRepository.verifyPassword(password, user.user_password);
+      const bcrypt = require('bcrypt');
+      const isValidPassword = await bcrypt.compare(password, employee.password);
       if (!isValidPassword) {
-        console.log('Invalid password for user:', email);
+        console.log('Invalid password for employee:', email);
         throw new CustomException('Invalid credentials', 401);
       }
 
-      console.log('Password verified for user:', email);
+      console.log('Password verified for employee:', email);
 
-      // Get user details with permissions
-      const userDetails = await this.usersRepository.getUserWithDetails(user.user_id);
-      const permissions = await this.usersRepository.getUserPermissions(user.user_id);
+      // Get employee details with permissions
+      const userDetails = {
+        user: {
+          id: employee.employee_id,
+          username: employee.employee_name,
+          email: employee.employee_exmail_account
+        },
+        employee: {
+          id: employee.employee_id,
+          name: employee.employee_name,
+          email: employee.employee_exmail_account
+        }
+      };
+      
+      // Get employee permissions with menu information
+      const permissions = await pgCore('employeeHasPermissions')
+        .select([
+          'permissions.permission_name',
+          'permissions.permission_id',
+          'menus.menu_name',
+          'menus.menu_url',
+          'employeeHasPermissions.menu_id'
+        ])
+        .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+        .leftJoin('menus', 'employeeHasPermissions.menu_id', 'menus.menu_id')
+        .where('employeeHasPermissions.employee_id', employee.employee_id)
+        .where('permissions.is_delete', false)
+        .where('menus.is_delete', false);
 
       // Generate authorization code if client_id and redirect_uri provided
       let authorizationCode = null;
       if (client_id && redirect_uri) {
-        authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, user.user_id);
+        authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, employee.employee_id);
       }
 
       // Generate JWT token dengan payload yang lebih lengkap
       const tokenPayload = {
-        user_id: user.user_id,
+        user_id: employee.employee_id,
+        employee_id: employee.employee_id,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
         aud: client_id || ssoConfig.sso.jwt.audience,
@@ -94,10 +131,10 @@ class SSOServerHandler {
       const ssoToken = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret);
 
       // Generate session ID
-      const sessionId = user.user_id; // Using user_id as session_id for simplicity
+      const sessionId = employee.employee_id; // Using employee_id as session_id for simplicity
       const loginTime = new Date().toISOString();
 
-      Logger.info('SSO login successful', { user_id: user.user_id, client_id });
+      Logger.info('SSO login successful', { user_id: employee.employee_id, client_id });
 
       // Group permissions by menu
       const menuPermissions = {};
@@ -125,12 +162,10 @@ class SSOServerHandler {
         message: 'Login SSO berhasil',
         data: {
           user: {
-            user_name: userDetails.user_name,
-            user_email: userDetails.user_email,
-            role_name: userDetails.role_name,
-            employee_name: userDetails.employee_name,
-            created_at: userDetails.created_at,
-            updated_at: userDetails.updated_at
+            user_name: userDetails.user.username,
+            user_email: userDetails.user.email,
+            employee_name: userDetails.employee.name,
+            employee_id: userDetails.employee.id
           },
           menu: menuArray,
           session: {
@@ -191,14 +226,18 @@ class SSOServerHandler {
 
       try {
         const decoded = jwt.verify(token, ssoConfig.sso.jwt.secret);
-        const user = await this.usersRepository.findById(decoded.user_id);
+        const employee = await pgCore('employees')
+          .select(['employee_id', 'employee_name', 'employee_exmail_account', 'is_delete'])
+          .where('employee_id', decoded.user_id)
+          .where('is_delete', false)
+          .first();
 
-        if (!user || user.is_delete) {
+        if (!employee) {
           throw new CustomException('User not found', 401);
         }
 
         // Generate authorization code
-        const authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, user.user_id);
+        const authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, employee.employee_id);
 
         // Redirect back to client with authorization code
         const redirectUrl = `${redirect_uri}?code=${authorizationCode}&state=${state}`;
@@ -252,27 +291,32 @@ class SSOServerHandler {
       // In a real implementation, you would validate client_secret
       // and redirect_uri against registered clients
 
-      // Get user details
-      const user = await this.usersRepository.getUserWithDetails(authCode.userId);
-      const permissions = await this.usersRepository.getUserPermissions(authCode.userId);
+      // Get employee details
+      const employee = await pgCore('employees')
+        .select(['employee_id', 'employee_name', 'employee_exmail_account'])
+        .where('employee_id', authCode.userId)
+        .where('is_delete', false)
+        .first();
+        
+      const permissions = await pgCore('employeeHasPermissions')
+        .select(['permissions.permission_name', 'permissions.permission_id'])
+        .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+        .where('employeeHasPermissions.employee_id', authCode.userId)
+        .where('permissions.is_delete', false);
 
-      if (!user) {
+      if (!employee) {
         throw new CustomException('User not found', 404);
       }
 
       // Generate access token
       const tokenPayload = {
-        user_id: user.user_id,
-        user_name: user.user_name,
-        user_email: user.user_email,
-        role_id: user.role_id,
-        employee_id: user.employee_id,
+        user_id: employee.employee_id,
+        employee_id: employee.employee_id,
+        username: employee.employee_name,
+        email: employee.employee_exmail_account,
         permissions: permissions.map(p => ({
-          permission_id: p.permission_id,
           permission_name: p.permission_name,
-          menu_id: p.menu_id,
-          menu_name: p.menu_name,
-          menu_url: p.menu_url,
+          permission_id: p.permission_id,
         })),
       };
 
@@ -285,7 +329,7 @@ class SSOServerHandler {
       // Clean up authorization code
       this.authorizationCodes.delete(code);
 
-      logger.info('SSO token generated successfully', { user_id: user.user_id, client_id });
+      Logger.info('SSO token generated successfully', { user_id: employee.employee_id, client_id });
 
       return res.status(200).json({
         access_token: accessToken,
@@ -323,10 +367,19 @@ class SSOServerHandler {
       }
 
       const decoded = jwt.verify(token, ssoConfig.sso.jwt.secret);
-      const user = await this.usersRepository.getUserWithDetails(decoded.user_id);
-      const permissions = await this.usersRepository.getUserPermissions(decoded.user_id);
+      const employee = await pgCore('employees')
+        .select(['employee_id', 'employee_name', 'employee_exmail_account'])
+        .where('employee_id', decoded.user_id)
+        .where('is_delete', false)
+        .first();
+        
+      const permissions = await pgCore('employeeHasPermissions')
+        .select(['permissions.permission_name', 'permissions.permission_id'])
+        .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+        .where('employeeHasPermissions.employee_id', decoded.user_id)
+        .where('permissions.is_delete', false);
 
-      if (!user) {
+      if (!employee) {
         throw new CustomException('User not found', 404);
       }
 
@@ -335,22 +388,15 @@ class SSOServerHandler {
         message: 'User info retrieved successfully',
         data: {
           user: {
-            user_id: user.user_id,
-            user_name: user.user_name,
-            user_email: user.user_email,
-            role_id: user.role_id,
-            role_name: user.role_name,
-            employee_id: user.employee_id,
-            employee_name: user.employee_name,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
+            user_id: employee.employee_id,
+            user_name: employee.employee_name,
+            user_email: employee.employee_exmail_account,
+            employee_id: employee.employee_id,
+            employee_name: employee.employee_name,
           },
           permissions: permissions.map(p => ({
             permission_id: p.permission_id,
             permission_name: p.permission_name,
-            menu_id: p.menu_id,
-            menu_name: p.menu_name,
-            menu_url: p.menu_url,
           })),
         },
       });

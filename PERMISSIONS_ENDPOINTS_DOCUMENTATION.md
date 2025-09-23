@@ -243,3 +243,13 @@ curl -X POST http://localhost:9518/api/permissions/get \
 ✅ **Format konsisten** dengan module roles, menus, companies, departments, dan employees
 
 **Server berjalan di port 9518 dan siap digunakan!** 🎉
+
+
+# 1. Update database schema
+npx knex migrate:latest --knexfile src/knexfile.js
+
+# 2. Update password semua employees
+npx knex seed:run --specific=update_employee_passwords.js --knexfile src/knexfile.js
+
+# 3. Insert employee permissions
+npx knex seed:run --specific=insert_employee_permissions.js --knexfile src/knexfile.js

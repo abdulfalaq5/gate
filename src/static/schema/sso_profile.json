@@ -2,21 +2,6 @@
   "SchemaPostSSOProfileUpdateCombined": {
     "type": "object",
     "properties": {
-      "user_name": {
-        "type": "string",
-        "minLength": 3,
-        "maxLength": 100,
-        "pattern": "^[a-zA-Z0-9_]+$",
-        "description": "Username baru (3-100 karakter, hanya huruf, angka, dan underscore)",
-        "example": "new_username"
-      },
-      "user_email": {
-        "type": "string",
-        "format": "email",
-        "maxLength": 100,
-        "description": "Email user baru (format email valid, maksimal 100 karakter)",
-        "example": "new@example.com"
-      },
       "employee_name": {
         "type": "string",
         "minLength": 2,
@@ -72,27 +57,10 @@
       "data": {
         "type": "object",
         "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "ID unik user",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "user_name": {
-            "type": "string",
-            "description": "Username user",
-            "example": "admin"
-          },
-          "user_email": {
-            "type": "string",
-            "format": "email",
-            "description": "Email user",
-            "example": "admin@example.com"
-          },
           "employee_id": {
             "type": "string",
             "format": "uuid",
-            "description": "ID employee terkait",
+            "description": "ID employee",
             "example": "123e4567-e89b-12d3-a456-426614174001"
           },
           "employee_name": {
@@ -106,37 +74,35 @@
             "description": "Email employee",
             "example": "john.doe@company.com"
           },
-          "title_id": {
+          "title_name": {
             "type": "string",
-            "format": "uuid",
-            "description": "ID title/jabatan employee",
-            "example": "123e4567-e89b-12d3-a456-426614174002"
+            "description": "Nama title/jabatan employee",
+            "example": "Front End Developer"
           },
-          "role_id": {
+          "department_name": {
             "type": "string",
-            "format": "uuid",
-            "description": "ID role user",
-            "example": "123e4567-e89b-12d3-a456-426614174003"
+            "description": "Nama departemen employee",
+            "example": "IT"
           },
-          "role_name": {
+          "company_name": {
             "type": "string",
-            "description": "Nama role user",
-            "example": "Administrator"
+            "description": "Nama perusahaan employee",
+            "example": "MSI"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "description": "Tanggal pembuatan user",
+            "description": "Tanggal pembuatan employee",
             "example": "2024-01-01T00:00:00.000Z"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "description": "Tanggal terakhir update user",
+            "description": "Tanggal terakhir update employee",
             "example": "2024-01-01T00:00:00.000Z"
           }
         },
-        "required": ["user_id", "user_name", "user_email", "employee_id", "employee_name", "employee_email", "title_id", "role_id", "role_name", "created_at", "updated_at"]
+        "required": ["employee_id", "employee_name", "employee_email", "title_name", "department_name", "company_name", "created_at", "updated_at"]
       },
       "timestamp": {
         "type": "string",
