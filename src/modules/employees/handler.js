@@ -73,14 +73,23 @@ const createEmployee = async (req, res) => {
       return errorResponse(res, validation.errors, 400)
     }
 
-    // Prepare employee data - exclude company_id as it's not a direct column in employees table
-    const { company_id, ...employeePayload } = req.body
+    // Prepare employee data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
+    const { company_id, employeeHasPermissions, ...employeePayload } = req.body
     const employeeData = {
       ...employeePayload,
       created_by: req.user?.user_id
     }
     
     const employee = await employeesRepository.createEmployee(employeeData)
+    
+    // Create employee permissions if provided
+    if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
+      await employeesRepository.createEmployeePermissions(
+        employee.employee_id, 
+        employeeHasPermissions, 
+        req.user?.user_id
+      )
+    }
     
     // Kirim queue ke RabbitMQ untuk operasi CREATE
     await databaseQueueService.sendEmployeesCreateQueue(employeeData, employee)
@@ -94,7 +103,7 @@ const createEmployee = async (req, res) => {
     
     // Provide more specific error message
     if (error.code === '23503') { // Foreign key constraint violation
-      return errorResponse(res, 'Invalid title_id. Title does not exist.', 400)
+      return errorResponse(res, 'Invalid title_id, department_id, menu_id, or permission_id. One or more referenced records do not exist.', 400)
     }
     if (error.code === '23505') { // Unique constraint violation
       return errorResponse(res, 'Employee with this email already exists.', 400)

@@ -163,6 +163,41 @@ class EmployeesRepository {
   }
 
   /**
+   * Create employee permissions
+   */
+  async createEmployeePermissions(employeeId, permissions, createdBy) {
+    if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {
+      return []
+    }
+
+    const permissionData = []
+    
+    for (const permission of permissions) {
+      if (permission.menu_id && permission.permission_detail && Array.isArray(permission.permission_detail)) {
+        for (const detail of permission.permission_detail) {
+          if (detail.permission_id) {
+            permissionData.push({
+              employee_id: employeeId,
+              menu_id: permission.menu_id,
+              permission_id: detail.permission_id,
+              created_by: createdBy,
+              created_at: new Date()
+            })
+          }
+        }
+      }
+    }
+
+    if (permissionData.length > 0) {
+      return await this.knex('employeeHasPermissions')
+        .insert(permissionData)
+        .returning('*')
+    }
+
+    return []
+  }
+
+  /**
    * Update employee
    */
   async updateEmployee(id, updateData) {

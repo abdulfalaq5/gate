@@ -101,10 +101,36 @@
 			"company_id": {
 				"type": "string",
 				"format": "uuid"
+			},
+			"employeeHasPermissions": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"menu_id": {
+							"type": "string",
+							"format": "uuid"
+						},
+						"permission_detail": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"permission_id": {
+										"type": "string",
+										"format": "uuid"
+									}
+								},
+								"required": ["permission_id"]
+							}
+						}
+					},
+					"required": ["menu_id", "permission_detail"]
+				}
 			}
 		},
 		"required": ["employee_name", "employee_email", "title_id"],
-		"description": "company_id is optional and will be ignored during insert as it's derived from title->department->company relationship"
+		"description": "company_id is optional and will be ignored during insert as it's derived from title->department->company relationship. employeeHasPermissions is optional and will create permission records for the employee."
 	},
 	"SchemaPutEmployees": {
 		"type": "object",

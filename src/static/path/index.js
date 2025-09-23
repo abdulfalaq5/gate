@@ -7,9 +7,6 @@ const employees = require('./employees.json')
 const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
 const permissions = require('./permissions.json')
-const systemHasMenus = require('./system_has_menus.json')
-const menuHasPermissions = require('./menu_has_permissions.json')
-// employeeHasPermissions path removed
 const ssoProfile = require('./sso_profile.json')
 const titles = require('./titles.json')
 
@@ -23,9 +20,6 @@ module.exports = {
   ...employeesImport,
   ...importModule,
   ...permissions,
-  ...systemHasMenus,
-  ...menuHasPermissions,
-  // employeeHasPermissions removed
   ...ssoProfile,
   ...titles
 }
