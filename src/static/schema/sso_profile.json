@@ -16,11 +16,11 @@
         "description": "Email employee baru (format email valid, maksimal 100 karakter)",
         "example": "john.doe@company.com"
       },
-      "title_id": {
+      "employee_foto": {
         "type": "string",
-        "format": "uuid",
-        "description": "ID title/jabatan employee",
-        "example": "123e4567-e89b-12d3-a456-426614174000"
+        "format": "binary",
+        "description": "File foto profil employee (format: image/jpeg, image/png, image/gif, image/webp, maksimal 5MB)",
+        "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
       },
       "current_password": {
         "type": "string",
@@ -41,7 +41,7 @@
       }
     },
     "additionalProperties": false,
-    "description": "Minimal satu field harus diisi. Jika ingin mengubah password, semua field password harus diisi."
+    "description": "Minimal satu field harus diisi. Jika ingin mengubah password, semua field password harus diisi. Content-Type harus multipart/form-data untuk upload file."
   },
   "SchemaResponseSSOProfile": {
     "type": "object",

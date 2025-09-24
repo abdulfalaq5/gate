@@ -40,4 +40,5 @@ module.exports = {
   // Profile Management endpoints
   getProfile: ssoProfileHandler.getProfile.bind(ssoProfileHandler),
   updateProfile: ssoProfileHandler.updateProfile.bind(ssoProfileHandler),
+  getUploadMiddleware: ssoProfileHandler.getUploadMiddleware.bind(ssoProfileHandler),
 };

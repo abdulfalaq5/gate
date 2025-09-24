@@ -1,7 +1,7 @@
 const { body } = require('express-validator');
 
 /**
- * Validasi untuk endpoint update profil employee dan password
+ * Validasi untuk endpoint update profil employee dan password dengan upload foto
  */
 const updateProfileValidation = [
   // Employee data validation
@@ -16,11 +16,6 @@ const updateProfileValidation = [
     .withMessage('Format email employee tidak valid')
     .isLength({ max: 100 })
     .withMessage('Email employee maksimal 100 karakter'),
-  
-  body('title_id')
-    .optional()
-    .isUUID()
-    .withMessage('Title ID harus berupa UUID yang valid'),
 
   // Password validation (conditional)
   body('current_password')
@@ -51,13 +46,12 @@ const updateProfileValidation = [
     const { 
       employee_name, 
       employee_email, 
-      title_id, 
       current_password, 
       new_password, 
       confirm_password 
     } = req.body;
 
-    const hasEmployeeUpdate = employee_name || employee_email || title_id;
+    const hasEmployeeUpdate = employee_name || employee_email || req.file;
     const hasPasswordUpdate = current_password || new_password || confirm_password;
 
     if (!hasEmployeeUpdate && !hasPasswordUpdate) {

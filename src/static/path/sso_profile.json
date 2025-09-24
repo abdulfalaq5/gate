@@ -55,7 +55,7 @@
     "put": {
       "tags": ["SSO Profile"],
       "summary": "Update Employee Profile",
-      "description": "Update data profil employee dan password",
+      "description": "Update data profil employee, password, dan upload foto profil",
       "security": [
         {
           "bearerAuth": []
@@ -64,6 +64,11 @@
       "requestBody": {
         "required": true,
         "content": {
+          "multipart/form-data": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostSSOProfileUpdateCombined"
+            }
+          },
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/SchemaPostSSOProfileUpdateCombined"

@@ -34,7 +34,7 @@ router.get('/auth/sso/stats', ssoRoutes.getStats);
 
 // SSO Profile Routes (Protected)
 router.get('/auth/sso/profil', verifySSOToken, ssoRoutes.getProfile);
-router.put('/auth/sso/profil', verifySSOToken, updateProfileValidation, ssoRoutes.updateProfile);
+router.put('/auth/sso/profil', verifySSOToken, ssoRoutes.getUploadMiddleware(), updateProfileValidation, ssoRoutes.updateProfile);
 
 // Client Registration Routes
 router.post('/auth/sso/clients', ssoRoutes.registerClient);

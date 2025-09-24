@@ -1,9 +1,12 @@
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const path = require('path');
 // UsersRepository removed - now using employees table directly
 const EmployeesRepository = require('../employees/postgre_repository');
 const { CustomException } = require('../../utils/exception');
 const { Logger } = require('../../utils/logger');
 const { pgCore } = require('../../config/database');
+const { generateMinioUpload } = require('../../utils/minio-upload');
 
 /**
  * SSO Profile Handler - Menangani operasi profil user
@@ -12,6 +15,30 @@ class SSOProfileHandler {
   constructor() {
     // UsersRepository removed - now using employees table directly
     this.employeesRepository = new EmployeesRepository(pgCore);
+    
+    // Configure multer for file upload
+    this.upload = multer({
+      storage: multer.memoryStorage(),
+      fileFilter: (req, file, cb) => {
+        // Allow only image files
+        if (file.mimetype.startsWith('image/')) {
+          cb(null, true);
+        } else {
+          cb(new Error('Hanya file gambar yang diperbolehkan'), false);
+        }
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit for profile photos
+        files: 1 // Only one file allowed
+      }
+    });
+  }
+
+  /**
+   * Get multer middleware for file upload
+   */
+  getUploadMiddleware() {
+    return this.upload.single('employee_foto');
   }
 
   /**
@@ -102,7 +129,7 @@ class SSOProfileHandler {
   }
 
   /**
-   * PUT /auth/sso/profil - Update profil employee dan password
+   * PUT /auth/sso/profil - Update profil employee dan password dengan upload foto
    */
   async updateProfile(req, res) {
     try {
@@ -111,7 +138,6 @@ class SSOProfileHandler {
         // Employee data
         employee_name,
         employee_email,
-        title_id,
         // Password data
         current_password,
         new_password,
@@ -127,13 +153,13 @@ class SSOProfileHandler {
         updates: { 
           employee_name, 
           employee_email, 
-          title_id,
+          photo_update: !!req.file,
           password_update: !!current_password
         } 
       });
 
       // Validasi minimal satu field harus diisi
-      const hasEmployeeUpdate = employee_name || employee_email || title_id;
+      const hasEmployeeUpdate = employee_name || employee_email || req.file;
       const hasPasswordUpdate = current_password || new_password || confirm_password;
 
       if (!hasEmployeeUpdate && !hasPasswordUpdate) {
@@ -147,7 +173,7 @@ class SSOProfileHandler {
           'employees.employee_name',
           'employees.employee_email',
           'employees.password',
-          'employees.title_id'
+          'employees.employee_foto'
         ])
         .where('employees.employee_id', userId)
         .where('employees.is_delete', false)
@@ -181,6 +207,49 @@ class SSOProfileHandler {
         }
       }
 
+      // Handle file upload untuk employee_foto
+      let employeeFotoPath = employeeProfile.employee_foto; // Keep existing photo if no new upload
+      if (req.file) {
+        try {
+          // Convert req.file to req.files format for generateMinioUpload compatibility
+          req.files = [req.file];
+          
+          // Upload file ke MinIO
+          const uploadResult = await generateMinioUpload(
+            req, 
+            0, // file index
+            'employee-photos', // folder path
+            `employee-${userId}`, // naming prefix
+            '', // default value
+            {
+              isWatermark: false,
+              isPrivate: false,
+              isContentType: true,
+              fileNames: '',
+              compressImage: true,
+              maxFileSize: 5 * 1024 * 1024 // 5MB
+            }
+          );
+
+          if (uploadResult.status) {
+            employeeFotoPath = uploadResult.pathForDatabase;
+            Logger.info('Employee photo uploaded successfully', { 
+              user_id: userId, 
+              photo_path: employeeFotoPath 
+            });
+          } else {
+            Logger.error('Failed to upload employee photo', { 
+              user_id: userId, 
+              error: uploadResult.error 
+            });
+            throw new CustomException(`Gagal mengupload foto: ${uploadResult.error}`, 400);
+          }
+        } catch (error) {
+          Logger.error('Error uploading employee photo:', error);
+          throw new CustomException('Gagal mengupload foto profil', 400);
+        }
+      }
+
       // Validasi email duplikasi untuk employee
       if (employee_email) {
         const existingEmployee = await pgCore('employees')
@@ -205,7 +274,7 @@ class SSOProfileHandler {
         // Update employee fields
         if (employee_name) employeeUpdateData.employee_name = employee_name;
         if (employee_email) employeeUpdateData.employee_email = employee_email;
-        if (title_id) employeeUpdateData.title_id = title_id;
+        if (employeeFotoPath) employeeUpdateData.employee_foto = employeeFotoPath;
         
         // Update password jika ada
         if (hasPasswordUpdate) {
@@ -234,7 +303,7 @@ class SSOProfileHandler {
             'employees.employee_id',
             'employees.employee_name',
             'employees.employee_email',
-            'employees.title_id',
+            'employees.employee_foto',
             'titles.title_name',
             'departments.department_name',
             'companies.company_name',
@@ -253,6 +322,7 @@ class SSOProfileHandler {
           employee_id: updatedProfile.employee_id,
           employee_name: updatedProfile.employee_name,
           employee_email: updatedProfile.employee_email,
+          employee_foto: updatedProfile.employee_foto,
           title_name: updatedProfile.title_name,
           department_name: updatedProfile.department_name,
           company_name: updatedProfile.company_name,
@@ -261,6 +331,9 @@ class SSOProfileHandler {
         };
 
         let message = 'Profil berhasil diupdate';
+        if (req.file) {
+          message += ' dan foto berhasil diupload';
+        }
         if (hasPasswordUpdate) {
           message += ' dan password berhasil diubah';
         }
@@ -279,6 +352,25 @@ class SSOProfileHandler {
 
     } catch (error) {
       Logger.error('Error updating user profile:', error);
+      
+      // Handle multer errors
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          success: false,
+          message: 'Ukuran file foto terlalu besar. Maksimal ukuran file adalah 5 MB.',
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      if (error.code === 'LIMIT_FILE_COUNT') {
+        return res.status(400).json({
+          success: false,
+          message: 'Hanya satu file foto yang diperbolehkan.',
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
       
       if (error instanceof CustomException) {
         return res.status(error.statusCode).json({
