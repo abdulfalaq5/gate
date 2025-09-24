@@ -59,6 +59,7 @@ class SSOServerHandler {
           'employee_id',
           'employee_name',
           'employee_exmail_account',
+          'employee_foto',
           'password',
           'is_delete'
         ])
@@ -88,12 +89,14 @@ class SSOServerHandler {
         user: {
           id: employee.employee_id,
           username: employee.employee_name,
-          email: employee.employee_exmail_account
+          email: employee.employee_exmail_account,
+          employee_foto: employee.employee_foto
         },
         employee: {
           id: employee.employee_id,
           name: employee.employee_name,
-          email: employee.employee_exmail_account
+          email: employee.employee_exmail_account,
+          employee_foto: employee.employee_foto
         }
       };
       
@@ -165,7 +168,8 @@ class SSOServerHandler {
             user_name: userDetails.user.username,
             user_email: userDetails.user.email,
             employee_name: userDetails.employee.name,
-            employee_id: userDetails.employee.id
+            employee_id: userDetails.employee.id,
+            employee_foto: userDetails.employee.employee_foto
           },
           menu: menuArray,
           session: {
