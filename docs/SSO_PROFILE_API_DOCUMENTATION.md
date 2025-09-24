@@ -19,7 +19,7 @@ Authorization: Bearer <jwt_token>
 ## Endpoints
 
 ### 1. GET /auth/sso/profil
-Mendapatkan data profil user yang sedang login.
+Mendapatkan data profil user yang sedang login dengan informasi lengkap employee termasuk kontak dan foto profil.
 
 **Headers:**
 ```
@@ -32,19 +32,40 @@ Authorization: Bearer <jwt_token>
   "success": true,
   "message": "Profil berhasil diambil",
   "data": {
-    "user_id": "uuid",
-    "user_name": "username",
-    "user_email": "user@example.com",
     "employee_id": "uuid",
     "employee_name": "Employee Name",
-    "role_id": "uuid",
-    "role_name": "Role Name",
+    "employee_email": "employee@company.com",
+    "employee_exmail_account": "employee@company.com",
+    "employee_mobile": "+6281234567890",
+    "employee_office_number": "+62212345678",
+    "employee_address": "Jl. Sudirman No. 123, Jakarta",
+    "employee_channel": "LinkedIn",
+    "employee_foto": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...",
+    "title_name": "Role Name",
+    "department_name": "Department Name",
+    "company_name": "Company Name",
     "created_at": "2024-01-01T00:00:00.000Z",
     "updated_at": "2024-01-01T00:00:00.000Z"
   },
   "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
+
+**Field Descriptions:**
+- `employee_id`: ID unik employee
+- `employee_name`: Nama lengkap employee
+- `employee_email`: Email utama employee
+- `employee_exmail_account`: Email eksternal untuk login SSO
+- `employee_mobile`: Nomor handphone employee
+- `employee_office_number`: Nomor telepon kantor employee
+- `employee_address`: Alamat rumah employee
+- `employee_channel`: Channel atau sumber employee (LinkedIn, JobStreet, dll)
+- `employee_foto`: Foto profil employee dalam format base64 atau URL
+- `title_name`: Nama jabatan/title employee
+- `department_name`: Nama departemen employee
+- `company_name`: Nama perusahaan employee
+- `created_at`: Tanggal pembuatan record
+- `updated_at`: Tanggal terakhir update record
 
 **Response Error (401):**
 ```json

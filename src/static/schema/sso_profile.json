@@ -74,6 +74,37 @@
             "description": "Email employee",
             "example": "john.doe@company.com"
           },
+          "employee_exmail_account": {
+            "type": "string",
+            "format": "email",
+            "description": "External mail account untuk login",
+            "example": "john.doe@company.com"
+          },
+          "employee_mobile": {
+            "type": "string",
+            "description": "Nomor handphone employee",
+            "example": "+6281234567890"
+          },
+          "employee_office_number": {
+            "type": "string",
+            "description": "Nomor telepon kantor employee",
+            "example": "+62212345678"
+          },
+          "employee_address": {
+            "type": "string",
+            "description": "Alamat rumah employee",
+            "example": "Jl. Sudirman No. 123, Jakarta"
+          },
+          "employee_channel": {
+            "type": "string",
+            "description": "Channel atau sumber employee",
+            "example": "LinkedIn"
+          },
+          "employee_foto": {
+            "type": "string",
+            "description": "Foto profil employee (base64 atau URL)",
+            "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
+          },
           "title_name": {
             "type": "string",
             "description": "Nama title/jabatan employee",
