@@ -202,7 +202,7 @@ const updateEmployee = async (req, res) => {
     }
     
     // Prepare update data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
-    const { company_id, employeeHasPermissions, ...updatePayload } = req.body
+    const { company_id, employeeHasPermissions, employee_foto, ...updatePayload } = req.body
     
     // Parse employeeHasPermissions if it's a JSON string
     let parsedPermissions = null
@@ -222,8 +222,12 @@ const updateEmployee = async (req, res) => {
     }
     
     // Handle employee photo upload to MinIO
-    if (req.files && req.files.length > 0) {
+    // Only process photo upload if there's a file uploaded
+    const hasPhotoFile = req.files && req.files.length > 0 && req.files.find(file => file.fieldname === 'employee_foto')
+    
+    if (hasPhotoFile) {
       const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
+      
       if (photoFile) {
         try {
           // Find the correct file index
@@ -241,7 +245,7 @@ const updateEmployee = async (req, res) => {
               isContentType: true,
               fileNames: '',
               compressImage: true, // Enable image compression
-              maxFileSize: 5 * 1024 * 1024 // 5MB max for employee photos
+              maxFileSize: 10 * 1024 * 1024 // 10MB max for employee photos
             }
           )
           
@@ -257,6 +261,10 @@ const updateEmployee = async (req, res) => {
           // Continue without photo if upload fails
         }
       }
+    } else {
+      // If no photo file is uploaded, preserve the existing photo in the database
+      // Don't include employee_foto in updatePayload
+      console.log('No photo file uploaded, preserving existing photo')
     }
     
     const updateData = {
