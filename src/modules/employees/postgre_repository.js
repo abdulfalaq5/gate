@@ -127,25 +127,90 @@ class EmployeesRepository {
   }
 
   /**
-   * Get employee by ID
+   * Get employee by ID with permission details
    */
   async getEmployeeById(id) {
-    const [employee] = await this.knex(this.tableName)
-      .leftJoin('titles', 'employees.title_id', 'titles.title_id')
-      .leftJoin('departments', 'titles.department_id', 'departments.department_id')
-      .leftJoin('companies', 'departments.company_id', 'companies.company_id')
-      .select(
-        'employees.*',
-        'titles.title_name',
-        'departments.department_name',
-        'departments.department_id',
-        'companies.company_name',
-        'companies.company_id'
-      )
-      .where('employees.employee_id', id)
-      .where('employees.is_delete', false)
-    
-    return employee
+    try {
+      // Get basic employee data
+      const [employee] = await this.knex(this.tableName)
+        .leftJoin('titles', 'employees.title_id', 'titles.title_id')
+        .leftJoin('departments', 'titles.department_id', 'departments.department_id')
+        .leftJoin('companies', 'departments.company_id', 'companies.company_id')
+        .select(
+          'employees.*',
+          'titles.title_name',
+          'departments.department_name',
+          'departments.department_id',
+          'companies.company_name',
+          'companies.company_id'
+        )
+        .where('employees.employee_id', id)
+        .where('employees.is_delete', false)
+      
+      if (!employee) {
+        return null
+      }
+
+      // Get all menus first
+      const allMenus = await this.knex('menus')
+        .select('menu_id', 'menu_name')
+        .where('is_delete', false)
+        .orderBy('menu_name')
+
+      // Get all permissions
+      const allPermissions = await this.knex('permissions')
+        .select('permission_id', 'permission_name')
+        .where('is_delete', false)
+        .orderBy('permission_name')
+
+      // Get employee's existing permissions
+      const employeePermissions = await this.knex('employeeHasPermissions')
+        .select('menu_id', 'permission_id')
+        .where('employee_id', id)
+
+      // Create a set of employee permissions for quick lookup
+      const employeePermissionSet = new Set()
+      employeePermissions.forEach(perm => {
+        employeePermissionSet.add(`${perm.menu_id}-${perm.permission_id}`)
+      })
+
+      // Group permissions by menu
+      const menuPermissionMap = new Map()
+      
+      // Initialize all menus
+      allMenus.forEach(menu => {
+        menuPermissionMap.set(menu.menu_id, {
+          menu_id: menu.menu_id,
+          menu_name: menu.menu_name,
+          permission_detail: []
+        })
+      })
+
+      // Add all permissions to each menu
+      allMenus.forEach(menu => {
+        allPermissions.forEach(permission => {
+          const permissionKey = `${menu.menu_id}-${permission.permission_id}`
+          const hasPermission = employeePermissionSet.has(permissionKey)
+          
+          menuPermissionMap.get(menu.menu_id).permission_detail.push({
+            permission_id: permission.permission_id,
+            permission_name: permission.permission_name,
+            permission_status: hasPermission
+          })
+        })
+      })
+
+      // Convert map to array
+      const permission_detail = Array.from(menuPermissionMap.values())
+
+      // Add permission_detail to employee object
+      employee.permission_detail = permission_detail
+      
+      return employee
+    } catch (error) {
+      console.error('Error in getEmployeeById:', error)
+      throw error
+    }
   }
 
   /**
