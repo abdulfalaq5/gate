@@ -109,9 +109,12 @@ const createEmployee = async (req, res) => {
       const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
       if (photoFile) {
         try {
+          // Find the correct file index
+          const fileIndex = req.files.findIndex(file => file.fieldname === 'employee_foto')
+          
           const uploadResult = await generateMinioUpload(
             req, 
-            0, // file index
+            fileIndex, // Use correct file index
             'employees/photos', // path in MinIO
             'employee_photo', // naming prefix
             '', // default value
@@ -223,9 +226,12 @@ const updateEmployee = async (req, res) => {
       const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
       if (photoFile) {
         try {
+          // Find the correct file index
+          const fileIndex = req.files.findIndex(file => file.fieldname === 'employee_foto')
+          
           const uploadResult = await generateMinioUpload(
             req, 
-            0, // file index
+            fileIndex, // Use correct file index
             'employees/photos', // path in MinIO
             'employee_photo', // naming prefix
             '', // default value

@@ -14,7 +14,11 @@ if (isMinioEnabled) {
   const endpoint = process.env.S3_ENDPOINT || process.env.MINIO_ENDPOINT || 'localhost'
   const url = new URL(endpoint)
   const endPoint = url.hostname
-  const port = parseInt(url.port) || 9000
+  // Fix port handling for HTTPS URLs
+  let port = parseInt(url.port)
+  if (!port) {
+    port = url.protocol === 'https:' ? 443 : 9000
+  }
   const useSSL = url.protocol === 'https:' || process.env.S3_SSL_ENABLED === 'true' || process.env.MINIO_USE_SSL === 'true'
 
   // Initialize MinIO client

@@ -66,7 +66,7 @@ const generateMinioUpload = async (req, num, paths, naming, defaults = '', addit
       };
     }
 
-    let fileNames = req?.files[num]?.fieldname
+    let fileNames = req?.files[num]?.originalname
       ? `${naming !== '' ? `${naming}-` : ''}${Date.now()}${path.extname(originalName)}`
       : defaults;
 
