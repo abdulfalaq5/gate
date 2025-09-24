@@ -15,5 +15,5 @@ pipelines:
                 SSH_USER: $SERVER_DEV_USER
                 SERVER: $SERVER_DEV_IP
                 MODE: 'command'
-                COMMAND: 'cd /deployment/public_html/core-api/ && git pull origin develop'
-            - echo "Deployed!"
+                COMMAND: 'cd /deployment/public_html/core-api/ && git pull origin develop && make docker-server-build && make docker-server-restart'
+            - echo "Deployed and restarted!"
