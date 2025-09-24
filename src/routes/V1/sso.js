@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
 
 // Import modules
@@ -14,6 +15,14 @@ const employeesRoutes = require('../../modules/employees');
 const titlesRoutes = require('../../modules/titles');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
+
+// Configure multer for multipart/form-data
+const upload = multer({
+  limits: {
+    fileSize: 1024 * 1024 * 1024, // 1 GB limit
+    files: 10 // max 10 files
+  }
+});
 
 // SSO Routes
 router.post('/auth/sso/login', ssoRoutes.login);
@@ -77,9 +86,9 @@ router.delete('/departments/:id', verifySSOToken, departmentsRoutes.deleteDepart
 
 // Employees
 router.post('/employees/get', verifySSOToken, employeesRoutes.getEmployees);
-router.post('/employees/create', verifySSOToken, employeesRoutes.createEmployee);
+router.post('/employees/create', verifySSOToken, upload.any(), employeesRoutes.createEmployee);
 router.get('/employees/:id', verifySSOToken, employeesRoutes.getEmployeeById);
-router.put('/employees/:id', verifySSOToken, employeesRoutes.updateEmployee);
+router.put('/employees/:id', verifySSOToken, upload.any(), employeesRoutes.updateEmployee);
 router.delete('/employees/:id', verifySSOToken, employeesRoutes.deleteEmployee);
 
 // Titles

@@ -119,6 +119,12 @@ const employeesColumns = {
     description: 'Employee password for authentication',
     example: 'hashed_password_here'
   },
+  employee_foto: {
+    type: 'string',
+    required: false,
+    description: 'Employee photo file path stored in MinIO',
+    example: 'employees/photos/employee_photo_1234567890.jpg'
+  },
   created_at: {
     type: 'timestamp',
     required: false,
@@ -184,6 +190,7 @@ const employeesValidationRules = {
       'island_id', 
       'employee_phone', 
       'password', 
+      'employee_foto',
       'company_id', 
       'employeeHasPermissions'
     ] // company_id is optional and will be ignored during insert
@@ -207,6 +214,7 @@ const employeesValidationRules = {
       'island_id', 
       'employee_phone', 
       'password', 
+      'employee_foto',
       'company_id', 
       'employeeHasPermissions'
     ]

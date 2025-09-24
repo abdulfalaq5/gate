@@ -98,6 +98,10 @@
 				"maxLength": 255,
 				"description": "Employee password for authentication"
 			},
+			"employee_foto": {
+				"type": "string",
+				"description": "Employee photo file path stored in MinIO"
+			},
 			"created_at": {
 				"type": "string",
 				"format": "date-time"
@@ -195,35 +199,18 @@
 				"type": "string",
 				"maxLength": 255
 			},
+			"employee_foto": {
+				"type": "string",
+				"format": "binary",
+				"description": "Employee photo file to upload"
+			},
 			"company_id": {
 				"type": "string",
 				"format": "uuid"
 			},
 			"employeeHasPermissions": {
-				"type": "array",
-				"items": {
-					"type": "object",
-					"properties": {
-						"menu_id": {
-							"type": "string",
-							"format": "uuid"
-						},
-						"permission_detail": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"permission_id": {
-										"type": "string",
-										"format": "uuid"
-									}
-								},
-								"required": ["permission_id"]
-							}
-						}
-					},
-					"required": ["menu_id", "permission_detail"]
-				}
+				"type": "string",
+				"description": "JSON string containing employee permissions array"
 			}
 		},
 		"required": ["employee_name", "employee_email", "title_id"],
@@ -297,35 +284,18 @@
 				"type": "string",
 				"maxLength": 255
 			},
+			"employee_foto": {
+				"type": "string",
+				"format": "binary",
+				"description": "Employee photo file to upload"
+			},
 			"company_id": {
 				"type": "string",
 				"format": "uuid"
 			},
 			"employeeHasPermissions": {
-				"type": "array",
-				"items": {
-					"type": "object",
-					"properties": {
-						"menu_id": {
-							"type": "string",
-							"format": "uuid"
-						},
-						"permission_detail": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"permission_id": {
-										"type": "string",
-										"format": "uuid"
-									}
-								},
-								"required": ["permission_id"]
-							}
-						}
-					},
-					"required": ["menu_id", "permission_detail"]
-				}
+				"type": "string",
+				"description": "JSON string containing employee permissions array"
 			}
 		},
 		"description": "company_id is optional and will be ignored during update as it's derived from title->department->company relationship. employeeHasPermissions is optional and will replace all existing permissions for the employee."

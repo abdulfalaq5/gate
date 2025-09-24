@@ -6,6 +6,7 @@ const { pgCore } = require('../../config/database')
 const EmployeesRepository = require('./postgre_repository')
 const databaseQueueService = require('../../services/database_queue_service')
 const bcrypt = require('bcrypt')
+const { generateMinioUpload } = require('../../utils/minio-upload')
 
 const employeesRepository = new EmployeesRepository(pgCore)
 
@@ -68,6 +69,15 @@ const getEmployeeById = async (req, res) => {
  */
 const createEmployee = async (req, res) => {
   try {
+    // Convert string boolean values to actual boolean for multipart/form-data
+    if (req.body.employee_disabled !== undefined) {
+      if (req.body.employee_disabled === 'true' || req.body.employee_disabled === true) {
+        req.body.employee_disabled = true
+      } else if (req.body.employee_disabled === 'false' || req.body.employee_disabled === false) {
+        req.body.employee_disabled = false
+      }
+    }
+
     // Validate request
     const validation = validateRequest(req.body, employeesValidationRules.create, employeesColumns)
     if (!validation.isValid) {
@@ -77,9 +87,56 @@ const createEmployee = async (req, res) => {
     // Prepare employee data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
     const { company_id, employeeHasPermissions, ...employeePayload } = req.body
     
+    // Parse employeeHasPermissions if it's a JSON string
+    let parsedPermissions = null
+    if (employeeHasPermissions && typeof employeeHasPermissions === 'string') {
+      try {
+        parsedPermissions = JSON.parse(employeeHasPermissions)
+      } catch (error) {
+        return errorResponse(res, 'Invalid JSON format for employeeHasPermissions', 400)
+      }
+    } else if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
+      parsedPermissions = employeeHasPermissions
+    }
+    
     // Hash password if provided
     if (employeePayload.password) {
       employeePayload.password = await bcrypt.hash(employeePayload.password, 10)
+    }
+    
+    // Handle employee photo upload to MinIO
+    if (req.files && req.files.length > 0) {
+      const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
+      if (photoFile) {
+        try {
+          const uploadResult = await generateMinioUpload(
+            req, 
+            0, // file index
+            'employees/photos', // path in MinIO
+            'employee_photo', // naming prefix
+            '', // default value
+            {
+              isWatermark: false,
+              isPrivate: false,
+              isContentType: true,
+              fileNames: '',
+              compressImage: true, // Enable image compression
+              maxFileSize: 5 * 1024 * 1024 // 5MB max for employee photos
+            }
+          )
+          
+          if (uploadResult.status) {
+            employeePayload.employee_foto = uploadResult.pathForDatabase
+            console.log(`Employee photo uploaded successfully: ${uploadResult.fileNames}`)
+          } else {
+            console.warn(`Failed to upload employee photo: ${uploadResult.error}`)
+            // Continue without photo if upload fails
+          }
+        } catch (error) {
+          console.error('Error uploading employee photo:', error)
+          // Continue without photo if upload fails
+        }
+      }
     }
     
     const employeeData = {
@@ -90,10 +147,10 @@ const createEmployee = async (req, res) => {
     const employee = await employeesRepository.createEmployee(employeeData)
     
     // Create employee permissions if provided
-    if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
+    if (parsedPermissions && Array.isArray(parsedPermissions)) {
       await employeesRepository.createEmployeePermissions(
         employee.employee_id, 
-        employeeHasPermissions, 
+        parsedPermissions, 
         req.user?.user_id
       )
     }
@@ -132,12 +189,68 @@ const updateEmployee = async (req, res) => {
       return errorResponse(res, 'Employee not found', 404)
     }
     
+    // Convert string boolean values to actual boolean for multipart/form-data
+    if (req.body.employee_disabled !== undefined) {
+      if (req.body.employee_disabled === 'true' || req.body.employee_disabled === true) {
+        req.body.employee_disabled = true
+      } else if (req.body.employee_disabled === 'false' || req.body.employee_disabled === false) {
+        req.body.employee_disabled = false
+      }
+    }
+    
     // Prepare update data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
     const { company_id, employeeHasPermissions, ...updatePayload } = req.body
+    
+    // Parse employeeHasPermissions if it's a JSON string
+    let parsedPermissions = null
+    if (employeeHasPermissions && typeof employeeHasPermissions === 'string') {
+      try {
+        parsedPermissions = JSON.parse(employeeHasPermissions)
+      } catch (error) {
+        return errorResponse(res, 'Invalid JSON format for employeeHasPermissions', 400)
+      }
+    } else if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
+      parsedPermissions = employeeHasPermissions
+    }
     
     // Hash password if provided
     if (updatePayload.password) {
       updatePayload.password = await bcrypt.hash(updatePayload.password, 10)
+    }
+    
+    // Handle employee photo upload to MinIO
+    if (req.files && req.files.length > 0) {
+      const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
+      if (photoFile) {
+        try {
+          const uploadResult = await generateMinioUpload(
+            req, 
+            0, // file index
+            'employees/photos', // path in MinIO
+            'employee_photo', // naming prefix
+            '', // default value
+            {
+              isWatermark: false,
+              isPrivate: false,
+              isContentType: true,
+              fileNames: '',
+              compressImage: true, // Enable image compression
+              maxFileSize: 5 * 1024 * 1024 // 5MB max for employee photos
+            }
+          )
+          
+          if (uploadResult.status) {
+            updatePayload.employee_foto = uploadResult.pathForDatabase
+            console.log(`Employee photo updated successfully: ${uploadResult.fileNames}`)
+          } else {
+            console.warn(`Failed to update employee photo: ${uploadResult.error}`)
+            // Continue without photo if upload fails
+          }
+        } catch (error) {
+          console.error('Error uploading employee photo:', error)
+          // Continue without photo if upload fails
+        }
+      }
     }
     
     const updateData = {
@@ -149,14 +262,14 @@ const updateEmployee = async (req, res) => {
     const result = await employeesRepository.updateEmployee(id, updateData)
     
     // Update employee permissions if provided
-    if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
+    if (parsedPermissions && Array.isArray(parsedPermissions)) {
       // Delete existing permissions first
       await employeesRepository.deleteEmployeePermissions(id)
       
       // Create new permissions
       await employeesRepository.createEmployeePermissions(
         id, 
-        employeeHasPermissions, 
+        parsedPermissions, 
         req.user?.user_id
       )
     }

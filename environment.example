@@ -45,6 +45,30 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
 REDIS_DB=0
+
+# PostgreSQL Configuration (for knexfile.js)
+DB_CLIENT_DEV=pg
+DB_HOST_DEV=localhost
+DB_PORT_DEV=5432
+DB_USER_DEV=postgres
+DB_PASS_DEV=password
+DB_NAME_DEV=gate_sso
+
+DB_CLIENT_PROD=pg
+DB_HOST_PROD=localhost
+DB_PORT_PROD=5432
+DB_USER_PROD=postgres
+DB_PASS_PROD=password
+DB_NAME_PROD=gate_sso
+
+DB_CLIENT_TEST=pg
+DB_HOST_TEST=localhost
+DB_PORT_TEST=5432
+DB_USER_TEST=postgres
+DB_PASS_TEST=password
+DB_NAME_TEST=gate_sso
+
+# Legacy PostgreSQL Configuration (for SSO)
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_DB=gate_sso
@@ -111,3 +135,20 @@ SSO_CORS_ORIGINS=http://localhost:3001,http://localhost:3002
 SSO_CORS_CREDENTIALS=true
 SSO_CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
 SSO_CORS_HEADERS=Content-Type,Authorization,X-Requested-With
+
+# MinIO Configuration
+MINIO_ENABLED=true
+S3_PROVIDER=minio
+S3_REGION=us-east-1
+S3_BUCKET=msi-interview
+S3_ACCESS_KEY_ID=admin
+S3_SECRET_ACCESS_KEY=supersecurepass123
+S3_ENDPOINT=https://minio-bucket.motorsights.com
+S3_FORCE_PATH_STYLE=true
+S3_SSL_ENABLED=false
+S3_SIGNATURE_VERSION=v4
+
+# MinIO Private Bucket Configuration (Optional)
+S3_BUCKET_PRIVATE=msi-interview-private
+MINIO_BUCKET_PRIVATE=msi-interview-private
+AWS_BUCKET_PRIVATE=msi-interview-private

@@ -12,7 +12,7 @@ const { addWatermark } = require('./custom');
 const resizeImage = require('./image');
 
 const generateMinioUpload = async (req, num, paths, naming, defaults = '', additional = {
-  isWatermark: false, isPrivate: false, isContentType: false, fileNames: '', compressImage: false
+  isWatermark: false, isPrivate: false, isContentType: false, fileNames: '', compressImage: false, maxFileSize: 10 * 1024 * 1024 // 10MB default
 }) => {
   const filePath = `user-upload-minio-${logDateFormat()}.txt`;
 
@@ -23,14 +23,51 @@ const generateMinioUpload = async (req, num, paths, naming, defaults = '', addit
       return {
         pathForDatabase: defaults,
         fileNames: defaults,
-        status: false
+        status: false,
+        error: 'MinIO is disabled'
+      };
+    }
+
+    // Validate file exists
+    if (!req.files || !req.files[num]) {
+      console.log('No file found at index:', num);
+      return {
+        pathForDatabase: defaults,
+        fileNames: defaults,
+        status: false,
+        error: 'No file found'
       };
     }
 
     let { buffer } = req.files[num];
     const mime = req?.files[num]?.mimetype;
+    const originalName = req?.files[num]?.originalname;
+    
+    // Validate file size
+    if (buffer.length > additional.maxFileSize) {
+      console.log(`File size ${buffer.length} exceeds maximum allowed size ${additional.maxFileSize}`);
+      return {
+        pathForDatabase: defaults,
+        fileNames: defaults,
+        status: false,
+        error: `File size exceeds maximum allowed size of ${Math.round(additional.maxFileSize / 1024 / 1024)}MB`
+      };
+    }
+
+    // Validate file type for images
+    const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (additional.isContentType && mime && !allowedImageTypes.includes(mime.toLowerCase())) {
+      console.log(`Invalid file type: ${mime}`);
+      return {
+        pathForDatabase: defaults,
+        fileNames: defaults,
+        status: false,
+        error: 'Invalid file type. Only image files are allowed.'
+      };
+    }
+
     let fileNames = req?.files[num]?.fieldname
-      ? `${naming !== '' ? `${naming}-` : ''}${Date.now()}${path.extname(req?.files[num]?.originalname)}`
+      ? `${naming !== '' ? `${naming}-` : ''}${Date.now()}${path.extname(originalName)}`
       : defaults;
 
     let watermarkImage;
@@ -42,8 +79,8 @@ const generateMinioUpload = async (req, num, paths, naming, defaults = '', addit
     }
 
     const bucketName = additional.isPrivate
-      ? process.env.MINIO_BUCKET_PRIVATE || process.env.AWS_BUCKET_PRIVATE
-      : process.env.MINIO_BUCKET || process.env.AWS_BUCKET;
+      ? process.env.S3_BUCKET_PRIVATE || process.env.MINIO_BUCKET_PRIVATE || process.env.AWS_BUCKET_PRIVATE
+      : process.env.S3_BUCKET || process.env.MINIO_BUCKET || process.env.AWS_BUCKET;
 
     const { pathForDatabase } = generateFolder(paths);
 
@@ -77,14 +114,19 @@ const generateMinioUpload = async (req, num, paths, naming, defaults = '', addit
     return {
       pathForDatabase: uploadResult.success ? uploadResult.url : defaults,
       fileNames,
-      status: uploadResult.success
+      status: uploadResult.success,
+      error: uploadResult.error || null,
+      fileSize: buffer.length,
+      contentType: mime
     };
   } catch (error) {
     console.error('Error MinIO Upload : ', error);
+    logger(filePath, 'upload').write(`Error uploading file: ${error.message} ${logDateFormat()}\n`);
     return {
       pathForDatabase: defaults,
       fileNames: defaults,
-      status: false
+      status: false,
+      error: error.message
     };
   }
 };
@@ -105,8 +147,8 @@ const generateMinioUploadUpdated = async (req, file, row, defaults = '', additio
       : defaults;
 
     const bucketName = additional.isPrivate
-      ? process.env.MINIO_BUCKET_PRIVATE || process.env.AWS_BUCKET_PRIVATE
-      : process.env.MINIO_BUCKET || process.env.AWS_BUCKET;
+      ? process.env.S3_BUCKET_PRIVATE || process.env.MINIO_BUCKET_PRIVATE || process.env.AWS_BUCKET_PRIVATE
+      : process.env.S3_BUCKET || process.env.MINIO_BUCKET || process.env.AWS_BUCKET;
 
     const { pathForDatabase } = generateFolder(file?.path);
     let { buffer } = req.files[file?.num];
