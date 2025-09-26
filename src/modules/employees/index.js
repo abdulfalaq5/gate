@@ -8,4 +8,5 @@ module.exports = {
   deleteEmployee: EmployeesHandler.deleteEmployee.bind(EmployeesHandler),
   getEmployeesByTitle: EmployeesHandler.getEmployeesByTitle.bind(EmployeesHandler),
   resetPassword: EmployeesHandler.resetPassword.bind(EmployeesHandler),
+  getMenuPermissions: EmployeesHandler.getMenuPermissions.bind(EmployeesHandler),
 };

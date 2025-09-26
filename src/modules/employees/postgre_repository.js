@@ -338,6 +338,42 @@ class EmployeesRepository {
     
     return employee
   }
+
+  /**
+   * Get all menus and permissions for menu permission endpoint
+   */
+  async getMenuPermissions() {
+    try {
+      // Get all menus where is_delete = false
+      const menus = await this.knex('menus')
+        .select('menu_id', 'menu_name')
+        .where('is_delete', false)
+        .orderBy('menu_name')
+
+      // Get all permissions where is_delete = false
+      const permissions = await this.knex('permissions')
+        .select('permission_id', 'permission_name')
+        .where('is_delete', false)
+        .orderBy('permission_name')
+
+      // Format response according to the required structure
+      const permission_detail = menus.map(menu => ({
+        menu_id: menu.menu_id,
+        menu_name: menu.menu_name,
+        permission_detail: permissions.map(permission => ({
+          permission_id: permission.permission_id,
+          permission_name: permission.permission_name
+        }))
+      }))
+
+      return {
+        permission_detail
+      }
+    } catch (error) {
+      console.error('Error in getMenuPermissions:', error)
+      throw error
+    }
+  }
 }
 
 module.exports = EmployeesRepository

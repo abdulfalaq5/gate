@@ -397,6 +397,20 @@ const resetPassword = async (req, res) => {
   }
 }
 
+/**
+ * Get menu permissions
+ */
+const getMenuPermissions = async (req, res) => {
+  try {
+    const result = await employeesRepository.getMenuPermissions()
+    
+    return successResponse(res, result, 'Menu permissions retrieved successfully')
+  } catch (error) {
+    console.error('Error getting menu permissions:', error)
+    return errorResponse(res, 'Failed to retrieve menu permissions', 500)
+  }
+}
+
 module.exports = {
   getEmployees,
   getEmployeeById,
@@ -404,5 +418,6 @@ module.exports = {
   updateEmployee,
   deleteEmployee,
   getEmployeesByTitle,
-  resetPassword
+  resetPassword,
+  getMenuPermissions
 }

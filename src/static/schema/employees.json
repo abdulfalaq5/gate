@@ -494,5 +494,97 @@
 			},
 			"timestamp": "2024-01-01T00:00:00.000Z"
 		}
+	},
+	"SchemaResponseEmployeesMenuPermissions": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"description": "Indicates if the request was successful"
+			},
+			"message": {
+				"type": "string",
+				"description": "Response message"
+			},
+			"data": {
+				"type": "object",
+				"properties": {
+					"permission_detail": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"menu_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Menu ID"
+								},
+								"menu_name": {
+									"type": "string",
+									"description": "Menu name"
+								},
+								"permission_detail": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"permission_id": {
+												"type": "string",
+												"format": "uuid",
+												"description": "Permission ID"
+											},
+											"permission_name": {
+												"type": "string",
+												"description": "Permission name"
+											}
+										},
+										"required": ["permission_id", "permission_name"]
+									}
+								}
+							},
+							"required": ["menu_id", "menu_name", "permission_detail"]
+						}
+					}
+				},
+				"required": ["permission_detail"]
+			},
+			"timestamp": {
+				"type": "string",
+				"format": "date-time",
+				"description": "Response timestamp"
+			}
+		},
+		"required": ["success", "message", "data", "timestamp"],
+		"example": {
+			"success": true,
+			"message": "Menu permissions retrieved successfully",
+			"data": {
+				"permission_detail": [
+					{
+						"menu_id": "f50d3f97-1d3a-45cd-af90-b5b1d814f54f",
+						"menu_name": "Companies",
+						"permission_detail": [
+							{
+								"permission_id": "6255473f-6d75-4456-b39b-97f503ecb580",
+								"permission_name": "create"
+							},
+							{
+								"permission_id": "6255473f-6d75-4456-b39b-97f503ecb580",
+								"permission_name": "read"
+							},
+							{
+								"permission_id": "6255473f-6d75-4456-b39b-97f503ecb580",
+								"permission_name": "update"
+							},
+							{
+								"permission_id": "6255473f-6d75-4456-b39b-97f503ecb580",
+								"permission_name": "delete"
+							}
+						]
+					}
+				]
+			},
+			"timestamp": "2024-01-01T00:00:00.000Z"
+		}
 	}
 }

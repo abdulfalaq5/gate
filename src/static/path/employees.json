@@ -240,5 +240,31 @@
 				}
 			}
 		}
+	},
+	"/employees/getmenupermission": {
+		"get": {
+			"tags": ["Employees"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Get all menus and permissions for menu permission management",
+			"responses": {
+				"200": {
+					"description": "Menu permissions retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseEmployeesMenuPermissions"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
 	}
 }
