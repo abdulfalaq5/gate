@@ -356,11 +356,53 @@ const getEmployeesByTitle = async (req, res) => {
   }
 }
 
+/**
+ * Reset employee password
+ */
+const resetPassword = async (req, res) => {
+  try {
+    const { employee_id } = req.body
+    
+    // Validasi parameter
+    if (!employee_id) {
+      return errorResponse(res, 'employee_id is required', 400)
+    }
+    
+    // Cek apakah employee ada
+    const existingEmployee = await employeesRepository.getEmployeeById(employee_id)
+    if (!existingEmployee) {
+      return errorResponse(res, 'Employee not found', 404)
+    }
+    
+    // Hash password baru
+    const newPassword = 'QwerMSI2025!'
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    
+    // Update password di database
+    const result = await employeesRepository.resetPassword(employee_id, hashedPassword)
+    
+    if (!result) {
+      return errorResponse(res, 'Failed to reset password', 500)
+    }
+    
+    return successResponse(res, { 
+      employee_id: result.employee_id,
+      employee_name: result.employee_name,
+      employee_email: result.employee_email,
+      message: 'Password berhasil direset'
+    }, 'Password reset successfully')
+  } catch (error) {
+    console.error('Error resetting password:', error)
+    return errorResponse(res, 'Failed to reset password', 500)
+  }
+}
+
 module.exports = {
   getEmployees,
   getEmployeeById,
   createEmployee,
   updateEmployee,
   deleteEmployee,
-  getEmployeesByTitle
+  getEmployeesByTitle,
+  resetPassword
 }

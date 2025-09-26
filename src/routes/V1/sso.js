@@ -87,6 +87,7 @@ router.delete('/departments/:id', verifySSOToken, departmentsRoutes.deleteDepart
 // Employees
 router.post('/employees/get', verifySSOToken, employeesRoutes.getEmployees);
 router.post('/employees/create', verifySSOToken, upload.any(), employeesRoutes.createEmployee);
+router.put('/employees/reset_password', verifySSOToken, employeesRoutes.resetPassword);
 router.get('/employees/:id', verifySSOToken, employeesRoutes.getEmployeeById);
 router.put('/employees/:id', verifySSOToken, upload.any(), employeesRoutes.updateEmployee);
 router.delete('/employees/:id', verifySSOToken, employeesRoutes.deleteEmployee);

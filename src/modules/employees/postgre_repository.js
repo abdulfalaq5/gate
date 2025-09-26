@@ -322,6 +322,22 @@ class EmployeesRepository {
   async findByEmail(email) {
     return await this.getEmployeeByEmail(email);
   }
+
+  /**
+   * Reset employee password
+   */
+  async resetPassword(employeeId, hashedPassword) {
+    const [employee] = await this.knex(this.tableName)
+      .where('employee_id', employeeId)
+      .where('is_delete', false)
+      .update({
+        password: hashedPassword,
+        updated_at: new Date()
+      })
+      .returning('*')
+    
+    return employee
+  }
 }
 
 module.exports = EmployeesRepository

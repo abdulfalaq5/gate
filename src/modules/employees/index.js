@@ -7,4 +7,5 @@ module.exports = {
   updateEmployee: EmployeesHandler.updateEmployee.bind(EmployeesHandler),
   deleteEmployee: EmployeesHandler.deleteEmployee.bind(EmployeesHandler),
   getEmployeesByTitle: EmployeesHandler.getEmployeesByTitle.bind(EmployeesHandler),
+  resetPassword: EmployeesHandler.resetPassword.bind(EmployeesHandler),
 };

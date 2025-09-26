@@ -428,5 +428,71 @@
 				}
 			}
 		}
+	},
+	"SchemaPostEmployeesResetPassword": {
+		"type": "object",
+		"required": ["employee_id"],
+		"properties": {
+			"employee_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Employee ID to reset password"
+			}
+		},
+		"example": {
+			"employee_id": "123e4567-e89b-12d3-a456-426614174000"
+		}
+	},
+	"SchemaResponseEmployeesResetPassword": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"description": "Success status"
+			},
+			"message": {
+				"type": "string",
+				"description": "Response message"
+			},
+			"data": {
+				"type": "object",
+				"properties": {
+					"employee_id": {
+						"type": "string",
+						"format": "uuid",
+						"description": "Employee ID"
+					},
+					"employee_name": {
+						"type": "string",
+						"description": "Employee name"
+					},
+					"employee_email": {
+						"type": "string",
+						"format": "email",
+						"description": "Employee email"
+					},
+					"message": {
+						"type": "string",
+						"description": "Reset confirmation message"
+					}
+				}
+			},
+			"timestamp": {
+				"type": "string",
+				"format": "date-time",
+				"description": "Response timestamp"
+			}
+		},
+		"example": {
+			"success": true,
+			"message": "Password reset successfully",
+			"data": {
+				"employee_id": "123e4567-e89b-12d3-a456-426614174000",
+				"employee_name": "John Doe",
+				"employee_email": "john.doe@example.com",
+				"message": "Password berhasil direset"
+			},
+			"timestamp": "2024-01-01T00:00:00.000Z"
+		}
 	}
 }

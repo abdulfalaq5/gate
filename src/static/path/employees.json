@@ -198,5 +198,47 @@
 				}
 			}
 		}
+	},
+	"/employees/reset_password": {
+		"put": {
+			"tags": ["Employees"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Reset employee password to default password (QwerMSI2025!)",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostEmployeesResetPassword"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Password reset successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseEmployeesResetPassword"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - employee_id is required"
+				},
+				"404": {
+					"description": "Employee not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
 	}
 }
