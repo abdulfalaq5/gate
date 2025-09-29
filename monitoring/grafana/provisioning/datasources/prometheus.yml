@@ -1,0 +1,42 @@
+# Grafana Datasource Configuration untuk Prometheus
+# File ini akan secara otomatis menambahkan Prometheus sebagai datasource di Grafana
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: https://prometheus.motorsights.com
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: jaeger
+    secureJsonData:
+      # Jika ada authentication, tambahkan di sini
+      # httpHeaderValue1: "Bearer YOUR_API_KEY"
+    version: 1
+
+  - name: Prometheus-Local
+    type: prometheus
+    access: proxy
+    url: http://localhost:9090
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+    version: 1

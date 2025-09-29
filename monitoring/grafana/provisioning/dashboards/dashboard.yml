@@ -1,0 +1,17 @@
+# Grafana Dashboard Provisioning Configuration
+# File ini akan secara otomatis memuat dashboard ke Grafana
+
+apiVersion: 1
+
+providers:
+  - name: 'Gate Application Dashboards'
+    orgId: 1
+    folder: 'Gate Application'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      # Atau path relatif jika menggunakan volume mounting
+      # path: ./dashboards

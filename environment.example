@@ -96,6 +96,11 @@ SSO_METRICS_PORT=9090
 SSO_ENABLE_HEALTH_CHECK=true
 SSO_HEALTH_CHECK_INTERVAL=30000
 
+# Prometheus Integration
+PROMETHEUS_ENABLED=true
+PROMETHEUS_SERVER_URL=https://prometheus.motorsights.com
+GRAFANA_SERVER_URL=https://grafana.motorsights.com
+
 # Email Configuration
 SSO_EMAIL_ENABLED=false
 SSO_EMAIL_PROVIDER=smtp

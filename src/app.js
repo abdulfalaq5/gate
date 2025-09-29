@@ -17,7 +17,9 @@ const {
 
 const healthCheck = require('./routes')
 const apiV1 = require('./routes/V1')
+const metricsRoutes = require('./routes/metrics')
 const { initListener } = require('./listeners')
+const { prometheusMetrics } = require('./utils/prometheus_metrics')
 
 // Conditionally initialize listeners only if RabbitMQ is configured and not disabled
 if (process.env.RABBITMQ_URL && process.env.RABBITMQ_URL !== 'disabled') {
@@ -45,6 +47,9 @@ app.use(methodOverride()) // lets you use HTTP verbs
 app.use(xss()) // handler xss attack
 app.use(express.json({ limit })) // json limit
 app.use(express.urlencoded({ limit, extended: true })) // urlencoded limit
+
+// Prometheus metrics middleware (should be early in the stack)
+app.use(prometheusMetrics.httpMetricsMiddleware())
 if (process.env.NODE_ENV === 'production') {
   app.use(morgan(MORGAN_FORMAT.PROD))
 } else {
@@ -52,6 +57,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use(healthCheck) // routing
 app.use(apiV1) // routing
+app.use(metricsRoutes) // metrics routing
 app.use('/public', express.static('public')) // for public folder
 app.use(notFoundHandler) // 404 handler
 app.use(errorHandler) // error handlerr
