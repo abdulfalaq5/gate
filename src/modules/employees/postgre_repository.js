@@ -240,7 +240,7 @@ class EmployeesRepository {
     for (const permission of permissions) {
       if (permission.menu_id && permission.permission_detail && Array.isArray(permission.permission_detail)) {
         for (const detail of permission.permission_detail) {
-          if (detail.permission_id) {
+          if (detail.permission_id && detail.permission_status === true) {
             permissionData.push({
               employee_id: employeeId,
               menu_id: permission.menu_id,
@@ -269,6 +269,91 @@ class EmployeesRepository {
     return await this.knex('employeeHasPermissions')
       .where('employee_id', employeeId)
       .del()
+  }
+
+  /**
+   * Update employee permissions based on permission_status
+   */
+  async updateEmployeePermissions(employeeId, permissions, updatedBy) {
+    if (!permissions || !Array.isArray(permissions) || permissions.length === 0) {
+      return { created: [], deleted: [] }
+    }
+
+    const permissionData = []
+    const deleteConditions = []
+    
+    for (const permission of permissions) {
+      if (permission.menu_id && permission.permission_detail && Array.isArray(permission.permission_detail)) {
+        for (const detail of permission.permission_detail) {
+          if (detail.permission_id) {
+            if (detail.permission_status === true) {
+              permissionData.push({
+                employee_id: employeeId,
+                menu_id: permission.menu_id,
+                permission_id: detail.permission_id,
+                created_by: updatedBy,
+                created_at: new Date()
+              })
+            } else if (detail.permission_status === false) {
+              deleteConditions.push({
+                employee_id: employeeId,
+                menu_id: permission.menu_id,
+                permission_id: detail.permission_id
+              })
+            }
+          }
+        }
+      }
+    }
+
+    const results = { created: [], deleted: [] }
+
+    // Delete permissions where status is false
+    if (deleteConditions.length > 0) {
+      for (const condition of deleteConditions) {
+        const deletedRows = await this.knex('employeeHasPermissions')
+          .where(condition)
+          .del()
+        if (deletedRows > 0) {
+          results.deleted.push(condition)
+        }
+      }
+    }
+
+    // Insert permissions where status is true
+    if (permissionData.length > 0) {
+      try {
+        // Insert permissions and handle duplicates gracefully
+        const createdPermissions = await this.knex('employeeHasPermissions')
+          .insert(permissionData)
+          .returning('*')
+        
+        results.created = createdPermissions || []
+      } catch (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          // If duplicate, try to insert each permission individually
+          const createdPermissions = []
+          for (const permission of permissionData) {
+            try {
+              const [created] = await this.knex('employeeHasPermissions')
+                .insert(permission)
+                .returning('*')
+              if (created) {
+                createdPermissions.push(created)
+              }
+            } catch (duplicateError) {
+              // Skip duplicates silently
+              console.log(`Permission already exists for employee ${permission.employee_id}, menu ${permission.menu_id}, permission ${permission.permission_id}`)
+            }
+          }
+          results.created = createdPermissions
+        } else {
+          throw error
+        }
+      }
+    }
+
+    return results
   }
 
   /**

@@ -275,13 +275,9 @@ const updateEmployee = async (req, res) => {
     
     const result = await employeesRepository.updateEmployee(id, updateData)
     
-    // Update employee permissions if provided
+    // Update employee permissions based on status if provided
     if (parsedPermissions && Array.isArray(parsedPermissions)) {
-      // Delete existing permissions first
-      await employeesRepository.deleteEmployeePermissions(id)
-      
-      // Create new permissions
-      await employeesRepository.createEmployeePermissions(
+      await employeesRepository.updateEmployeePermissions(
         id, 
         parsedPermissions, 
         req.user?.user_id

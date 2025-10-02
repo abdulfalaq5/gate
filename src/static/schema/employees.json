@@ -128,6 +128,48 @@
 			},
 			"is_delete": {
 				"type": "boolean"
+			},
+			"permission_detail": {
+				"type": "array",
+				"description": "Array of menu permissions with detailed status",
+				"items": {
+					"type": "object",
+					"properties": {
+						"menu_id": {
+							"type": "string",
+							"format": "uuid",
+							"description": "Menu ID"
+						},
+						"menu_name": {
+							"type": "string",
+							"description": "Menu name"
+						},
+						"permission_detail": {
+							"type": "array",
+							"description": "Array of permissions for this menu",
+							"items": {
+								"type": "object",
+								"properties": {
+									"permission_id": {
+										"type": "string",
+										"format": "uuid",
+										"description": "Permission ID"
+									},
+									"permission_name": {
+										"type": "string",
+										"description": "Permission name"
+									},
+									"permission_status": {
+										"type": "boolean",
+										"description": "Whether employee has this permission"
+									}
+								},
+								"required": ["permission_id", "permission_name", "permission_status"]
+							}
+						}
+					},
+					"required": ["menu_id", "menu_name", "permission_detail"]
+				}
 			}
 		}
 	},
@@ -210,8 +252,8 @@
 			},
 			"permission_detail": {
 				"type": "string",
-				"description": "JSON string containing employee permissions array",
-				"example": "[{\"menu_id\":\"b149136f-dd21-4baa-a759-dc68d51c93ed\",\"permission_detail\":[{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]}]"
+				"description": "JSON string containing employee permissions array with permission_status",
+				"example": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
 			}
 		},
 		"required": ["employee_name", "employee_email", "title_id"],
@@ -233,7 +275,7 @@
 			"employee_wechat_workplace": "Not follow",
 			"employee_phone": "6285399480077",
 			"password": "Qwer1234!",
-			"permission_detail": "[{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\"},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]"
+			"permission_detail": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
 		}
 	},
 	"SchemaPutEmployees": {
@@ -315,8 +357,8 @@
 			},
 			"permission_detail": {
 				"type": "string",
-				"description": "JSON string containing employee permissions array",
-				"example": "[{\"menu_id\":\"b149136f-dd21-4baa-a759-dc68d51c93ed\",\"permission_detail\":[{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]}]"
+				"description": "JSON string containing employee permissions array with permission_status",
+				"example": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
 			}
 		},
 		"description": "company_id is optional and will be ignored during update as it's derived from title->department->company relationship. permission_detail is optional and will replace all existing permissions for the employee.",
@@ -336,7 +378,7 @@
 			"employee_disabled": false,
 			"employee_wechat_workplace": "Not follow",
 			"employee_phone": "6285399480077",
-			"permission_detail": "[{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\"},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]"
+			"permission_detail": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
 		}
 	},
 	"SchemaPostEmployeesGet": {
