@@ -208,13 +208,33 @@
 				"type": "string",
 				"format": "uuid"
 			},
-			"employeeHasPermissions": {
+			"permission_detail": {
 				"type": "string",
-				"description": "JSON string containing employee permissions array"
+				"description": "JSON string containing employee permissions array",
+				"example": "[{\"menu_id\":\"b149136f-dd21-4baa-a759-dc68d51c93ed\",\"permission_detail\":[{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]}]"
 			}
 		},
 		"required": ["employee_name", "employee_email", "title_id"],
-		"description": "company_id is optional and will be ignored during insert as it's derived from title->department->company relationship. employeeHasPermissions is optional and will create permission records for the employee."
+		"description": "company_id is optional and will be ignored during insert as it's derived from title->department->company relationship. permission_detail is optional and will create permission records for the employee.",
+		"example": {
+			"employee_name": "Abd. Rahman Muhridja",
+			"employee_email": "abdrahmanmuhridja@motorsights.net",
+			"title_id": "9b48be3e-c45e-4620-a32c-c4e547feaa60",
+			"department_id": "679418f6-773e-4e43-8d65-2f91d817a75e",
+			"gender_id": "ac496e5f-97c8-46a6-86ba-2a11942a01d6",
+			"island_id": "b039e457-96cf-48bf-b3b2-948419f88ed2",
+			"employee_mobile": "6285399480077",
+			"employee_office_number": "0853-994-800-77",
+			"employee_address": "Tamalanrea, Makassar",
+			"employee_exmail_account": "abdrahmanmuhridja@motorsights.net",
+			"employee_channel": "Direct Recruitment",
+			"employee_activation_status": "Activated",
+			"employee_disabled": false,
+			"employee_wechat_workplace": "Not follow",
+			"employee_phone": "6285399480077",
+			"password": "Qwer1234!",
+			"permission_detail": "[{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\"},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]"
+		}
 	},
 	"SchemaPutEmployees": {
 		"type": "object",
@@ -293,12 +313,31 @@
 				"type": "string",
 				"format": "uuid"
 			},
-			"employeeHasPermissions": {
+			"permission_detail": {
 				"type": "string",
-				"description": "JSON string containing employee permissions array"
+				"description": "JSON string containing employee permissions array",
+				"example": "[{\"menu_id\":\"b149136f-dd21-4baa-a759-dc68d51c93ed\",\"permission_detail\":[{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]}]"
 			}
 		},
-		"description": "company_id is optional and will be ignored during update as it's derived from title->department->company relationship. employeeHasPermissions is optional and will replace all existing permissions for the employee."
+		"description": "company_id is optional and will be ignored during update as it's derived from title->department->company relationship. permission_detail is optional and will replace all existing permissions for the employee.",
+		"example": {
+			"employee_name": "Abd. Rahman Muhridja",
+			"employee_email": "abdrahmanmuhridja@motorsights.net",
+			"title_id": "9b48be3e-c45e-4620-a32c-c4e547feaa60",
+			"department_id": "679418f6-773e-4e43-8d65-2f91d817a75e",
+			"gender_id": "ac496e5f-97c8-46a6-86ba-2a11942a01d6",
+			"island_id": "b039e457-96cf-48bf-b3b2-948419f88ed2",
+			"employee_mobile": "6285399480077",
+			"employee_office_number": "0853-994-800-77",
+			"employee_address": "Tamalanrea, Makassar",
+			"employee_exmail_account": "abdrahmanmuhridja@motorsights.net",
+			"employee_channel": "Direct Recruitment",
+			"employee_activation_status": "Activated",
+			"employee_disabled": false,
+			"employee_wechat_workplace": "Not follow",
+			"employee_phone": "6285399480077",
+			"permission_detail": "[{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\"},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\"}]"
+		}
 	},
 	"SchemaPostEmployeesGet": {
 		"type": "object",

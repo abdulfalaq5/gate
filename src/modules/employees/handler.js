@@ -84,19 +84,19 @@ const createEmployee = async (req, res) => {
       return errorResponse(res, validation.errors, 400)
     }
 
-    // Prepare employee data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
-    const { company_id, employeeHasPermissions, ...employeePayload } = req.body
+    // Prepare employee data - exclude company_id and permission_detail as they're not direct columns in employees table
+    const { company_id, permission_detail, ...employeePayload } = req.body
     
-    // Parse employeeHasPermissions if it's a JSON string
+    // Parse permission_detail if it's a JSON string
     let parsedPermissions = null
-    if (employeeHasPermissions && typeof employeeHasPermissions === 'string') {
+    if (permission_detail && typeof permission_detail === 'string') {
       try {
-        parsedPermissions = JSON.parse(employeeHasPermissions)
+        parsedPermissions = JSON.parse(permission_detail)
       } catch (error) {
-        return errorResponse(res, 'Invalid JSON format for employeeHasPermissions', 400)
+        return errorResponse(res, 'Invalid JSON format for permission_detail', 400)
       }
-    } else if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
-      parsedPermissions = employeeHasPermissions
+    } else if (permission_detail && Array.isArray(permission_detail)) {
+      parsedPermissions = permission_detail
     }
     
     // Hash password if provided
@@ -201,19 +201,19 @@ const updateEmployee = async (req, res) => {
       }
     }
     
-    // Prepare update data - exclude company_id and employeeHasPermissions as they're not direct columns in employees table
-    const { company_id, employeeHasPermissions, employee_foto, ...updatePayload } = req.body
+    // Prepare update data - exclude company_id and permission_detail as they're not direct columns in employees table
+    const { company_id, permission_detail, employee_foto, ...updatePayload } = req.body
     
-    // Parse employeeHasPermissions if it's a JSON string
+    // Parse permission_detail if it's a JSON string
     let parsedPermissions = null
-    if (employeeHasPermissions && typeof employeeHasPermissions === 'string') {
+    if (permission_detail && typeof permission_detail === 'string') {
       try {
-        parsedPermissions = JSON.parse(employeeHasPermissions)
+        parsedPermissions = JSON.parse(permission_detail)
       } catch (error) {
-        return errorResponse(res, 'Invalid JSON format for employeeHasPermissions', 400)
+        return errorResponse(res, 'Invalid JSON format for permission_detail', 400)
       }
-    } else if (employeeHasPermissions && Array.isArray(employeeHasPermissions)) {
-      parsedPermissions = employeeHasPermissions
+    } else if (permission_detail && Array.isArray(permission_detail)) {
+      parsedPermissions = permission_detail
     }
     
     // Hash password if provided
