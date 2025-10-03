@@ -102,8 +102,8 @@ router.put('/titles/:id', verifySSOToken, titlesRoutes.updateTitle);
 router.delete('/titles/:id', verifySSOToken, titlesRoutes.deleteTitle);
 
 // Systems
-router.post('/systems', verifySSOToken, systemsRoutes.createSystem);
-router.get('/systems', verifySSOToken, systemsRoutes.listSystems);
+router.post('/systems/create', verifySSOToken, systemsRoutes.createSystem);
+router.post('/systems/get', verifySSOToken, systemsRoutes.listSystems);
 router.get('/systems/:id', verifySSOToken, systemsRoutes.getSystem);
 router.put('/systems/:id', verifySSOToken, systemsRoutes.updateSystem);
 router.delete('/systems/:id', verifySSOToken, systemsRoutes.deleteSystem);

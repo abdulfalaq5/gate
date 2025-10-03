@@ -1,9 +1,10 @@
 const SystemsRepository = require('./postgre_repository');
 const { successResponse, errorResponse } = require('../../utils/response');
+const { pgCore } = require('../../config/database');
 
 class SystemsHandler {
   constructor() {
-    this.systemsRepository = new SystemsRepository(require('../../repository/postgres/core_postgres'));
+    this.systemsRepository = new SystemsRepository(pgCore);
   }
 
   async createSystem(req, res) {
@@ -51,9 +52,33 @@ class SystemsHandler {
 
   async listSystems(req, res) {
     try {
-      const systems = await this.systemsRepository.findAllActive();
+      const { page = 1, limit = 10, search = '' } = req.body;
+      
+      // Validate pagination parameters
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+      
+      if (pageNum < 1) {
+        return errorResponse(res, 'Page must be greater than 0', 400);
+      }
+      
+      if (limitNum < 1 || limitNum > 100) {
+        return errorResponse(res, 'Limit must be between 1 and 100', 400);
+      }
 
-      return successResponse(res, systems, 'Systems retrieved successfully');
+      const result = await this.systemsRepository.findAllActiveWithPagination(
+        pageNum, 
+        limitNum, 
+        search
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'Systems retrieved successfully',
+        data: result.data,
+        pagination: result.pagination,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       console.error('Error listing systems:', error);
       return errorResponse(res, 'Failed to retrieve systems', 500);
