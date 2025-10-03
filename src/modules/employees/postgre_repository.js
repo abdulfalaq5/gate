@@ -151,11 +151,23 @@ class EmployeesRepository {
         return null
       }
 
-      // Get all menus first
-      const allMenus = await this.knex('menus')
-        .select('menu_id', 'menu_name')
+      // Get all systems first
+      const allSystems = await this.knex('systems')
+        .select('system_id', 'system_name')
         .where('is_delete', false)
-        .orderBy('menu_name')
+        .orderBy('system_name')
+
+      // Get all menus with their system_id
+      const allMenus = await this.knex('menus')
+        .leftJoin('systems', 'menus.system_id', 'systems.system_id')
+        .select(
+          'menus.menu_id', 
+          'menus.menu_name',
+          'menus.system_id',
+          'systems.system_name'
+        )
+        .where('menus.is_delete', false)
+        .orderBy('menus.menu_name')
 
       // Get all permissions
       const allPermissions = await this.knex('permissions')
@@ -174,12 +186,25 @@ class EmployeesRepository {
         employeePermissionSet.add(`${perm.menu_id}-${perm.permission_id}`)
       })
 
-      // Group permissions by menu
-      const menuPermissionMap = new Map()
+      // Group by system first, then by menu
+      const systemMap = new Map()
       
-      // Initialize all menus
+      // Initialize all systems
+      allSystems.forEach(system => {
+        systemMap.set(system.system_id, {
+          system_id: system.system_id,
+          system_name: system.system_name,
+          permission_detail: []
+        })
+      })
+
+      // Group menus by system
+      const menuMap = new Map()
       allMenus.forEach(menu => {
-        menuPermissionMap.set(menu.menu_id, {
+        if (!menuMap.has(menu.system_id)) {
+          menuMap.set(menu.system_id, [])
+        }
+        menuMap.get(menu.system_id).push({
           menu_id: menu.menu_id,
           menu_name: menu.menu_name,
           permission_detail: []
@@ -192,16 +217,26 @@ class EmployeesRepository {
           const permissionKey = `${menu.menu_id}-${permission.permission_id}`
           const hasPermission = employeePermissionSet.has(permissionKey)
           
-          menuPermissionMap.get(menu.menu_id).permission_detail.push({
-            permission_id: permission.permission_id,
-            permission_name: permission.permission_name,
-            permission_status: hasPermission
-          })
+          const menuInMap = menuMap.get(menu.system_id)?.find(m => m.menu_id === menu.menu_id)
+          if (menuInMap) {
+            menuInMap.permission_detail.push({
+              permission_id: permission.permission_id,
+              permission_name: permission.permission_name,
+              permission_status: hasPermission
+            })
+          }
         })
       })
 
-      // Convert map to array
-      const permission_detail = Array.from(menuPermissionMap.values())
+      // Build final structure grouped by system
+      systemMap.forEach((system, systemId) => {
+        const menus = menuMap.get(systemId) || []
+        system.permission_detail = menus
+      })
+
+      // Convert map to array and filter out systems with no menus
+      const permission_detail = Array.from(systemMap.values())
+        .filter(system => system.permission_detail.length > 0)
 
       // Add permission_detail to employee object
       employee.permission_detail = permission_detail
@@ -462,3 +497,4 @@ class EmployeesRepository {
 }
 
 module.exports = EmployeesRepository
+

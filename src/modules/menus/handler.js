@@ -16,7 +16,7 @@ class MenusHandler {
         ...req.body    // POST parameters
       };
       
-      const { menu_name, menu_parent_id, menu_url, menu_icon, menu_order } = requestParams;
+      const { menu_name, menu_parent_id, menu_url, menu_icon, menu_order, system_id } = requestParams;
       const createdBy = req.user?.user_id;
 
       if (!menu_name) {
@@ -29,6 +29,7 @@ class MenusHandler {
         menu_url,
         menu_icon,
         menu_order: menu_order ? parseInt(menu_order) : undefined,
+        system_id: system_id === '' ? null : system_id,
         created_by: createdBy,
       };
 
@@ -83,6 +84,7 @@ class MenusHandler {
           'menu_icon', 
           'menu_parent_id',
           'menu_order',
+          'system_id',
           'created_by',
           'updated_by',
           'is_delete'
@@ -127,7 +129,7 @@ class MenusHandler {
   async updateMenu(req, res) {
     try {
       const { id } = req.params;
-      const { menu_name, menu_parent_id, menu_url, menu_icon, menu_order } = req.body;
+      const { menu_name, menu_parent_id, menu_url, menu_icon, menu_order, system_id } = req.body;
       const updatedBy = req.user?.user_id;
 
       const menu = await this.menusRepository.findById(id);
@@ -145,6 +147,7 @@ class MenusHandler {
       if (menu_url) updateData.menu_url = menu_url;
       if (menu_icon) updateData.menu_icon = menu_icon;
       if (menu_order) updateData.menu_order = menu_order;
+      if (system_id !== undefined) updateData.system_id = system_id === '' ? null : system_id;
 
       const updatedMenu = await this.menusRepository.updateMenu(id, updateData);
 

@@ -49,6 +49,11 @@
 								"menu_name": {
 									"type": "string",
 									"description": "Filter by exact menu name"
+								},
+								"system_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by system ID"
 								}
 							}
 						},
@@ -58,7 +63,8 @@
 							"sort_by": "menu_order",
 							"sort_order": "asc",
 							"search": "",
-							"menu_name": ""
+							"menu_name": "",
+							"system_id": ""
 						}
 					}
 				}
