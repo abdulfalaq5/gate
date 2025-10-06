@@ -252,8 +252,8 @@
 			},
 			"permission_detail": {
 				"type": "string",
-				"description": "JSON string containing employee permissions array with permission_status",
-				"example": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
+				"description": "JSON string containing employee permissions array with permission_status. Supports both old structure (direct menu_id) and new structure (with system_id and system_name)",
+				"example": "[{\"system_id\":\"ea805534-6616-4980-b0b0-b983a39940f8\",\"system_name\":\"Power BI\",\"permission_detail\":[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]}]"
 			}
 		},
 		"required": ["employee_name", "employee_email", "title_id"],
@@ -357,8 +357,8 @@
 			},
 			"permission_detail": {
 				"type": "string",
-				"description": "JSON string containing employee permissions array with permission_status",
-				"example": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
+				"description": "JSON string containing employee permissions array with permission_status. Supports both old structure (direct menu_id) and new structure (with system_id and system_name)",
+				"example": "[{\"system_id\":\"ea805534-6616-4980-b0b0-b983a39940f8\",\"system_name\":\"Power BI\",\"permission_detail\":[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]}]"
 			}
 		},
 		"description": "company_id is optional and will be ignored during update as it's derived from title->department->company relationship. permission_detail is optional and will replace all existing permissions for the employee.",

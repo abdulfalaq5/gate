@@ -318,23 +318,39 @@ class EmployeesRepository {
     const deleteConditions = []
     
     for (const permission of permissions) {
+      // Support both old structure (direct menu_id) and new structure (with system_id)
+      let menusToProcess = []
+      
       if (permission.menu_id && permission.permission_detail && Array.isArray(permission.permission_detail)) {
-        for (const detail of permission.permission_detail) {
-          if (detail.permission_id) {
-            if (detail.permission_status === true) {
-              permissionData.push({
-                employee_id: employeeId,
-                menu_id: permission.menu_id,
-                permission_id: detail.permission_id,
-                created_by: updatedBy,
-                created_at: new Date()
-              })
-            } else if (detail.permission_status === false) {
-              deleteConditions.push({
-                employee_id: employeeId,
-                menu_id: permission.menu_id,
-                permission_id: detail.permission_id
-              })
+        // Old structure: direct menu with permission_detail
+        menusToProcess.push({
+          menu_id: permission.menu_id,
+          permission_detail: permission.permission_detail
+        })
+      } else if (permission.system_id && permission.permission_detail && Array.isArray(permission.permission_detail)) {
+        // New structure: system with menus containing permission_detail
+        menusToProcess = permission.permission_detail
+      }
+      
+      for (const menu of menusToProcess) {
+        if (menu.menu_id && menu.permission_detail && Array.isArray(menu.permission_detail)) {
+          for (const detail of menu.permission_detail) {
+            if (detail.permission_id) {
+              if (detail.permission_status === true) {
+                permissionData.push({
+                  employee_id: employeeId,
+                  menu_id: menu.menu_id,
+                  permission_id: detail.permission_id,
+                  created_by: updatedBy,
+                  created_at: new Date()
+                })
+              } else if (detail.permission_status === false) {
+                deleteConditions.push({
+                  employee_id: employeeId,
+                  menu_id: menu.menu_id,
+                  permission_id: detail.permission_id
+                })
+              }
             }
           }
         }
