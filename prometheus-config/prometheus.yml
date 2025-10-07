@@ -1,0 +1,70 @@
+# Prometheus Configuration untuk scraping aplikasi Gate
+# File ini harus ditambahkan ke konfigurasi Prometheus server yang sudah ada
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Aplikasi Gate Express.js
+  - job_name: 'gate-express-app'
+    static_configs:
+      - targets: ['localhost:9588']  # Ganti dengan IP server Gate yang sebenarnya
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    honor_labels: false
+    honor_timestamps: true
+    
+    # Relabeling untuk memberikan label yang lebih deskriptif
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'gate-express-web'
+      - target_label: job
+        replacement: 'gate-application'
+      - target_label: environment
+        replacement: 'production'  # Sesuaikan dengan environment
+
+  # Jika ada multiple instance aplikasi Gate
+  - job_name: 'gate-express-api'
+    static_configs:
+      - targets: ['localhost:9588']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'gate-express-api'
+      - target_label: service
+        replacement: 'gate-api'
+
+  # Monitoring endpoint khusus
+  - job_name: 'gate-monitoring'
+    static_configs:
+      - targets: ['localhost:9588']
+    metrics_path: '/metrics/app'
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'gate-monitoring'
+      - target_label: job
+        replacement: 'gate-custom-metrics'
+
+# Alerting rules (opsional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Recording rules (opsional)
+# rule_files:
+#   - "gate_recording_rules.yml"

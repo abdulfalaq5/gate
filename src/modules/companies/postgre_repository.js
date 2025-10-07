@@ -7,7 +7,7 @@ const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = requi
  */
 const getCompanies = async (queryParams) => {
   // Base query untuk companies
-  const baseQuery = pgCore('companies').select('*')
+  const baseQuery = pgCore('companies').select('*').where('companies.is_delete', false)
   
   // Apply semua filter standar
   const dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)

@@ -50,12 +50,29 @@ class PermissionsHandler {
 
   async listPermissions(req, res) {
     try {
+      // Support parameters from both query string (GET) and body (POST)
+      const requestParams = {
+        ...req.query,  // GET parameters
+        ...req.body    // POST parameters
+      };
+      
+      // Create a modified request object for parseStandardQuery
+      const modifiedReq = {
+        ...req,
+        query: requestParams
+      };
+
       // Parse query parameters dengan konfigurasi untuk permissions
-      const queryParams = parseStandardQuery(req, {
+      const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: ['permission_name', 'created_at', 'updated_at'],
-        defaultSort: ['permission_name', 'asc'],
+        defaultSort: ['created_at', 'desc'],
         searchableColumns: ['permission_name'],
-        allowedFilters: ['permission_name'],
+        allowedFilters: [
+          'permission_name',
+          'created_by',
+          'updated_by',
+          'is_delete'
+        ],
         dateColumn: 'created_at'
       });
 

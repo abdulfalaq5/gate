@@ -128,142 +128,15 @@
 					}
 				}
 			}
-		},
-		"post": {
-			"tags": [
-				"Menu Has Permissions"
-			],
-			"summary": "Create a new menu-permission relationship",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"requestBody": {
-				"required": true,
-				"content": {
-					"application/json": {
-						"schema": {
-							"$ref": "#/components/schemas/SchemaCreateMenuHasPermission"
-						}
-					}
-				}
-			},
-			"responses": {
-				"201": {
-					"description": "Created",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"400": {
-					"description": "Bad Request",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"409": {
-					"description": "Conflict - Relationship already exists",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
 		}
 	},
 	"/menu-has-permissions/{menu_id}/{permission_id}": {
-		"get": {
-			"tags": [
-				"Menu Has Permissions"
-			],
-			"summary": "Get a specific menu-permission relationship",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				},
-				{
-					"in": "path",
-					"name": "permission_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Permission ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"404": {
-					"description": "Not Found",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
 		"put": {
 			"tags": [
 				"Menu Has Permissions"
 			],
-			"summary": "Update a menu-permission relationship",
+			"summary": "Create or delete a menu-permission relationship based on permission_status",
+			"description": "If permission_status is true, creates a new menu-permission relationship. If false, deletes the existing relationship.",
 			"security": [
 				{
 					"bearerAuth": []
@@ -303,7 +176,7 @@
 			},
 			"responses": {
 				"200": {
-					"description": "OK",
+					"description": "Menu-permission relationship deleted successfully",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -312,63 +185,8 @@
 						}
 					}
 				},
-				"404": {
-					"description": "Not Found",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
-		"delete": {
-			"tags": [
-				"Menu Has Permissions"
-			],
-			"summary": "Delete a menu-permission relationship",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				},
-				{
-					"in": "path",
-					"name": "permission_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Permission ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
+				"201": {
+					"description": "Menu-permission relationship created successfully",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -377,8 +195,28 @@
 						}
 					}
 				},
+				"400": {
+					"description": "Bad Request - permission_status must be a boolean value",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
 				"404": {
-					"description": "Not Found",
+					"description": "Not Found - Menu-permission relationship not found (when trying to delete)",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
+				"409": {
+					"description": "Conflict - Menu-permission relationship already exists (when trying to create)",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -405,7 +243,7 @@
 			"tags": [
 				"Menu Has Permissions"
 			],
-			"summary": "Get all permissions for a specific menu",
+			"summary": "Get all permissions for a specific menu with status",
 			"security": [
 				{
 					"bearerAuth": []
@@ -429,144 +267,35 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean",
+										"description": "Indicates if the request was successful"
+									},
+									"message": {
+										"type": "string",
+										"description": "Response message"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaMenuPermissionsResponse"
+									},
+									"timestamp": {
+										"type": "string",
+										"format": "date-time",
+										"description": "Response timestamp"
+									}
+								}
 							}
 						}
 					}
 				},
-				"500": {
-					"description": "Internal Server Error",
+				"404": {
+					"description": "Menu not found",
 					"content": {
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
-		"delete": {
-			"tags": [
-				"Menu Has Permissions"
-			],
-			"summary": "Delete all menu-permission relationships for a specific menu",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"/menu-has-permissions/permission/{permission_id}": {
-		"get": {
-			"tags": [
-				"Menu Has Permissions"
-			],
-			"summary": "Get all menus for a specific permission",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "permission_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Permission ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
-		"delete": {
-			"tags": [
-				"Menu Has Permissions"
-			],
-			"summary": "Delete all menu-permission relationships for a specific permission",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "permission_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Permission ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
 							}
 						}
 					}

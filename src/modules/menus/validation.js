@@ -22,6 +22,10 @@ const createMenuValidation = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Menu order must be a non-negative integer'),
+  body('system_id')
+    .optional()
+    .isUUID()
+    .withMessage('Invalid system ID format'),
 ];
 
 const updateMenuValidation = [
@@ -48,6 +52,10 @@ const updateMenuValidation = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Menu order must be a non-negative integer'),
+  body('system_id')
+    .optional()
+    .isUUID()
+    .withMessage('Invalid system ID format'),
 ];
 
 const deleteMenuValidation = [
@@ -79,6 +87,10 @@ const listMenusValidation = [
     .optional()
     .isUUID()
     .withMessage('Invalid parent ID format'),
+  query('system_id')
+    .optional()
+    .isUUID()
+    .withMessage('Invalid system ID format'),
 ];
 
 module.exports = {

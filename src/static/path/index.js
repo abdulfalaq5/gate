@@ -4,10 +4,12 @@ const authMember = require('./auth_member.json')
 const companies = require('./companies.json')
 const departments = require('./departments.json')
 const employees = require('./employees.json')
+const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
-const roles = require('./roles.json')
 const permissions = require('./permissions.json')
-const users = require('./users.json')
+const ssoProfile = require('./sso_profile.json')
+const systems = require('./systems.json')
+const titles = require('./titles.json')
 
 module.exports = {
   ...auth,
@@ -16,8 +18,10 @@ module.exports = {
   ...companies,
   ...departments,
   ...employees,
+  ...employeesImport,
   ...importModule,
-  ...roles,
   ...permissions,
-  ...users
+  ...ssoProfile,
+  ...systems,
+  ...titles
 }

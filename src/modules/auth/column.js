@@ -1,23 +1,27 @@
-const TABLE = 'users';
-const TABLE_JOIN = 'roles';
+const TABLE = 'employees';
+const TABLE_JOIN = 'titles';
+const TABLE_JOIN_DEPT = 'departments';
 const COLUMN = [
-  `${TABLE}.user_id as users_id`,
-  `${TABLE}.user_name as full_name`,
+  `${TABLE}.employee_id as users_id`,
+  `${TABLE}.employee_name as full_name`,
   `${TABLE}.is_delete as status`,
-  `${TABLE}.user_password as password`,
-  `${TABLE}.salt`,
-  `${TABLE_JOIN}.role_name`,
+  `${TABLE}.password`,
+  `${TABLE}.employee_exmail_account as user_email`,
+  `${TABLE_JOIN}.title_name`,
+  `${TABLE_JOIN_DEPT}.department_name`,
 ];
 const COLUMN_ME = [
-  `${TABLE}.user_id as users_id`,
-  `${TABLE}.user_name as full_name`,
-  `${TABLE_JOIN}.role_name`,
-  `${TABLE}.role_id`,
+  `${TABLE}.employee_id as users_id`,
+  `${TABLE}.employee_name as full_name`,
+  `${TABLE}.employee_exmail_account as user_email`,
+  `${TABLE_JOIN}.title_name`,
+  `${TABLE_JOIN_DEPT}.department_name`,
 ];
 
 module.exports = {
   TABLE,
   TABLE_JOIN,
+  TABLE_JOIN_DEPT,
   COLUMN,
   COLUMN_ME,
 };

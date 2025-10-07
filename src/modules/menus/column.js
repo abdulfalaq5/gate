@@ -5,6 +5,7 @@ const menusColumns = {
   menu_url: 'menu_url',
   menu_icon: 'menu_icon',
   menu_order: 'menu_order',
+  system_id: 'system_id',
   created_at: 'created_at',
   created_by: 'created_by',
   updated_at: 'updated_at',

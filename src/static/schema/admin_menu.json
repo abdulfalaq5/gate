@@ -30,6 +30,12 @@
 				"type": "integer",
 				"description": "Order of the menu"
 			},
+			"system_id": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "System ID associated with the menu"
+			},
 			"created_at": {
 				"type": "string",
 				"format": "date-time",
@@ -124,6 +130,12 @@
 				"type": "integer",
 				"nullable": true,
 				"description": "Order of the menu"
+			},
+			"system_id": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "System ID associated with the menu"
 			}
 		}
 	},
@@ -154,6 +166,12 @@
 				"type": "integer",
 				"nullable": true,
 				"description": "Order of the menu"
+			},
+			"system_id": {
+				"type": "string",
+				"format": "uuid",
+				"nullable": true,
+				"description": "System ID associated with the menu"
 			}
 		}
 	},

@@ -56,7 +56,21 @@ const applySearch = (queryBuilder, search) => {
  */
 const applyFilters = (queryBuilder, filters) => {
   Object.keys(filters).forEach(key => {
-    queryBuilder.where(key, filters[key]);
+    // Handle ambiguous columns by checking if the query has joins
+    const queryString = queryBuilder.toString().toLowerCase();
+    if (queryString.includes('join')) {
+      // For joined tables, specify the table name to avoid ambiguity
+      if (key === 'department_id' || key === 'created_by' || key === 'updated_by') {
+        queryBuilder.where(`titles.${key}`, filters[key]);
+      } else if (key === 'company_id') {
+        // For departments table with companies join, use departments.company_id
+        queryBuilder.where(`departments.${key}`, filters[key]);
+      } else {
+        queryBuilder.where(key, filters[key]);
+      }
+    } else {
+      queryBuilder.where(key, filters[key]);
+    }
   });
   
   return queryBuilder;

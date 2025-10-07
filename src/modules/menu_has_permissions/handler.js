@@ -80,9 +80,13 @@ class MenuHasPermissionsHandler {
     try {
       const { menu_id } = req.params;
 
-      const permissions = await this.menuHasPermissionsRepository.findByMenuId(menu_id);
+      const result = await this.menuHasPermissionsRepository.getMenuPermissionsWithStatus(menu_id);
 
-      return successResponse(res, permissions, 'Permissions for menu retrieved successfully');
+      if (!result) {
+        return errorResponse(res, 'Menu not found', 404);
+      }
+
+      return successResponse(res, result, 'Menu permissions retrieved successfully');
     } catch (error) {
       console.error('Error getting permissions by menu:', error);
       return errorResponse(res, 'Failed to retrieve permissions for menu', 500);
@@ -105,21 +109,40 @@ class MenuHasPermissionsHandler {
   async updateMenuHasPermission(req, res) {
     try {
       const { menu_id, permission_id } = req.params;
+      const { permission_status } = req.body;
       const updatedBy = req.user?.user_id;
 
-      const record = await this.menuHasPermissionsRepository.findById(menu_id, permission_id);
-
-      if (!record) {
-        return errorResponse(res, 'Menu-Permission relationship not found', 404);
+      if (typeof permission_status !== 'boolean') {
+        return errorResponse(res, 'permission_status must be a boolean value (true/false)', 400);
       }
 
-      const updateData = {
-        updated_by: updatedBy,
-      };
+      if (permission_status === true) {
+        // Insert data ke tabel menuHasPermissions
+        const existingRecord = await this.menuHasPermissionsRepository.findById(menu_id, permission_id);
+        
+        if (existingRecord) {
+          return errorResponse(res, 'Menu-Permission relationship already exists', 409);
+        }
 
-      const updatedRecord = await this.menuHasPermissionsRepository.updateMenuHasPermission(menu_id, permission_id, updateData);
+        const recordData = {
+          menu_id,
+          permission_id,
+          created_by: updatedBy,
+        };
 
-      return successResponse(res, updatedRecord, 'Menu-Permission relationship updated successfully');
+        const newRecord = await this.menuHasPermissionsRepository.createMenuHasPermission(recordData);
+        return successResponse(res, newRecord, 'Menu-Permission relationship created successfully', 201);
+      } else {
+        // Delete data dari tabel menuHasPermissions
+        const existingRecord = await this.menuHasPermissionsRepository.findById(menu_id, permission_id);
+        
+        if (!existingRecord) {
+          return errorResponse(res, 'Menu-Permission relationship not found', 404);
+        }
+
+        const deletedRecord = await this.menuHasPermissionsRepository.deleteMenuHasPermission(menu_id, permission_id);
+        return successResponse(res, deletedRecord, 'Menu-Permission relationship deleted successfully');
+      }
     } catch (error) {
       console.error('Error updating menu-permission relationship:', error);
       return errorResponse(res, 'Failed to update menu-permission relationship', 500);

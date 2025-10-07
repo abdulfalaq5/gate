@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const ssoConfig = require('../../config/sso');
-const UsersRepository = require('../users/postgre_repository');
+// UsersRepository removed - now using employees table directly
 const { CustomException } = require('../../utils/exception');
 const { Logger } = require('../../utils/logger');
 const { pgCore } = require('../../config/database');
 
 class SSOServerHandler {
   constructor() {
-    this.usersRepository = new UsersRepository(pgCore);
+    // UsersRepository removed - now using employees table directly
     this.authorizationCodes = new Map(); // In production, use Redis or database
   }
 
@@ -37,78 +37,175 @@ class SSOServerHandler {
   // SSO Login endpoint
   async login(req, res) {
     try {
-      const { user_name, user_password, client_id, redirect_uri } = req.body;
+      const { email, password, client_id, redirect_uri } = req.body;
+      const clientIP = req.ip || req.connection.remoteAddress || '::1';
       
-      console.log('SSO Login Request:', { user_name, client_id, redirect_uri });
+      console.log('SSO Login Request:', { email, client_id, redirect_uri });
 
       // Validation
-      if (!user_name || !user_password) {
-        console.log('Validation failed: missing user_name or user_password');
+      if (!email || !password) {
+        console.log('Validation failed: missing email or password');
         return res.status(400).json({
           success: false,
-          message: 'Username dan password diperlukan',
+          message: 'Email dan password diperlukan',
           errors: null,
           timestamp: new Date().toISOString()
         });
       }
 
-      // Find user by username or email
-      let user = await this.usersRepository.findByUsername(user_name);
-      if (!user) {
-        user = await this.usersRepository.findByEmail(user_name);
-      }
+      // Find employee by email
+      const employee = await pgCore('employees')
+        .select([
+          'employee_id',
+          'employee_name',
+          'employee_exmail_account',
+          'employee_foto',
+          'password',
+          'is_delete'
+        ])
+        .where('employee_exmail_account', email)
+        .where('is_delete', false)
+        .first();
 
-      if (!user) {
-        console.log('User not found:', user_name);
+      if (!employee) {
+        console.log('Employee not found:', email);
         throw new CustomException('Invalid credentials', 401);
       }
 
-      console.log('User found:', user.user_name);
+      console.log('Employee found:', employee.employee_name);
 
       // Verify password
-      const isValidPassword = await this.usersRepository.verifyPassword(user_password, user.user_password);
+      const bcrypt = require('bcrypt');
+      const isValidPassword = await bcrypt.compare(password, employee.password);
       if (!isValidPassword) {
-        console.log('Invalid password for user:', user_name);
+        console.log('Invalid password for employee:', email);
         throw new CustomException('Invalid credentials', 401);
       }
 
-      console.log('Password verified for user:', user_name);
+      console.log('Password verified for employee:', email);
 
-      // Get user details with permissions
-      const userDetails = await this.usersRepository.getUserWithDetails(user.user_id);
-      const permissions = await this.usersRepository.getUserPermissions(user.user_id);
+      // Get employee details with permissions
+      const userDetails = {
+        user: {
+          id: employee.employee_id,
+          username: employee.employee_name,
+          email: employee.employee_exmail_account,
+          employee_foto: employee.employee_foto
+        },
+        employee: {
+          id: employee.employee_id,
+          name: employee.employee_name,
+          email: employee.employee_exmail_account,
+          employee_foto: employee.employee_foto
+        }
+      };
+      
+      // Get employee permissions with menu information
+      const permissions = await pgCore('employeeHasPermissions')
+        .select([
+          'permissions.permission_name',
+          'permissions.permission_id',
+          'menus.menu_name',
+          'menus.menu_url',
+          'employeeHasPermissions.menu_id'
+        ])
+        .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+        .leftJoin('menus', 'employeeHasPermissions.menu_id', 'menus.menu_id')
+        .where('employeeHasPermissions.employee_id', employee.employee_id)
+        .where('permissions.is_delete', false)
+        .where('menus.is_delete', false);
 
       // Generate authorization code if client_id and redirect_uri provided
       let authorizationCode = null;
       if (client_id && redirect_uri) {
-        authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, user.user_id);
+        authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, employee.employee_id);
       }
 
-      // Generate JWT token - hanya menyimpan user_id untuk mengurangi ukuran token
+      // Generate JWT token dengan payload yang lebih lengkap
       const tokenPayload = {
-        user_id: user.user_id,
+        user_id: employee.employee_id,
+        employee_id: employee.employee_id,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
         aud: client_id || ssoConfig.sso.jwt.audience,
         iss: ssoConfig.sso.jwt.issuer,
       };
 
-      const token = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret);
+      const ssoToken = jwt.sign(tokenPayload, ssoConfig.sso.jwt.secret);
 
-      Logger.info('SSO login successful', { user_id: user.user_id, client_id });
+      // Generate session ID
+      const sessionId = employee.employee_id; // Using employee_id as session_id for simplicity
+      const loginTime = new Date().toISOString();
+
+      Logger.info('SSO login successful', { user_id: employee.employee_id, client_id });
+
+      // Group permissions by menu
+      const menuPermissions = {};
+      permissions.forEach(p => {
+        if (!menuPermissions[p.menu_name]) {
+          menuPermissions[p.menu_name] = {
+            name: p.menu_name,
+            url: p.menu_url,
+            menu_id: p.menu_id,
+            permission: []
+          };
+        }
+        menuPermissions[p.menu_name].permission.push(p.permission_name);
+      });
+
+      // Convert to array and remove duplicates
+      const menuArray = Object.values(menuPermissions).map(menu => ({
+        name: menu.name,
+        url: menu.url,
+        permission: [...new Set(menu.permission)] // Remove duplicates
+      }));
 
       return res.status(200).json({
         success: true,
-        message: 'SSO login successful',
+        message: 'Login SSO berhasil',
         data: {
-          token,
-          authorization_code: authorizationCode,
-          user_id: user.user_id, // Hanya mengembalikan user_id untuk referensi
+          user: {
+            user_name: userDetails.user.username,
+            user_email: userDetails.user.email,
+            employee_name: userDetails.employee.name,
+            employee_id: userDetails.employee.id,
+            employee_foto: userDetails.employee.employee_foto
+          },
+          menu: menuArray,
+          session: {
+            client_id: client_id || 'report-management-client',
+            session_id: sessionId,
+            login_time: loginTime,
+            ip_address: clientIP,
+            last_activity: loginTime
+          },
+          oauth: {
+            authorization_code: authorizationCode,
+            redirect_uri: redirect_uri || 'http://localhost:9581/api/v1/auth/sso/callback',
+            expires_in: 600, // 10 minutes
+            sso_token: ssoToken
+          }
         },
+        timestamp: loginTime
       });
     } catch (error) {
       Logger.error('Error during SSO login:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -133,14 +230,18 @@ class SSOServerHandler {
 
       try {
         const decoded = jwt.verify(token, ssoConfig.sso.jwt.secret);
-        const user = await this.usersRepository.findById(decoded.user_id);
+        const employee = await pgCore('employees')
+          .select(['employee_id', 'employee_name', 'employee_exmail_account', 'is_delete'])
+          .where('employee_id', decoded.user_id)
+          .where('is_delete', false)
+          .first();
 
-        if (!user || user.is_delete) {
+        if (!employee) {
           throw new CustomException('User not found', 401);
         }
 
         // Generate authorization code
-        const authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, user.user_id);
+        const authorizationCode = this.generateAuthorizationCode(client_id, redirect_uri, employee.employee_id);
 
         // Redirect back to client with authorization code
         const redirectUrl = `${redirect_uri}?code=${authorizationCode}&state=${state}`;
@@ -152,7 +253,22 @@ class SSOServerHandler {
       }
     } catch (error) {
       Logger.error('Error during SSO authorization:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -179,27 +295,32 @@ class SSOServerHandler {
       // In a real implementation, you would validate client_secret
       // and redirect_uri against registered clients
 
-      // Get user details
-      const user = await this.usersRepository.getUserWithDetails(authCode.userId);
-      const permissions = await this.usersRepository.getUserPermissions(authCode.userId);
+      // Get employee details
+      const employee = await pgCore('employees')
+        .select(['employee_id', 'employee_name', 'employee_exmail_account'])
+        .where('employee_id', authCode.userId)
+        .where('is_delete', false)
+        .first();
+        
+      const permissions = await pgCore('employeeHasPermissions')
+        .select(['permissions.permission_name', 'permissions.permission_id'])
+        .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+        .where('employeeHasPermissions.employee_id', authCode.userId)
+        .where('permissions.is_delete', false);
 
-      if (!user) {
+      if (!employee) {
         throw new CustomException('User not found', 404);
       }
 
       // Generate access token
       const tokenPayload = {
-        user_id: user.user_id,
-        user_name: user.user_name,
-        user_email: user.user_email,
-        role_id: user.role_id,
-        employee_id: user.employee_id,
+        user_id: employee.employee_id,
+        employee_id: employee.employee_id,
+        username: employee.employee_name,
+        email: employee.employee_exmail_account,
         permissions: permissions.map(p => ({
-          permission_id: p.permission_id,
           permission_name: p.permission_name,
-          menu_id: p.menu_id,
-          menu_name: p.menu_name,
-          menu_url: p.menu_url,
+          permission_id: p.permission_id,
         })),
       };
 
@@ -212,7 +333,7 @@ class SSOServerHandler {
       // Clean up authorization code
       this.authorizationCodes.delete(code);
 
-      logger.info('SSO token generated successfully', { user_id: user.user_id, client_id });
+      Logger.info('SSO token generated successfully', { user_id: employee.employee_id, client_id });
 
       return res.status(200).json({
         access_token: accessToken,
@@ -222,7 +343,22 @@ class SSOServerHandler {
       });
     } catch (error) {
       Logger.error('Error generating SSO token:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -235,10 +371,19 @@ class SSOServerHandler {
       }
 
       const decoded = jwt.verify(token, ssoConfig.sso.jwt.secret);
-      const user = await this.usersRepository.getUserWithDetails(decoded.user_id);
-      const permissions = await this.usersRepository.getUserPermissions(decoded.user_id);
+      const employee = await pgCore('employees')
+        .select(['employee_id', 'employee_name', 'employee_exmail_account'])
+        .where('employee_id', decoded.user_id)
+        .where('is_delete', false)
+        .first();
+        
+      const permissions = await pgCore('employeeHasPermissions')
+        .select(['permissions.permission_name', 'permissions.permission_id'])
+        .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+        .where('employeeHasPermissions.employee_id', decoded.user_id)
+        .where('permissions.is_delete', false);
 
-      if (!user) {
+      if (!employee) {
         throw new CustomException('User not found', 404);
       }
 
@@ -247,46 +392,91 @@ class SSOServerHandler {
         message: 'User info retrieved successfully',
         data: {
           user: {
-            user_id: user.user_id,
-            user_name: user.user_name,
-            user_email: user.user_email,
-            role_id: user.role_id,
-            role_name: user.role_name,
-            employee_id: user.employee_id,
-            employee_name: user.employee_name,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
+            user_id: employee.employee_id,
+            user_name: employee.employee_name,
+            user_email: employee.employee_exmail_account,
+            employee_id: employee.employee_id,
+            employee_name: employee.employee_name,
           },
           permissions: permissions.map(p => ({
             permission_id: p.permission_id,
             permission_name: p.permission_name,
-            menu_id: p.menu_id,
-            menu_name: p.menu_name,
-            menu_url: p.menu_url,
           })),
         },
       });
     } catch (error) {
       Logger.error('Error getting user info:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
   // Logout endpoint
   async logout(req, res) {
     try {
+      const userId = req.user?.user_id;
+      const clientIP = req.ip || req.connection.remoteAddress;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token tidak valid atau tidak ada',
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       // In a real implementation, you would invalidate the token
       // by adding it to a blacklist or using token revocation
+      // For now, we'll just log the logout
 
-      logger.info('SSO logout successful', { user_id: req.user?.user_id });
+      Logger.info('SSO logout successful', { 
+        user_id: userId,
+        ip: clientIP,
+        logout_time: new Date().toISOString()
+      });
 
       return res.status(200).json({
         success: true,
-        message: 'Logout successful',
+        message: 'Logout berhasil',
+        data: {
+          user_id: userId,
+          logout_time: new Date().toISOString()
+        },
+        timestamp: new Date().toISOString()
       });
     } catch (error) {
       Logger.error('Error during SSO logout:', error);
-      throw error;
+      
+      if (error instanceof CustomException) {
+        return res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+          errors: null,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'Terjadi kesalahan server',
+        errors: null,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 }

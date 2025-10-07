@@ -21,6 +21,7 @@ const {
   COLUMN_CLIENT,
   COLUMN_CLIENT_ME,
   TABLE_JOIN,
+  TABLE_JOIN_DEPT,
 } = require('./column');
 /**
  * @param {object} where
@@ -31,13 +32,19 @@ const {
 const getByParam = async (where, password, column = COLUMN) => {
   try {
     where[`${TABLE}.deleted_at`] = null;
-    // Convert username to user_name for the query
+    // Convert email to employee_exmail_account for the query
+    if (where.email) {
+      where[`${TABLE}.employee_exmail_account`] = where.email;
+      delete where.email;
+    }
+    // Convert username to employee_name for the query (backward compatibility)
     if (where.username) {
-      where[`${TABLE}.user_name`] = where.username;
+      where[`${TABLE}.employee_name`] = where.username;
       delete where.username;
     }
     const [result] = await pgCore(TABLE)
-      .innerJoin(TABLE_JOIN, `${TABLE_JOIN}.role_id`, `${TABLE}.role_id`)
+      .leftJoin(TABLE_JOIN, `${TABLE_JOIN}.title_id`, `${TABLE}.title_id`)
+      .leftJoin(TABLE_JOIN_DEPT, `${TABLE_JOIN_DEPT}.department_id`, `${TABLE}.department_id`)
       .select(column)
       .where(where);
     if (result) {
@@ -55,7 +62,7 @@ const getByParam = async (where, password, column = COLUMN) => {
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
     }
     return mappingSuccess(
-      lang.__('username.not.found', { val: where?.username }),
+      lang.__('username.not.found', { val: where?.email || where?.username }),
       [],
       201,
       false
@@ -101,7 +108,7 @@ const getByParamInspection = async (where, password, column = COLUMN) => {
       return mappingSuccess(lang.__('account.not.active'), [], 201, false);
     }
     return mappingSuccess(
-      lang.__('username.not.found', { val: where?.username }),
+      lang.__('username.not.found', { val: where?.email || where?.username }),
       [],
       201,
       false
@@ -218,7 +225,7 @@ const conductorSignin = async (where, password, column = COLUMN) => {
       return mappingSuccess(lang.__('account.not.access'), [], 201, false);
     }
     return mappingSuccess(
-      lang.__('username.not.found', { val: where?.username }),
+      lang.__('username.not.found', { val: where?.email || where?.username }),
       [],
       201,
       false
@@ -254,12 +261,12 @@ const refreshToken = async (where, column = COLUMN) => {
 
 const getPermissions = async (result) => {
   try {
-    const permissions = await pgCore.raw(`select concat(mam.permission_name, '.',mp.name)
-    from mst_menu_has_permissions mmhp
-    inner join mst_permissions mp on mmhp.permission_id = mp.id
-    inner join mst_admin_menu mam on mmhp.menu_id = mam.menu_id
-    inner join mst_role_has_permissions mrhp on mmhp.permission_id = mrhp.permission_id
-    and mmhp.menu_id = mrhp.menu_id and mrhp.role_id = '${result?.role_id}'`);
+    const permissions = await pgCore.raw(`select concat(m.menu_name, '.', p.permission_name)
+    from "menuHasPermissions" mhp
+    inner join permissions p on mhp.permission_id = p.permission_id
+    inner join menus m on mhp.menu_id = m.menu_id
+    inner join "employeeHasPermissions" ehp on mhp.permission_id = ehp.permission_id
+    and ehp.employee_id = '${result?.users_id}'`);
     return permissions?.rows;
   } catch (error) {
     return error;
@@ -268,30 +275,26 @@ const getPermissions = async (result) => {
 
 const getUserInfo = async (userId) => {
   try {
-    const userInfo = await pgCore('users')
+    const userInfo = await pgCore('employees')
       .select([
-        'users.user_id as id',
-        'users.user_name as username',
-        'users.user_email as email',
-        'users.is_delete as is_active',
-        'users.created_at',
-        'users.updated_at',
+        'employees.employee_id as id',
+        'employees.employee_name as username',
+        'employees.employee_exmail_account as email',
+        'employees.is_delete as is_active',
+        'employees.created_at',
+        'employees.updated_at',
         'employees.employee_id',
         'employees.employee_name as name',
         'employees.employee_email',
         'departments.department_id',
         'departments.department_name',
         'titles.title_id',
-        'titles.title_name',
-        'roles.role_id',
-        'roles.role_name'
+        'titles.title_name'
       ])
-      .leftJoin('employees', 'users.employee_id', 'employees.employee_id')
       .leftJoin('titles', 'employees.title_id', 'titles.title_id')
-      .leftJoin('departments', 'titles.department_id', 'departments.department_id')
-      .leftJoin('roles', 'users.role_id', 'roles.role_id')
-      .where('users.user_id', userId)
-      .where('users.is_delete', false)
+      .leftJoin('departments', 'employees.department_id', 'departments.department_id')
+      .where('employees.employee_id', userId)
+      .where('employees.is_delete', false)
       .first();
 
     if (userInfo) {
@@ -330,14 +333,14 @@ const getUserInfo = async (userId) => {
 
 const getSystemAccess = async (userId) => {
   try {
-    // Get user's role
-    const userRole = await pgCore('users')
-      .select('role_id')
-      .where('user_id', userId)
+    // Check if employee exists
+    const employee = await pgCore('employees')
+      .select('employee_id')
+      .where('employee_id', userId)
       .where('is_delete', false)
       .first();
 
-    if (!userRole) return [];
+    if (!employee) return [];
 
     // Get systems with their menus and permissions
     const systems = await pgCore('systems')
@@ -369,17 +372,16 @@ const getSystemAccess = async (userId) => {
       const accessList = [];
 
       for (const menu of menus) {
-        // Get permissions for this menu and role
-        const permissions = await pgCore('roleHasMenuPermissions')
+        // Get permissions for this menu and employee
+        const permissions = await pgCore('employeeHasPermissions')
           .select([
             'permissions.permission_id',
             'permissions.permission_name',
             'permissions.permission_name as permission_slug',
             'permissions.permission_name as permission_description'
           ])
-          .leftJoin('permissions', 'roleHasMenuPermissions.permission_id', 'permissions.permission_id')
-          .where('roleHasMenuPermissions.role_id', userRole.role_id)
-          .where('roleHasMenuPermissions.menu_id', menu.menu_id)
+          .leftJoin('permissions', 'employeeHasPermissions.permission_id', 'permissions.permission_id')
+          .where('employeeHasPermissions.employee_id', employee.employee_id)
           .where('permissions.is_delete', false);
 
         if (permissions.length > 0) {
@@ -401,30 +403,13 @@ const getSystemAccess = async (userId) => {
       }
 
       if (accessList.length > 0) {
-        // Get role info
-        const roleInfo = await pgCore('roles')
-          .select([
-            'roles.role_id as role_id',
-            'roles.role_name as role_name',
-            'roles.role_name as role_slug',
-            'roles.role_name as role_description'
-          ])
-          .where('roles.role_id', userRole.role_id)
-          .where('roles.is_delete', false)
-          .first();
-
         systemAccess.push({
           system_id: system.system_id,
           system_name: system.system_name,
           system_description: system.system_name,
           system_base_url: system.system_base_url,
           system_is_active: !system.system_is_active,
-          roles: roleInfo ? [{
-            role_id: roleInfo.role_id,
-            role_name: roleInfo.role_name,
-            role_slug: roleInfo.role_slug,
-            role_description: roleInfo.role_description
-          }] : [],
+          roles: [], // No longer using roles, using direct employee permissions
           access_list: accessList
         });
       }

@@ -138,152 +138,15 @@
 					}
 				}
 			}
-		},
-		"post": {
-			"tags": [
-				"Role Has Menu Permissions"
-			],
-			"summary": "Create a new role-menu-permission relationship",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"requestBody": {
-				"required": true,
-				"content": {
-					"application/json": {
-						"schema": {
-							"$ref": "#/components/schemas/SchemaCreateRoleHasMenuPermission"
-						}
-					}
-				}
-			},
-			"responses": {
-				"201": {
-					"description": "Created",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"400": {
-					"description": "Bad Request",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"409": {
-					"description": "Conflict - Relationship already exists",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
 		}
 	},
 	"/role-has-menu-permissions/{role_id}/{menu_id}/{permission_id}": {
-		"get": {
-			"tags": [
-				"Role Has Menu Permissions"
-			],
-			"summary": "Get a specific role-menu-permission relationship",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "role_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Role ID"
-				},
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				},
-				{
-					"in": "path",
-					"name": "permission_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Permission ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"404": {
-					"description": "Not Found",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
 		"put": {
 			"tags": [
 				"Role Has Menu Permissions"
 			],
-			"summary": "Update a role-menu-permission relationship",
+			"summary": "Grant or revoke a role-menu-permission relationship",
+			"description": "Set permission_status to true to grant permission (insert), false to revoke permission (delete)",
 			"security": [
 				{
 					"bearerAuth": []
@@ -333,7 +196,7 @@
 			},
 			"responses": {
 				"200": {
-					"description": "OK",
+					"description": "Permission revoked successfully",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -342,73 +205,8 @@
 						}
 					}
 				},
-				"404": {
-					"description": "Not Found",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
-		"delete": {
-			"tags": [
-				"Role Has Menu Permissions"
-			],
-			"summary": "Delete a role-menu-permission relationship",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "role_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Role ID"
-				},
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				},
-				{
-					"in": "path",
-					"name": "permission_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Permission ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
+				"201": {
+					"description": "Permission granted successfully",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -417,8 +215,28 @@
 						}
 					}
 				},
+				"400": {
+					"description": "Bad Request - Invalid permission_status value",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
 				"404": {
-					"description": "Not Found",
+					"description": "Not Found - Relationship not found when trying to revoke",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaErrorResponse"
+							}
+						}
+					}
+				},
+				"409": {
+					"description": "Conflict - Relationship already exists when trying to grant",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -445,7 +263,8 @@
 			"tags": [
 				"Role Has Menu Permissions"
 			],
-			"summary": "Get all permissions for a specific role",
+			"summary": "Get all menus with permissions and their status for a specific role",
+			"description": "Returns all menus with their available permissions and whether the role has each permission (true/false)",
 			"security": [
 				{
 					"bearerAuth": []
@@ -469,164 +288,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
-		"delete": {
-			"tags": [
-				"Role Has Menu Permissions"
-			],
-			"summary": "Delete all role-menu-permission relationships for a specific role",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "role_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Role ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"/role-has-menu-permissions/role/{role_id}/menu/{menu_id}": {
-		"get": {
-			"tags": [
-				"Role Has Menu Permissions"
-			],
-			"summary": "Get all permissions for a specific role and menu",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "role_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Role ID"
-				},
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
-							}
-						}
-					}
-				},
-				"500": {
-					"description": "Internal Server Error",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaErrorResponse"
-							}
-						}
-					}
-				}
-			}
-		},
-		"delete": {
-			"tags": [
-				"Role Has Menu Permissions"
-			],
-			"summary": "Delete all role-menu-permission relationships for a specific role and menu",
-			"security": [
-				{
-					"bearerAuth": []
-				}
-			],
-			"parameters": [
-				{
-					"in": "path",
-					"name": "role_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Role ID"
-				},
-				{
-					"in": "path",
-					"name": "menu_id",
-					"required": true,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					},
-					"description": "Menu ID"
-				}
-			],
-			"responses": {
-				"200": {
-					"description": "OK",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SchemaResponse"
+								"$ref": "#/components/schemas/SchemaRoleMenusWithPermissionsResponse"
 							}
 						}
 					}

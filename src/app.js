@@ -17,7 +17,9 @@ const {
 
 const healthCheck = require('./routes')
 const apiV1 = require('./routes/V1')
+const metricsRoutes = require('./routes/metrics')
 const { initListener } = require('./listeners')
+const { prometheusMetrics } = require('./utils/prometheus_metrics')
 
 // Conditionally initialize listeners only if RabbitMQ is configured and not disabled
 if (process.env.RABBITMQ_URL && process.env.RABBITMQ_URL !== 'disabled') {
@@ -29,11 +31,25 @@ if (process.env.RABBITMQ_URL && process.env.RABBITMQ_URL !== 'disabled') {
 
 const limit = process.env.JSON_LIMIT || '1gb'
 app.set('trust proxy', 1);
+
+// Set timeout for requests (10 minutes for import operations)
+app.use((req, res, next) => {
+  // Set longer timeout for import endpoints
+  if (req.path.includes('/import')) {
+    req.setTimeout(10 * 60 * 1000) // 10 minutes
+    res.setTimeout(10 * 60 * 1000) // 10 minutes
+  }
+  next()
+})
+
 app.use(compress()) // gzip compression
 app.use(methodOverride()) // lets you use HTTP verbs
 app.use(xss()) // handler xss attack
 app.use(express.json({ limit })) // json limit
 app.use(express.urlencoded({ limit, extended: true })) // urlencoded limit
+
+// Prometheus metrics middleware (should be early in the stack)
+app.use(prometheusMetrics.httpMetricsMiddleware())
 if (process.env.NODE_ENV === 'production') {
   app.use(morgan(MORGAN_FORMAT.PROD))
 } else {
@@ -41,6 +57,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use(healthCheck) // routing
 app.use(apiV1) // routing
+app.use(metricsRoutes) // metrics routing
 app.use('/public', express.static('public')) // for public folder
 app.use(notFoundHandler) // 404 handler
 app.use(errorHandler) // error handlerr

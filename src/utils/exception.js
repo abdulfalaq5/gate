@@ -241,6 +241,21 @@ const mappingError = (error, code = HTTP.CREATED) => {
   }
 }
 
+/**
+ * Custom Exception Class untuk error handling yang lebih baik
+ */
+class CustomException extends Error {
+  constructor(message, statusCode = 500) {
+    super(message);
+    this.name = 'CustomException';
+    this.statusCode = statusCode;
+    this.isOperational = true;
+    
+    // Capture stack trace
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
 module.exports = {
   notFoundHandler,
   errorHandler,
@@ -255,4 +270,5 @@ module.exports = {
   mappingError,
   mappingSuccessPagination,
   baseResponseGeneral,
+  CustomException,
 }

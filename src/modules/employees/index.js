@@ -1,25 +1,12 @@
-const express = require('express')
-const { verifyToken } = require('../../middlewares')
-const {
-  getEmployees,
-  getEmployeeById,
-  createEmployee,
-  updateEmployee,
-  deleteEmployee,
-  getEmployeesByTitle
-} = require('./handler')
+const EmployeesHandler = require('./handler');
 
-const router = express.Router()
-
-// All routes require authentication
-router.use(verifyToken)
-
-// Employees routes
-router.get('/', getEmployees)
-router.get('/title/:titleId', getEmployeesByTitle)
-router.get('/:id', getEmployeeById)
-router.post('/', createEmployee)
-router.put('/:id', updateEmployee)
-router.delete('/:id', deleteEmployee)
-
-module.exports = router
+module.exports = {
+  getEmployees: EmployeesHandler.getEmployees.bind(EmployeesHandler),
+  getEmployeeById: EmployeesHandler.getEmployeeById.bind(EmployeesHandler),
+  createEmployee: EmployeesHandler.createEmployee.bind(EmployeesHandler),
+  updateEmployee: EmployeesHandler.updateEmployee.bind(EmployeesHandler),
+  deleteEmployee: EmployeesHandler.deleteEmployee.bind(EmployeesHandler),
+  getEmployeesByTitle: EmployeesHandler.getEmployeesByTitle.bind(EmployeesHandler),
+  resetPassword: EmployeesHandler.resetPassword.bind(EmployeesHandler),
+  getMenuPermissions: EmployeesHandler.getMenuPermissions.bind(EmployeesHandler),
+};

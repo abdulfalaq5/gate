@@ -1,64 +1,23 @@
 {
-	"/titles": {
-		"get": {
+	"/titles/get": {
+		"post": {
 			"tags": ["Titles"],
 			"security": [
-			{
-				"bearerAuth": []
-			}
-		],
-			"description": "Retrieve a paginated list of titles with optional filtering",
-			"parameters": [
 				{
-					"name": "page",
-					"in": "query",
-					"description": "Page number for pagination",
-					"required": false,
-					"schema": {
-						"type": "integer",
-						"default": 1
-					}
-				},
-				{
-					"name": "limit",
-					"in": "query",
-					"description": "Number of items per page",
-					"required": false,
-					"schema": {
-						"type": "integer",
-						"default": 10
-					}
-				},
-				{
-					"name": "search",
-					"in": "query",
-					"description": "Search term for title name",
-					"required": false,
-					"schema": {
-						"type": "string"
-					}
-				},
-				{
-					"name": "department_id",
-					"in": "query",
-					"description": "Filter by department ID",
-					"required": false,
-					"schema": {
-						"type": "string",
-						"format": "uuid"
-					}
-				},
-				{
-					"name": "is_delete",
-					"in": "query",
-					"description": "Filter by deletion status",
-					"required": false,
-					"schema": {
-						"type": "boolean",
-						"default": false
-					}
+					"bearerAuth": []
 				}
 			],
+			"description": "Retrieve a paginated list of titles with advanced filtering using POST method for complex queries",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostTitlesGet"
+						}
+					}
+				}
+			},
 			"responses": {
 				"200": {
 					"description": "Titles retrieved successfully",
@@ -74,14 +33,16 @@
 					"description": "Internal server error"
 				}
 			}
-		},
+		}
+	},
+	"/titles/create": {
 		"post": {
 			"tags": ["Titles"],
 			"security": [
-			{
-				"bearerAuth": []
-			}
-		],
+				{
+					"bearerAuth": []
+				}
+			],
 			"description": "Create a new title with the provided information",
 			"requestBody": {
 				"required": true,
