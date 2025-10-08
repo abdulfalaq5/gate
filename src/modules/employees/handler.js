@@ -78,26 +78,20 @@ const createEmployee = async (req, res) => {
       }
     }
 
+    // Map employee_password to password field (for consistency with frontend naming)
+    if (req.body.employee_password) {
+      req.body.password = req.body.employee_password
+      delete req.body.employee_password
+    }
+
     // Validate request
     const validation = validateRequest(req.body, employeesValidationRules.create, employeesColumns)
     if (!validation.isValid) {
       return errorResponse(res, validation.errors, 400)
     }
 
-    // Prepare employee data - exclude company_id and permission_detail as they're not direct columns in employees table
-    const { company_id, permission_detail, ...employeePayload } = req.body
-    
-    // Parse permission_detail if it's a JSON string
-    let parsedPermissions = null
-    if (permission_detail && typeof permission_detail === 'string') {
-      try {
-        parsedPermissions = JSON.parse(permission_detail)
-      } catch (error) {
-        return errorResponse(res, 'Invalid JSON format for permission_detail', 400)
-      }
-    } else if (permission_detail && Array.isArray(permission_detail)) {
-      parsedPermissions = permission_detail
-    }
+    // Prepare employee data - exclude company_id as it's not a direct column in employees table
+    const { company_id, ...employeePayload } = req.body
     
     // Hash password if provided
     if (employeePayload.password) {
@@ -148,15 +142,6 @@ const createEmployee = async (req, res) => {
     }
     
     const employee = await employeesRepository.createEmployee(employeeData)
-    
-    // Create employee permissions if provided
-    if (parsedPermissions && Array.isArray(parsedPermissions)) {
-      await employeesRepository.createEmployeePermissions(
-        employee.employee_id, 
-        parsedPermissions, 
-        req.user?.user_id
-      )
-    }
     
     // Kirim queue ke RabbitMQ untuk operasi CREATE
     await databaseQueueService.sendEmployeesCreateQueue(employeeData, employee)

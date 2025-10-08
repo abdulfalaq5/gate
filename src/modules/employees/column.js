@@ -190,9 +190,9 @@ const employeesValidationRules = {
       'island_id', 
       'employee_phone', 
       'password', 
+      'employee_password', // Alternative field name for password
       'employee_foto',
-      'company_id', 
-      'employeeHasPermissions'
+      'company_id'
     ] // company_id is optional and will be ignored during insert
   },
   update: {

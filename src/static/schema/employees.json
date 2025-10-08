@@ -237,45 +237,36 @@
 				"type": "string",
 				"maxLength": 50
 			},
-			"password": {
-				"type": "string",
-				"maxLength": 255
-			},
-			"employee_foto": {
-				"type": "string",
-				"format": "binary",
-				"description": "Employee photo file to upload"
-			},
-			"company_id": {
-				"type": "string",
-				"format": "uuid"
-			},
-			"permission_detail": {
-				"type": "string",
-				"description": "JSON string containing employee permissions array with permission_status. Supports both old structure (direct menu_id) and new structure (with system_id and system_name)",
-				"example": "[{\"system_id\":\"ea805534-6616-4980-b0b0-b983a39940f8\",\"system_name\":\"Power BI\",\"permission_detail\":[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]}]"
-			}
+		"password": {
+			"type": "string",
+			"maxLength": 255,
+			"description": "Employee password for authentication (will be hashed before storing)"
 		},
-		"required": ["employee_name", "employee_email", "title_id"],
-		"description": "company_id is optional and will be ignored during insert as it's derived from title->department->company relationship. permission_detail is optional and will create permission records for the employee.",
+		"employee_password": {
+			"type": "string",
+			"maxLength": 255,
+			"description": "Alternative field name for employee password (will be mapped to 'password' field)"
+		},
+		"employee_foto": {
+			"type": "string",
+			"format": "binary",
+			"description": "Employee photo file to upload"
+		},
+		"company_id": {
+			"type": "string",
+			"format": "uuid",
+			"description": "Company ID (optional, derived from title->department->company relationship)"
+		}
+	},
+	"required": ["employee_name", "employee_email", "title_id"],
+	"description": "Create employee with basic information. Supports both 'password' and 'employee_password' field names. The company_id is optional and will be ignored during insert as it's derived from title->department->company relationship.",
 		"example": {
-			"employee_name": "Abd. Rahman Muhridja",
-			"employee_email": "abdrahmanmuhridja@motorsights.net",
+			"employee_name": "John Doe",
+			"employee_email": "john.doe@company.com",
+			"employee_password": "admin123",
 			"title_id": "9b48be3e-c45e-4620-a32c-c4e547feaa60",
 			"department_id": "679418f6-773e-4e43-8d65-2f91d817a75e",
-			"gender_id": "ac496e5f-97c8-46a6-86ba-2a11942a01d6",
-			"island_id": "b039e457-96cf-48bf-b3b2-948419f88ed2",
-			"employee_mobile": "6285399480077",
-			"employee_office_number": "0853-994-800-77",
-			"employee_address": "Tamalanrea, Makassar",
-			"employee_exmail_account": "abdrahmanmuhridja@motorsights.net",
-			"employee_channel": "Direct Recruitment",
-			"employee_activation_status": "Activated",
-			"employee_disabled": false,
-			"employee_wechat_workplace": "Not follow",
-			"employee_phone": "6285399480077",
-			"password": "Qwer1234!",
-			"permission_detail": "[{\"menu_id\":\"cbd33a30-048b-46b2-9b9f-d3048d0f1b64\",\"menu_name\":\"Category Power BI\",\"permission_detail\":[{\"permission_id\":\"d8ba9141-0887-4b25-b3b4-3f2fcb5d60c5\",\"permission_name\":\"create\",\"permission_status\":true},{\"permission_id\":\"25cce7e4-d0c0-43ae-9890-bd1e99f05eb9\",\"permission_name\":\"delete\",\"permission_status\":false},{\"permission_id\":\"a8865aed-53e1-4126-9268-a103bf5bb8e8\",\"permission_name\":\"read\",\"permission_status\":false},{\"permission_id\":\"34703908-a2b0-4696-b1e4-9faff81f2a1e\",\"permission_name\":\"update\",\"permission_status\":false}]}]"
+			"company_id": "25534801-c618-4fa6-8cca-d08211382b89"
 		}
 	},
 	"SchemaPutEmployees": {
