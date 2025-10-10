@@ -106,6 +106,11 @@ const createEmployee = async (req, res) => {
       employeePayload.password = await bcrypt.hash(employeePayload.password, 10)
     }
     
+    // Set employee_exmail_account from employee_email
+    if (employeePayload.employee_email) {
+      employeePayload.employee_exmail_account = employeePayload.employee_email
+    }
+    
     // Handle employee photo upload to MinIO
     if (req.files && req.files.length > 0) {
       const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
@@ -220,6 +225,11 @@ const updateEmployee = async (req, res) => {
     // Hash password if provided
     if (updatePayload.password) {
       updatePayload.password = await bcrypt.hash(updatePayload.password, 10)
+    }
+    
+    // Set employee_exmail_account from employee_email
+    if (updatePayload.employee_email) {
+      updatePayload.employee_exmail_account = updatePayload.employee_email
     }
     
     // Handle employee photo upload to MinIO
