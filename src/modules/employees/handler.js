@@ -78,6 +78,14 @@ const createEmployee = async (req, res) => {
       }
     }
 
+    // Sanitize empty strings to null for UUID fields
+    const uuidFields = ['gender_id', 'island_id', 'title_id', 'department_id']
+    uuidFields.forEach(field => {
+      if (req.body[field] === '') {
+        req.body[field] = null
+      }
+    })
+
     // Map employee_password to password field (for consistency with frontend naming)
     if (req.body.employee_password) {
       req.body.password = req.body.employee_password
@@ -185,6 +193,14 @@ const updateEmployee = async (req, res) => {
         req.body.employee_disabled = false
       }
     }
+    
+    // Sanitize empty strings to null for UUID fields
+    const uuidFields = ['gender_id', 'island_id', 'title_id', 'department_id']
+    uuidFields.forEach(field => {
+      if (req.body[field] === '') {
+        req.body[field] = null
+      }
+    })
     
     // Prepare update data - exclude company_id and permission_detail as they're not direct columns in employees table
     const { company_id, permission_detail, employee_foto, ...updatePayload } = req.body
