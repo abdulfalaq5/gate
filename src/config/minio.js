@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Minio = require('minio');
+const { getCustomBaseUrl } = require('../utils/url-replacer');
 
 // Check if MinIO is enabled
 const isMinioEnabled = process.env.MINIO_ENABLED === 'true' || process.env.S3_PROVIDER === 'minio'
@@ -90,9 +91,13 @@ const uploadToMinio = async (bucketName, objectName, buffer, contentType = 'appl
     const protocol = url.protocol === 'https:' ? 'https' : 'http';
     const publicUrl = `${protocol}://${minioEndpoint}:${minioPort}/${bucketName}/${objectName}`;
 
+    // Replace dengan custom base URL jika ada
+    const customBaseUrl = getCustomBaseUrl();
+    const finalUrl = customBaseUrl ? publicUrl.replace(new URL(endpoint).origin, customBaseUrl) : publicUrl;
+
     return {
       success: true,
-      url: publicUrl,
+      url: finalUrl,
       bucket: bucketName,
       object: objectName
     };
@@ -135,9 +140,13 @@ const uploadToMinioPrivate = async (bucketName, objectName, buffer, contentType 
       fiveMonthsInSeconds
     );
 
+    // Replace dengan custom base URL jika ada (untuk private URLs)
+    const customBaseUrl = getCustomBaseUrl();
+    const finalUrl = customBaseUrl ? url.replace(new URL(url).origin, customBaseUrl) : url;
+
     return {
       success: true,
-      url,
+      url: finalUrl,
       bucket: bucketName,
       object: objectName
     };
@@ -182,7 +191,12 @@ const getSignedUrl = async (bucketName, objectName, expiry = defaultExpiry, isPr
   try {
     const client = isPrivate ? minioClientPrivate : minioClient;
     const url = await client.presignedGetObject(bucketName, objectName, expiry);
-    return url;
+    
+    // Replace dengan custom base URL jika ada
+    const customBaseUrl = getCustomBaseUrl();
+    const finalUrl = customBaseUrl ? url.replace(new URL(url).origin, customBaseUrl) : url;
+    
+    return finalUrl;
   } catch (error) {
     console.error('Error generating signed URL:', error);
     return '';

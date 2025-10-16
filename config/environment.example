@@ -149,6 +149,7 @@ S3_BUCKET=msi-interview
 S3_ACCESS_KEY_ID=admin
 S3_SECRET_ACCESS_KEY=supersecurepass123
 S3_ENDPOINT=https://minio-bucket.motorsights.com
+S3_BASE_URL=https://minio-bucket.motorsights.com
 S3_FORCE_PATH_STYLE=true
 S3_SSL_ENABLED=false
 S3_SIGNATURE_VERSION=v4

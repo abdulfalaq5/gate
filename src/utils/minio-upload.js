@@ -10,6 +10,7 @@ const { logger } = require('./logger');
 const { logDateFormat } = require('./date');
 const { addWatermark } = require('./custom');
 const resizeImage = require('./image');
+const { autoReplaceMinioUrl } = require('./url-replacer');
 
 const generateMinioUpload = async (req, num, paths, naming, defaults = '', additional = {
   isWatermark: false, isPrivate: false, isContentType: false, fileNames: '', compressImage: false, maxFileSize: 10 * 1024 * 1024 // 10MB default
