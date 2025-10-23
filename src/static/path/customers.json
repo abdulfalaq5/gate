@@ -1,0 +1,277 @@
+{
+	"/customers/get": {
+		"post": {
+			"tags": ["Customers"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"summary": "Get all customers with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of customers with optional filtering via request body",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for customer name, email, phone, address, city, state, or country"
+								},
+								"customer_name": {
+									"type": "string",
+									"description": "Filter by exact customer name"
+								},
+								"customer_email": {
+									"type": "string",
+									"description": "Filter by exact customer email"
+								},
+								"customer_phone": {
+									"type": "string",
+									"description": "Filter by exact customer phone"
+								},
+								"customer_city": {
+									"type": "string",
+									"description": "Filter by exact customer city"
+								},
+								"customer_state": {
+									"type": "string",
+									"description": "Filter by exact customer state"
+								},
+								"customer_country": {
+									"type": "string",
+									"description": "Filter by exact customer country"
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["customer_name", "customer_email", "customer_phone", "customer_city", "customer_country", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"sort_by": "created_at",
+							"sort_order": "desc",
+							"search": "",
+							"customer_name": "",
+							"customer_email": "",
+							"customer_phone": "",
+							"customer_city": "",
+							"customer_state": "",
+							"customer_country": ""
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Customers retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCustomersList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/customers/create": {
+		"post": {
+			"tags": ["Customers"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"summary": "Create a new customer (via request body)",
+			"description": "Create a new customer with the provided information",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostCustomers"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Customer created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCustomers"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/customers/{id}": {
+		"get": {
+			"tags": ["Customers"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve a specific customer by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Customer ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Customer retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCustomers"
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Customer not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Customers"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Update an existing customer",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Customer ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutCustomers"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Customer updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCustomers"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Customer not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Customers"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Soft delete a customer",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Customer ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Customer deleted successfully"
+				},
+				"404": {
+					"description": "Customer not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}

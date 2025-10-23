@@ -10,6 +10,7 @@ const ssoRoutes = require('../../modules/sso');
 const systemHasMenusRoutes = require('../../modules/system_has_menus');
 const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
 const companiesRoutes = require('../../modules/companies');
+const customersRoutes = require('../../modules/customers');
 const departmentsRoutes = require('../../modules/departments');
 const employeesRoutes = require('../../modules/employees');
 const titlesRoutes = require('../../modules/titles');
@@ -76,6 +77,13 @@ router.post('/companies/create', verifySSOToken, companiesRoutes.createCompany);
 router.get('/companies/:id', verifySSOToken, companiesRoutes.getCompanyById);
 router.put('/companies/:id', verifySSOToken, companiesRoutes.updateCompany);
 router.delete('/companies/:id', verifySSOToken, companiesRoutes.deleteCompany);
+
+// Customers
+router.post('/customers/get', verifySSOToken, customersRoutes.getCustomers);
+router.post('/customers/create', verifySSOToken, customersRoutes.createCustomer);
+router.get('/customers/:id', verifySSOToken, customersRoutes.getCustomerById);
+router.put('/customers/:id', verifySSOToken, customersRoutes.updateCustomer);
+router.delete('/customers/:id', verifySSOToken, customersRoutes.deleteCustomer);
 
 // Departments
 router.post('/departments/get', verifySSOToken, departmentsRoutes.getDepartments);

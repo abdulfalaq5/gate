@@ -237,6 +237,21 @@ class DatabaseQueueService {
   async sendEmployeesDeleteQueue(id, deleteData, result) {
     return this.sendDeleteQueue('employees', 'employee_id', id, deleteData, result);
   }
+
+  /**
+   * Kirim queue khusus untuk customers
+   */
+  async sendCustomersCreateQueue(data, result) {
+    return this.sendCreateQueue('customers', 'customer_id', data, result);
+  }
+
+  async sendCustomersUpdateQueue(id, data, result) {
+    return this.sendUpdateQueue('customers', 'customer_id', id, data, result);
+  }
+
+  async sendCustomersDeleteQueue(id, deleteData, result) {
+    return this.sendDeleteQueue('customers', 'customer_id', id, deleteData, result);
+  }
 }
 
 module.exports = new DatabaseQueueService();

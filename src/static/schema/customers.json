@@ -1,0 +1,210 @@
+{
+	"SchemaResponseCustomers": {
+		"type": "object",
+		"properties": {
+			"customer_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"customer_name": {
+				"type": "string"
+			},
+			"customer_email": {
+				"type": "string",
+				"format": "email"
+			},
+			"customer_phone": {
+				"type": "string"
+			},
+			"customer_address": {
+				"type": "string"
+			},
+			"customer_city": {
+				"type": "string"
+			},
+			"customer_state": {
+				"type": "string"
+			},
+			"customer_zip": {
+				"type": "string"
+			},
+			"customer_country": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			}
+		}
+	},
+	"SchemaPostCustomers": {
+		"type": "object",
+		"properties": {
+			"customer_name": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer name"
+			},
+			"customer_email": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 255,
+				"description": "Customer email address"
+			},
+			"customer_phone": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer phone number"
+			},
+			"customer_address": {
+				"type": "string",
+				"description": "Customer address"
+			},
+			"customer_city": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer city"
+			},
+			"customer_state": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer state/province"
+			},
+			"customer_zip": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer postal code"
+			},
+			"customer_country": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer country"
+			}
+		}
+	},
+	"SchemaPutCustomers": {
+		"type": "object",
+		"properties": {
+			"customer_name": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer name"
+			},
+			"customer_email": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 255,
+				"description": "Customer email address"
+			},
+			"customer_phone": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer phone number"
+			},
+			"customer_address": {
+				"type": "string",
+				"description": "Customer address"
+			},
+			"customer_city": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer city"
+			},
+			"customer_state": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer state/province"
+			},
+			"customer_zip": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer postal code"
+			},
+			"customer_country": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer country"
+			}
+		}
+	},
+	"SchemaResponseCustomersList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseCustomers"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"current_page": {
+						"type": "integer",
+						"description": "Current page number"
+					},
+					"per_page": {
+						"type": "integer",
+						"description": "Number of items per page"
+					},
+					"total": {
+						"type": "integer",
+						"description": "Total number of records"
+					},
+					"total_pages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					},
+					"has_next_page": {
+						"type": "boolean",
+						"description": "Whether there is a next page"
+					},
+					"has_prev_page": {
+						"type": "boolean",
+						"description": "Whether there is a previous page"
+					}
+				}
+			}
+		}
+	},
+	"SchemaResponseCustomersStats": {
+		"type": "object",
+		"properties": {
+			"total": {
+				"type": "integer",
+				"description": "Total number of customers"
+			},
+			"totalCities": {
+				"type": "integer",
+				"description": "Total number of unique cities"
+			},
+			"totalCountries": {
+				"type": "integer",
+				"description": "Total number of unique countries"
+			}
+		}
+	}
+}
