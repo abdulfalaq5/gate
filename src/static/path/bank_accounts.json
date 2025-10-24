@@ -1,0 +1,260 @@
+{
+	"/bank_accounts/get": {
+		"post": {
+			"tags": ["Bank Accounts"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"summary": "Get all bank accounts with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of bank accounts with optional filtering via request body",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for bank account name, number, or type"
+								},
+								"bank_account_name": {
+									"type": "string",
+									"description": "Filter by exact bank account name"
+								},
+								"bank_account_number": {
+									"type": "string",
+									"description": "Filter by exact bank account number"
+								},
+								"bank_account_type": {
+									"type": "string",
+									"description": "Filter by exact bank account type"
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["bank_account_name", "bank_account_number", "bank_account_type", "bank_account_balance", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"sort_by": "created_at",
+							"sort_order": "desc",
+							"search": ""
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Bank accounts retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseBankAccountsList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/bank_accounts/create": {
+		"post": {
+			"tags": ["Bank Accounts"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"summary": "Create a new bank account (via request body)",
+			"description": "Create a new bank account with the provided information",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostBankAccounts"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Bank account created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseBankAccounts"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/bank_accounts/{id}": {
+		"get": {
+			"tags": ["Bank Accounts"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Retrieve a specific bank account by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Bank Account ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Bank account retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseBankAccounts"
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Bank account not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Bank Accounts"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Update an existing bank account",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Bank Account ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutBankAccounts"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Bank account updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseBankAccounts"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Bank account not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Bank Accounts"],
+			"security": [
+			{
+				"bearerAuth": []
+			}
+		],
+			"description": "Soft delete a bank account",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Bank Account ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Bank account deleted successfully"
+				},
+				"404": {
+					"description": "Bank account not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}
+

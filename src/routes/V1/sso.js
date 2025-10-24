@@ -9,6 +9,7 @@ const systemsRoutes = require('../../modules/systems');
 const ssoRoutes = require('../../modules/sso');
 const systemHasMenusRoutes = require('../../modules/system_has_menus');
 const menuHasPermissionsRoutes = require('../../modules/menu_has_permissions');
+const bankAccountsRoutes = require('../../modules/bank_accounts');
 const companiesRoutes = require('../../modules/companies');
 const customersRoutes = require('../../modules/customers');
 const departmentsRoutes = require('../../modules/departments');
@@ -77,6 +78,13 @@ router.post('/companies/create', verifySSOToken, companiesRoutes.createCompany);
 router.get('/companies/:id', verifySSOToken, companiesRoutes.getCompanyById);
 router.put('/companies/:id', verifySSOToken, companiesRoutes.updateCompany);
 router.delete('/companies/:id', verifySSOToken, companiesRoutes.deleteCompany);
+
+// Bank Accounts
+router.post('/bank_accounts/get', verifySSOToken, bankAccountsRoutes.getBankAccounts);
+router.post('/bank_accounts/create', verifySSOToken, bankAccountsRoutes.createBankAccount);
+router.get('/bank_accounts/:id', verifySSOToken, bankAccountsRoutes.getBankAccountById);
+router.put('/bank_accounts/:id', verifySSOToken, bankAccountsRoutes.updateBankAccount);
+router.delete('/bank_accounts/:id', verifySSOToken, bankAccountsRoutes.deleteBankAccount);
 
 // Customers
 router.post('/customers/get', verifySSOToken, customersRoutes.getCustomers);

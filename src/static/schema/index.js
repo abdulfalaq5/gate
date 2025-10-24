@@ -1,6 +1,7 @@
 const adminMenu = require('./admin_menu.json')
 const auth = require('./auth.json')
 const authMember = require('./auth_member.json')
+const bankAccounts = require('./bank_accounts.json')
 const companies = require('./companies.json')
 const customers = require('./customers.json')
 const departments = require('./departments.json')
@@ -16,6 +17,7 @@ module.exports = {
   ...auth,
   ...adminMenu,
   ...authMember,
+  ...bankAccounts,
   ...companies,
   ...customers,
   ...departments,
