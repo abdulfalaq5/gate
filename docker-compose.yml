@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # Production API - Port 9509 untuk Customer
+  api:
+    container_name: gate-api-production
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "9509:9509"
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+      - ./public:/app/public
+      - ./storages:/app/storages
+    environment:
+      - NODE_ENV=production
+      - APP_PORT=9509
+      - APP_NAME=Gate-API-Production
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:9509/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    depends_on:
+      - database
+    networks:
+      - gate-network
+
+  # Development API - Port 9513 untuk Dev
+  api-dev:
+    container_name: gate-api-development
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    ports:
+      - "9513:9513"
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=development
+      - APP_PORT=9513
+      - APP_NAME=Gate-API-Development
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:9513/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - database
+    networks:
+      - gate-network
+
+  # Database PostgreSQL Shared
+  database:
+    container_name: gate-database
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${DB_NAME_PROD:-gate_db}
+      - POSTGRES_USER=${DB_USER_PROD:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASS_PROD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - gate-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_PROD:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx Reverse Proxy
+  nginx:
+    container_name: gate-nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/logs:/var/log/nginx
+    restart: unless-stopped
+    depends_on:
+      - api
+      - api-dev
+    networks:
+      - gate-network
+
+networks:
+  gate-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+
