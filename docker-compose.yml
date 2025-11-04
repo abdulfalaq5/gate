@@ -15,10 +15,6 @@ services:
       - ./logs:/app/logs
       - ./public:/app/public
       - ./storages:/app/storages
-      - ./test-db-connection.js:/app/test-db-connection.js
-      - ./list-tables.js:/app/list-tables.js
-      - ./create-database.js:/app/create-database.js
-      - ./fix-database.js:/app/fix-database.js
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - APP_PORT=${APP_PORT:-3000}
