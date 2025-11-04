@@ -1,0 +1,215 @@
+# Contoh Environment untuk Local Development
+
+Copy isi berikut ke file `.env` untuk local development dengan Docker.
+
+```env
+# Application Configuration
+APP_NAME=Gate-API
+APP_PORT=9588
+NODE_ENV=development
+
+# Server Configuration
+PORT=9588
+HOST=localhost
+
+# Application Environment
+APP_ENV=local
+
+# SSO JWT Configuration
+SSO_JWT_SECRET=your-super-secret-jwt-key-change-in-production
+SSO_JWT_ALGORITHM=HS256
+SSO_JWT_ISSUER=gate-sso
+SSO_JWT_AUDIENCE=gate-clients
+
+# Token Expiry Configuration (in seconds)
+SSO_ACCESS_TOKEN_EXPIRY=3600
+SSO_REFRESH_TOKEN_EXPIRY=604800
+SSO_AUTH_CODE_EXPIRY=600
+SSO_SESSION_EXPIRY=86400
+
+# Rate Limiting Configuration
+SSO_RATE_LIMIT_PER_MINUTE=60
+SSO_RATE_LIMIT_PER_HOUR=1000
+SSO_LOGIN_RATE_LIMIT=10
+SSO_LOGIN_RATE_LIMIT_HOUR=50
+
+# Security Configuration
+SSO_MAX_FAILED_ATTEMPTS=5
+SSO_LOCKOUT_DURATION=1800
+SSO_MAX_CONCURRENT_SESSIONS=5
+SSO_PASSWORD_MIN_LENGTH=8
+SSO_REQUIRE_STRONG_PASSWORD=false
+SSO_ENABLE_MFA=false
+
+# Client Configuration
+SSO_DEFAULT_TOKEN_EXPIRY=3600
+SSO_DEFAULT_REFRESH_EXPIRY=604800
+SSO_DEFAULT_MAX_SESSIONS=5
+SSO_DEFAULT_RATE_LIMIT=60
+SSO_REQUIRE_CLIENT_APPROVAL=false
+
+# ⚠️ PENTING: Untuk Docker Local, gunakan 'gate-database' bukan 'localhost'
+DB_CLIENT_DEV=pg
+DB_HOST_DEV=gate-database
+DB_PORT_DEV=5432
+DB_USER_DEV=postgres
+DB_PASS_DEV=postgres
+DB_NAME_DEV=gate_db
+
+DB_CLIENT_PROD=pg
+DB_HOST_PROD=gate-database
+DB_PORT_PROD=5432
+DB_USER_PROD=postgres
+DB_PASS_PROD=postgres
+DB_NAME_PROD=gate_db
+
+DB_CLIENT_TEST=pg
+DB_HOST_TEST=gate-database
+DB_PORT_TEST=5432
+DB_USER_TEST=postgres
+DB_PASS_TEST=postgres
+DB_NAME_TEST=gate_db_test
+
+# Legacy PostgreSQL Configuration (for SSO)
+POSTGRES_HOST=gate-database
+POSTGRES_PORT=5432
+POSTGRES_DB=gate_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+# Redis Configuration (Optional - using memory if not set)
+SSO_DB_TYPE=memory
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# RabbitMQ Configuration
+RABBITMQ_PORT=9505
+RABBITMQ_PORT_MANAGEMENT=9506
+RABBITMQ_URL=disabled
+RABBITMQ_DEFAULT_USER=guest
+RABBITMQ_DEFAULT_PASS=guest
+
+# Logging Configuration
+SSO_LOG_LEVEL=info
+SSO_ENABLE_FILE_LOGGING=true
+SSO_LOG_DIRECTORY=./logs
+SSO_MAX_LOG_FILES=10
+SSO_MAX_LOG_SIZE=10MB
+SSO_ENABLE_AUDIT_LOG=false
+
+# Monitoring Configuration
+SSO_ENABLE_METRICS=true
+SSO_METRICS_PORT=9090
+SSO_ENABLE_HEALTH_CHECK=true
+SSO_HEALTH_CHECK_INTERVAL=30000
+
+# Prometheus Integration
+PROMETHEUS_ENABLED=true
+PROMETHEUS_SERVER_URL=https://prometheus.motorsights.com
+GRAFANA_SERVER_URL=https://grafana.motorsights.com
+
+# Email Configuration
+SSO_EMAIL_ENABLED=false
+SSO_EMAIL_PROVIDER=smtp
+SMTP_HOST=localhost
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+SSO_EMAIL_FROM=noreply@gate-sso.com
+MAIL_HOST=
+MAIL_PORT=
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_FROM=noreply@gate-sso.com
+MAIL_ENCRYPTION=true
+IGNORE_TLS=false
+
+# Default Users (Development/Testing)
+SSO_ADMIN_USERNAME=admin
+SSO_ADMIN_PASSWORD=password
+SSO_ADMIN_EMAIL=admin@example.com
+SSO_ADMIN_FIRST_NAME=Admin
+SSO_ADMIN_LAST_NAME=User
+
+SSO_USER_USERNAME=user
+SSO_USER_PASSWORD=password
+SSO_USER_EMAIL=user@example.com
+SSO_USER_FIRST_NAME=Regular
+SSO_USER_LAST_NAME=User
+
+# Default Test Client
+SSO_TEST_CLIENT_ID=test_client
+SSO_TEST_CLIENT_SECRET=test_secret
+SSO_TEST_CLIENT_NAME=Test Client Application
+SSO_TEST_CLIENT_DESCRIPTION=Default test client for development
+SSO_TEST_CLIENT_REDIRECT_URIS=http://localhost:3001/callback,http://localhost:3002/callback
+SSO_TEST_CLIENT_SCOPES=read,write
+SSO_TEST_CLIENT_CONTACT_EMAIL=admin@example.com
+SSO_TEST_CLIENT_WEBSITE=http://localhost:3001
+
+# CORS Configuration
+SSO_CORS_ENABLED=true
+SSO_CORS_ORIGINS=http://localhost:3001,http://localhost:3002
+SSO_CORS_CREDENTIALS=true
+SSO_CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
+SSO_CORS_HEADERS=Content-Type,Authorization,X-Requested-With
+
+# MinIO Configuration
+MINIO_ENABLED=true
+S3_PROVIDER=minio
+S3_REGION=us-east-1
+S3_BUCKET=msi-interview
+S3_ACCESS_KEY_ID=admin
+S3_SECRET_ACCESS_KEY=supersecurepass123
+S3_ENDPOINT=https://minio-bucket.motorsights.com
+S3_BASE_URL=https://minio-bucket.motorsights.com
+S3_FORCE_PATH_STYLE=true
+S3_SSL_ENABLED=false
+S3_SIGNATURE_VERSION=v4
+
+# MinIO Private Bucket Configuration (Optional)
+S3_BUCKET_PRIVATE=msi-interview-private
+MINIO_BUCKET_PRIVATE=msi-interview-private
+AWS_BUCKET_PRIVATE=msi-interview-private
+
+# Elastic APM Configuration (Optional)
+APM_SERVICE_URL=
+APM_SERVICE_NAME=
+APM_SERVICE_TOKEN=
+ELASTIC_APM_SERVER_URL=
+ELASTIC_APM_SECRET_TOKEN=
+ELASTIC_APM_SERVICE_NAME=
+ELASTIC_APM_ENVIRONMENT=development
+ELASTIC_APM_ACTIVE=false
+ELASTIC_APM_DISABLED=true
+
+# JSON Limit for large uploads
+JSON_LIMIT=1gb
+```
+
+## Perbedaan untuk Production Server
+
+Jika deploy ke production server dengan database shared, edit bagian database:
+
+```env
+# Production Server dengan Database Shared
+DB_CLIENT_PROD=pg
+DB_HOST_PROD=103.169.73.226  # IP database shared
+DB_PORT_PROD=5432
+DB_USER_PROD=your_db_user
+DB_PASS_PROD=your_secure_password
+DB_NAME_PROD=your_database_name
+
+# Atau jika database di host yang sama
+DB_HOST_PROD=host.docker.internal  # Untuk access host dari container
+```
+
+## Setup
+
+1. Copy isi di atas ke file `.env`
+2. Sesuaikan konfigurasi database jika perlu
+3. Jalankan `docker-compose up -d`
+
