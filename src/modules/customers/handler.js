@@ -25,10 +25,10 @@ class CustomersHandler {
 
       // Parse query parameters menggunakan sistem filter standar
       const queryParams = parseStandardQuery(modifiedReq, {
-        allowedSortColumns: ['customer_name', 'customer_email', 'customer_phone', 'customer_city', 'customer_country', 'created_at', 'updated_at'],
+        allowedSortColumns: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_city', 'customer_country', 'created_at', 'updated_at'],
         defaultSort: ['created_at', 'desc'],
-        searchableColumns: ['customer_name', 'customer_email', 'customer_phone', 'customer_address', 'customer_city', 'customer_state', 'customer_country'],
-        allowedFilters: ['customer_name', 'customer_email', 'customer_phone', 'customer_city', 'customer_state', 'customer_country', 'is_delete'],
+        searchableColumns: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_country'],
+        allowedFilters: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_city', 'customer_state', 'customer_country', 'is_delete'],
         dateColumn: 'created_at'
       })
       

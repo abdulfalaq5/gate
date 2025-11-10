@@ -23,6 +23,10 @@ const validateCustomer = (data, operation = 'create') => {
       errors.push('Customer phone must not exceed 255 characters')
     }
     
+    if (data.job_title && data.job_title.length > 255) {
+      errors.push('Customer job title must not exceed 255 characters')
+    }
+    
     if (data.customer_city && data.customer_city.length > 255) {
       errors.push('Customer city must not exceed 255 characters')
     }
@@ -55,6 +59,10 @@ const validateCustomer = (data, operation = 'create') => {
     
     if (data.customer_phone !== undefined && data.customer_phone && data.customer_phone.length > 255) {
       errors.push('Customer phone must not exceed 255 characters')
+    }
+    
+    if (data.job_title !== undefined && data.job_title && data.job_title.length > 255) {
+      errors.push('Customer job title must not exceed 255 characters')
     }
     
     if (data.customer_city !== undefined && data.customer_city && data.customer_city.length > 255) {
@@ -104,6 +112,10 @@ const sanitizeCustomerData = (data) => {
   
   if (sanitized.customer_phone) {
     sanitized.customer_phone = sanitized.customer_phone.trim()
+  }
+  
+  if (sanitized.job_title) {
+    sanitized.job_title = sanitized.job_title.trim()
   }
   
   if (sanitized.customer_address) {

@@ -31,7 +31,7 @@
 								},
 								"search": {
 									"type": "string",
-									"description": "Search term for customer name, email, phone, address, city, state, or country"
+									"description": "Search term for customer name, email, phone, job title, address, city, state, or country"
 								},
 								"customer_name": {
 									"type": "string",
@@ -44,6 +44,10 @@
 								"customer_phone": {
 									"type": "string",
 									"description": "Filter by exact customer phone"
+								},
+								"job_title": {
+									"type": "string",
+									"description": "Filter by exact customer job title"
 								},
 								"customer_city": {
 									"type": "string",
@@ -59,7 +63,7 @@
 								},
 								"sort_by": {
 									"type": "string",
-									"enum": ["customer_name", "customer_email", "customer_phone", "customer_city", "customer_country", "created_at", "updated_at"],
+									"enum": ["customer_name", "customer_email", "customer_phone", "job_title", "customer_city", "customer_country", "created_at", "updated_at"],
 									"default": "created_at",
 									"description": "Column to sort by"
 								},
@@ -85,6 +89,7 @@
 							"customer_name": "",
 							"customer_email": "",
 							"customer_phone": "",
+							"job_title": "",
 							"customer_city": "",
 							"customer_state": "",
 							"customer_country": ""

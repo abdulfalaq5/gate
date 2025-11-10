@@ -16,6 +16,9 @@
 			"customer_phone": {
 				"type": "string"
 			},
+			"job_title": {
+				"type": "string"
+			},
 			"customer_address": {
 				"type": "string"
 			},
@@ -79,6 +82,11 @@
 				"maxLength": 255,
 				"description": "Customer phone number"
 			},
+			"job_title": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer job title or position"
+			},
 			"customer_address": {
 				"type": "string",
 				"description": "Customer address"
@@ -123,6 +131,11 @@
 				"type": "string",
 				"maxLength": 255,
 				"description": "Customer phone number"
+			},
+			"job_title": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Customer job title or position"
 			},
 			"customer_address": {
 				"type": "string",

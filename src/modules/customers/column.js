@@ -33,6 +33,13 @@ const customersColumns = {
     description: 'Customer phone number',
     example: '+6281234567890'
   },
+  job_title: {
+    type: 'string',
+    required: false,
+    maxLength: 255,
+    description: 'Customer job title or position',
+    example: 'Marketing Manager'
+  },
   customer_address: {
     type: 'text',
     required: false,
@@ -132,6 +139,11 @@ const customersIndexes = [
     type: 'btree'
   },
   {
+    name: 'idx_customers_job_title',
+    columns: ['job_title'],
+    type: 'btree'
+  },
+  {
     name: 'idx_customers_city',
     columns: ['customer_city'],
     type: 'btree'
@@ -157,14 +169,14 @@ const customersIndexes = [
 const customersValidationRules = {
   create: {
     required: [],
-    optional: ['customer_name', 'customer_email', 'customer_phone', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
+    optional: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
   },
   update: {
     required: [],
-    optional: ['customer_name', 'customer_email', 'customer_phone', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
+    optional: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
   },
   search: {
-    fields: ['customer_name', 'customer_email', 'customer_phone', 'customer_address', 'customer_city', 'customer_state', 'customer_country']
+    fields: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_country']
   }
 }
 
