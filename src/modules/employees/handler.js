@@ -32,7 +32,7 @@ const getEmployees = async (req, res) => {
       allowedSortColumns: ['employee_name', 'employee_email', 'title_id', 'created_at', 'updated_at'],
       defaultSort: ['created_at', 'desc'],
       searchableColumns: ['employee_name', 'employee_email', 'title_name', 'department_name', 'company_name'],
-      allowedFilters: ['title_id', 'is_delete', 'company_name', 'department_name', 'title_name'],
+      allowedFilters: ['title_id', 'is_delete', 'company_name', 'department_name', 'title_name', 'position'],
       dateColumn: 'created_at'
     })
     

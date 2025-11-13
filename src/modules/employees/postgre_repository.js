@@ -35,7 +35,7 @@ class EmployeesRepository {
     const standardFilters = {}
     
     Object.keys(filters).forEach(key => {
-      if (['company_name', 'department_name', 'title_name'].includes(key)) {
+      if (['company_name', 'department_name', 'title_name', 'position'].includes(key)) {
         relationFilters[key] = filters[key]
       } else {
         standardFilters[key] = filters[key]
@@ -51,8 +51,14 @@ class EmployeesRepository {
       ['title_name', 'department_name', 'company_name'].includes(col)
     )
     
+    // Gunakan filter standar tanpa filter relasi tambahan
+    const standardQueryParams = {
+      ...queryParams,
+      filters: standardFilters
+    }
+    
     // Apply filter standar dengan semua searchableColumns (termasuk relasi)
-    let dataQuery = applyStandardFilters(baseQuery.clone(), queryParams)
+    let dataQuery = applyStandardFilters(baseQuery.clone(), standardQueryParams)
     
     // Tambahkan pencarian di kolom relasi jika ada searchTerm
     if (search.searchTerm && relationSearchColumns.length > 0) {
@@ -79,6 +85,9 @@ class EmployeesRepository {
     if (relationFilters.title_name) {
       dataQuery = dataQuery.where('titles.title_name', 'ilike', `%${relationFilters.title_name}%`)
     }
+    if (relationFilters.position) {
+      dataQuery = dataQuery.where('titles.title_name', 'ilike', `%${relationFilters.position}%`)
+    }
     
     // Build count query untuk pagination metadata dengan filter relasi yang sama
     let countBaseQuery = this.knex(this.tableName)
@@ -88,7 +97,7 @@ class EmployeesRepository {
       .select('*')
       .where('employees.is_delete', false)
     
-    let countQuery = buildCountQuery(countBaseQuery, queryParams)
+    let countQuery = buildCountQuery(countBaseQuery, standardQueryParams)
     
     // Apply pencarian di kolom relasi ke count query juga
     if (search.searchTerm && relationSearchColumns.length > 0) {
@@ -114,6 +123,9 @@ class EmployeesRepository {
     }
     if (relationFilters.title_name) {
       countQuery = countQuery.where('titles.title_name', 'ilike', `%${relationFilters.title_name}%`)
+    }
+    if (relationFilters.position) {
+      countQuery = countQuery.where('titles.title_name', 'ilike', `%${relationFilters.position}%`)
     }
     
     // Execute queries secara parallel
