@@ -1,5 +1,5 @@
 const { employeesColumns } = require('./column')
-const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder')
+const { applyStandardFilters, buildCountQuery, formatSimplePaginatedResponse } = require('../../utils/query_builder')
 
 /**
  * Employees Repository - Database operations for employees table
@@ -123,7 +123,7 @@ class EmployeesRepository {
     ])
     
     // Format response dengan pagination metadata
-    return formatPaginatedResponse(employees, queryParams.pagination, countResult.total)
+    return formatSimplePaginatedResponse(employees, queryParams.pagination, countResult.total)
   }
 
   /**

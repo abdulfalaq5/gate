@@ -1,6 +1,6 @@
 const { pgCore } = require('../../config/database')
 const { bankAccountsColumns } = require('./column')
-const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder')
+const { applyStandardFilters, buildCountQuery, formatSimplePaginatedResponse } = require('../../utils/query_builder')
 
 /**
  * Get bank accounts with pagination and filtering menggunakan sistem filter standar
@@ -22,7 +22,7 @@ const getBankAccounts = async (queryParams) => {
   ])
   
   // Format response dengan pagination metadata
-  return formatPaginatedResponse(bankAccounts, queryParams.pagination, countResult.total)
+  return formatSimplePaginatedResponse(bankAccounts, queryParams.pagination, countResult.total)
 }
 
 /**

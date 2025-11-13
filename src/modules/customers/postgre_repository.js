@@ -1,6 +1,6 @@
 const { pgCore } = require('../../config/database')
 const { customersColumns } = require('./column')
-const { applyStandardFilters, buildCountQuery, formatPaginatedResponse } = require('../../utils/query_builder')
+const { applyStandardFilters, buildCountQuery, formatSimplePaginatedResponse } = require('../../utils/query_builder')
 
 /**
  * Get customers with pagination and filtering menggunakan sistem filter standar
@@ -22,7 +22,7 @@ const getCustomers = async (queryParams) => {
   ])
   
   // Format response dengan pagination metadata
-  return formatPaginatedResponse(customers, queryParams.pagination, countResult.total)
+    return formatSimplePaginatedResponse(customers, queryParams.pagination, countResult.total)
 }
 
 /**

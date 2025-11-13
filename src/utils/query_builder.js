@@ -170,6 +170,27 @@ const formatPaginatedResponse = (data, pagination, total) => {
   };
 };
 
+/**
+ * Format response dengan pagination metadata versi sederhana
+ * @param {Array} data - Data hasil query
+ * @param {Object} pagination - Pagination parameters
+ * @param {Number} total - Total records
+ * @returns {Object} Formatted response dengan pagination metadata sederhana
+ */
+const formatSimplePaginatedResponse = (data, pagination, total) => {
+  const totalPages = Math.ceil(total / pagination.limit);
+
+  return {
+    data,
+    pagination: {
+      page: pagination.page,
+      limit: pagination.limit,
+      total: parseInt(total),
+      totalPages,
+    },
+  };
+};
+
 module.exports = {
   applyPagination,
   applySorting,
@@ -179,4 +200,5 @@ module.exports = {
   applyStandardFilters,
   buildCountQuery,
   formatPaginatedResponse,
+  formatSimplePaginatedResponse,
 };
