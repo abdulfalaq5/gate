@@ -15,6 +15,7 @@ const customersRoutes = require('../../modules/customers');
 const departmentsRoutes = require('../../modules/departments');
 const employeesRoutes = require('../../modules/employees');
 const titlesRoutes = require('../../modules/titles');
+const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
 
@@ -116,6 +117,10 @@ router.get('/titles/:id', verifySSOToken, titlesRoutes.getTitleById);
 router.get('/titles/department/:departmentId', verifySSOToken, titlesRoutes.getTitlesByDepartment);
 router.put('/titles/:id', verifySSOToken, titlesRoutes.updateTitle);
 router.delete('/titles/:id', verifySSOToken, titlesRoutes.deleteTitle);
+
+// Sync Data
+router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);
+router.get('/sync/template', verifySSOToken, syncRoutes.getSyncTemplate);
 
 // Systems
 router.post('/systems/create', verifySSOToken, systemsRoutes.createSystem);
