@@ -19,6 +19,10 @@
 			"job_title": {
 				"type": "string"
 			},
+			"contact_person": {
+				"type": "string",
+				"maxLength": 200
+			},
 			"customer_address": {
 				"type": "string"
 			},
@@ -87,6 +91,11 @@
 				"maxLength": 255,
 				"description": "Customer job title or position"
 			},
+			"contact_person": {
+				"type": "string",
+				"maxLength": 200,
+				"description": "Contact person name"
+			},
 			"customer_address": {
 				"type": "string",
 				"description": "Customer address"
@@ -136,6 +145,11 @@
 				"type": "string",
 				"maxLength": 255,
 				"description": "Customer job title or position"
+			},
+			"contact_person": {
+				"type": "string",
+				"maxLength": 200,
+				"description": "Contact person name"
 			},
 			"customer_address": {
 				"type": "string",

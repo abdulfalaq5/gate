@@ -40,6 +40,13 @@ const customersColumns = {
     description: 'Customer job title or position',
     example: 'Marketing Manager'
   },
+  contact_person: {
+    type: 'string',
+    required: false,
+    maxLength: 200,
+    description: 'Contact person name',
+    example: 'Jane Smith'
+  },
   customer_address: {
     type: 'text',
     required: false,
@@ -169,14 +176,14 @@ const customersIndexes = [
 const customersValidationRules = {
   create: {
     required: [],
-    optional: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
+    optional: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'contact_person', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
   },
   update: {
     required: [],
-    optional: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
+    optional: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'contact_person', 'customer_address', 'customer_city', 'customer_state', 'customer_zip', 'customer_country']
   },
   search: {
-    fields: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'customer_address', 'customer_city', 'customer_state', 'customer_country']
+    fields: ['customer_name', 'customer_email', 'customer_phone', 'job_title', 'contact_person', 'customer_address', 'customer_city', 'customer_state', 'customer_country']
   }
 }
 
