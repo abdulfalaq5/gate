@@ -1,0 +1,384 @@
+{
+	"SchemaResponseCandidates": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"company_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"title_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"candidate_name": {
+				"type": "string"
+			},
+			"candidate_email": {
+				"type": "string",
+				"format": "email"
+			},
+			"candidate_phone": {
+				"type": "string"
+			},
+			"candidate_religion": {
+				"type": "string"
+			},
+			"candidate_gender": {
+				"type": "string"
+			},
+			"candidate_marital_status": {
+				"type": "string"
+			},
+			"candidate_age": {
+				"type": "integer"
+			},
+			"candidate_date_birth": {
+				"type": "string",
+				"format": "date"
+			},
+			"candidate_nationality": {
+				"type": "string"
+			},
+			"candidate_city": {
+				"type": "string"
+			},
+			"candidate_state": {
+				"type": "string"
+			},
+			"candidate_country": {
+				"type": "string"
+			},
+			"candidate_address": {
+				"type": "string"
+			},
+			"candidate_foto": {
+				"type": "string"
+			},
+			"candidate_resume": {
+				"type": "string"
+			},
+			"candidate_number": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			},
+			"company": {
+				"type": "object",
+				"properties": {
+					"company_id": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"company_name": {
+						"type": "string"
+					},
+					"company_address": {
+						"type": "string"
+					},
+					"company_email": {
+						"type": "string"
+					}
+				}
+			},
+			"department": {
+				"type": "object",
+				"properties": {
+					"department_id": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"department_name": {
+						"type": "string"
+					},
+					"department_code": {
+						"type": "string"
+					}
+				}
+			},
+			"title": {
+				"type": "object",
+				"properties": {
+					"title_id": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"title_name": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	},
+	"SchemaPostCandidates": {
+		"type": "object",
+		"properties": {
+			"company_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Company ID reference"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Department ID reference"
+			},
+			"title_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Title ID reference"
+			},
+			"candidate_name": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate name"
+			},
+			"candidate_email": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 255,
+				"description": "Candidate email address"
+			},
+			"candidate_phone": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate phone number"
+			},
+			"candidate_religion": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate religion"
+			},
+			"candidate_gender": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate gender"
+			},
+			"candidate_marital_status": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate marital status"
+			},
+			"candidate_age": {
+				"type": "integer",
+				"description": "Candidate age"
+			},
+			"candidate_date_birth": {
+				"type": "string",
+				"format": "date",
+				"description": "Candidate date of birth"
+			},
+			"candidate_nationality": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate nationality"
+			},
+			"candidate_city": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate city"
+			},
+			"candidate_state": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate state/province"
+			},
+			"candidate_country": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate country"
+			},
+			"candidate_address": {
+				"type": "string",
+				"description": "Candidate address"
+			},
+			"candidate_number": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate number"
+			},
+			"candidate_foto": {
+				"type": "string",
+				"format": "binary",
+				"description": "Candidate photo file (image)"
+			},
+			"candidate_resume": {
+				"type": "string",
+				"format": "binary",
+				"description": "Candidate resume file (PDF/document)"
+			}
+		}
+	},
+	"SchemaPutCandidates": {
+		"type": "object",
+		"properties": {
+			"company_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Company ID reference"
+			},
+			"department_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Department ID reference"
+			},
+			"title_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Title ID reference"
+			},
+			"candidate_name": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate name"
+			},
+			"candidate_email": {
+				"type": "string",
+				"format": "email",
+				"maxLength": 255,
+				"description": "Candidate email address"
+			},
+			"candidate_phone": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate phone number"
+			},
+			"candidate_religion": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate religion"
+			},
+			"candidate_gender": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate gender"
+			},
+			"candidate_marital_status": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate marital status"
+			},
+			"candidate_age": {
+				"type": "integer",
+				"description": "Candidate age"
+			},
+			"candidate_date_birth": {
+				"type": "string",
+				"format": "date",
+				"description": "Candidate date of birth"
+			},
+			"candidate_nationality": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate nationality"
+			},
+			"candidate_city": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate city"
+			},
+			"candidate_state": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate state/province"
+			},
+			"candidate_country": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate country"
+			},
+			"candidate_address": {
+				"type": "string",
+				"description": "Candidate address"
+			},
+			"candidate_number": {
+				"type": "string",
+				"maxLength": 255,
+				"description": "Candidate number"
+			},
+			"candidate_foto": {
+				"type": "string",
+				"format": "binary",
+				"description": "Candidate photo file (image) - only upload if changing"
+			},
+			"candidate_resume": {
+				"type": "string",
+				"format": "binary",
+				"description": "Candidate resume file (PDF/document) - only upload if changing"
+			}
+		}
+	},
+	"SchemaResponseCandidatesList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseCandidates"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"current_page": {
+						"type": "integer",
+						"description": "Current page number"
+					},
+					"per_page": {
+						"type": "integer",
+						"description": "Number of items per page"
+					},
+					"total": {
+						"type": "integer",
+						"description": "Total number of records"
+					},
+					"total_pages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					},
+					"has_next_page": {
+						"type": "boolean",
+						"description": "Whether there is a next page"
+					},
+					"has_prev_page": {
+						"type": "boolean",
+						"description": "Whether there is a previous page"
+					}
+				}
+			}
+		}
+	}
+}
+

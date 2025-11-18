@@ -15,6 +15,7 @@ const customersRoutes = require('../../modules/customers');
 const departmentsRoutes = require('../../modules/departments');
 const employeesRoutes = require('../../modules/employees');
 const titlesRoutes = require('../../modules/titles');
+const candidatesRoutes = require('../../modules/candidates');
 const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
@@ -117,6 +118,13 @@ router.get('/titles/:id', verifySSOToken, titlesRoutes.getTitleById);
 router.get('/titles/department/:departmentId', verifySSOToken, titlesRoutes.getTitlesByDepartment);
 router.put('/titles/:id', verifySSOToken, titlesRoutes.updateTitle);
 router.delete('/titles/:id', verifySSOToken, titlesRoutes.deleteTitle);
+
+// Candidates
+router.post('/candidates/get', verifySSOToken, candidatesRoutes.getCandidates);
+router.post('/candidates/create', verifySSOToken, upload.any(), candidatesRoutes.createCandidate);
+router.get('/candidates/:id', verifySSOToken, candidatesRoutes.getCandidateById);
+router.put('/candidates/:id', verifySSOToken, upload.any(), candidatesRoutes.updateCandidate);
+router.delete('/candidates/:id', verifySSOToken, candidatesRoutes.deleteCandidate);
 
 // Sync Data
 router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);

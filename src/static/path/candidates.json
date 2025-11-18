@@ -1,0 +1,291 @@
+{
+	"/candidates/get": {
+		"post": {
+			"tags": ["Candidates"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Get all candidates with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of candidates with optional filtering via request body",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for candidate name, email, phone, number, city, state, or country"
+								},
+								"candidate_name": {
+									"type": "string",
+									"description": "Filter by exact candidate name"
+								},
+								"candidate_email": {
+									"type": "string",
+									"description": "Filter by exact candidate email"
+								},
+								"candidate_phone": {
+									"type": "string",
+									"description": "Filter by exact candidate phone"
+								},
+								"candidate_number": {
+									"type": "string",
+									"description": "Filter by exact candidate number"
+								},
+								"company_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by company ID"
+								},
+								"department_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by department ID"
+								},
+								"title_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by title ID"
+								},
+								"candidate_city": {
+									"type": "string",
+									"description": "Filter by exact candidate city"
+								},
+								"candidate_state": {
+									"type": "string",
+									"description": "Filter by exact candidate state"
+								},
+								"candidate_country": {
+									"type": "string",
+									"description": "Filter by exact candidate country"
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["candidate_name", "candidate_email", "candidate_phone", "candidate_number", "candidate_city", "candidate_state", "candidate_country", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"search": "",
+							"sort_by": "created_at",
+							"sort_order": "desc"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Candidates retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCandidatesList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/candidates/create": {
+		"post": {
+			"tags": ["Candidates"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Create a new candidate (multipart/form-data)",
+			"description": "Create a new candidate with the provided information. Supports file upload for candidate_foto and candidate_resume.",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostCandidates"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Candidate created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCandidates"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/candidates/{id}": {
+		"get": {
+			"tags": ["Candidates"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Retrieve a specific candidate by its ID with all relations (company, department, title)",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Candidate ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Candidate retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCandidates"
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Candidate not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Candidates"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Update an existing candidate. Supports file upload for candidate_foto and candidate_resume. Files are only uploaded if new files are provided.",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Candidate ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutCandidates"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Candidate updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCandidates"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Candidate not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Candidates"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Soft delete a candidate",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Candidate ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Candidate deleted successfully"
+				},
+				"404": {
+					"description": "Candidate not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}
+
