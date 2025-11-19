@@ -16,6 +16,7 @@ const departmentsRoutes = require('../../modules/departments');
 const employeesRoutes = require('../../modules/employees');
 const titlesRoutes = require('../../modules/titles');
 const candidatesRoutes = require('../../modules/candidates');
+const scheduleInterviewRoutes = require('../../modules/schedule_interview');
 const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
@@ -125,6 +126,13 @@ router.post('/candidates/create', verifySSOToken, upload.any(), candidatesRoutes
 router.get('/candidates/:id', verifySSOToken, candidatesRoutes.getCandidateById);
 router.put('/candidates/:id', verifySSOToken, upload.any(), candidatesRoutes.updateCandidate);
 router.delete('/candidates/:id', verifySSOToken, candidatesRoutes.deleteCandidate);
+
+// Schedule Interviews
+router.post('/schedule_interview/get', verifySSOToken, scheduleInterviewRoutes.getCandidates);
+router.post('/schedule_interview/create', verifySSOToken, scheduleInterviewRoutes.createScheduleInterview);
+router.get('/schedule_interview/:id', verifySSOToken, scheduleInterviewRoutes.getScheduleInterviewById);
+router.put('/schedule_interview/:id', verifySSOToken, scheduleInterviewRoutes.updateScheduleInterview);
+router.delete('/schedule_interview/:id', verifySSOToken, scheduleInterviewRoutes.deleteScheduleInterview);
 
 // Sync Data
 router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);

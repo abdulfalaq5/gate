@@ -10,6 +10,7 @@ const employees = require('./employees.json')
 const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
 const permissions = require('./permissions.json')
+const scheduleInterview = require('./schedule_interview.json')
 const ssoProfile = require('./sso_profile.json')
 const systems = require('./systems.json')
 const titles = require('./titles.json')
@@ -27,6 +28,7 @@ module.exports = {
   ...employeesImport,
   ...importModule,
   ...permissions,
+  ...scheduleInterview,
   ...ssoProfile,
   ...systems,
   ...titles
