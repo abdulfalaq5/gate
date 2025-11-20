@@ -4,75 +4,169 @@ const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const interviewRepository = require('./postgre_repository')
 const { sanitizeInterviewData, sanitizeDetailInterviewData, validateDetailInterview } = require('./validation')
+const { getUserInfoFromToken } = require('../../utils/sso')
 
 class InterviewHandler {
   /**
-   * Get all candidates with pagination and filtering (POST method)
-   * Endpoint ini mengambil data dari tabel candidates sesuai requirements
+   * Get all interviews with pagination and filtering (POST method)
+   * Endpoint ini mengambil data dari tabel interviews beserta relasinya
    */
   async getCandidates(req, res) {
+    console.log('\n\n')
+    console.log('='.repeat(80))
+    console.log('[getCandidates] ========== HANDLER CALLED ==========')
+    console.log('[getCandidates] Request received at:', new Date().toISOString())
+    console.log('[getCandidates] Request method:', req.method)
+    console.log('[getCandidates] Request path:', req.path)
+    console.log('[getCandidates] Request query:', JSON.stringify(req.query, null, 2))
+    console.log('[getCandidates] Request body:', JSON.stringify(req.body, null, 2))
+    console.log('='.repeat(80))
+    console.log('\n')
+    
     try {
       // Support parameters from both query string (GET) and body (POST)
+      console.log('[getCandidates] Merging request parameters...')
       const requestParams = {
         ...req.query,  // GET parameters
         ...req.body    // POST parameters
       }
+      console.log('[getCandidates] Merged requestParams:', JSON.stringify(requestParams, null, 2))
       
       // Create a modified request object for parseStandardQuery
+      console.log('[getCandidates] Creating modified request object...')
       const modifiedReq = {
         ...req,
         query: requestParams
       }
+      console.log('[getCandidates] Modified request created')
 
       // Parse query parameters menggunakan sistem filter standar
-      const queryParams = parseStandardQuery(modifiedReq, {
+      console.log('[getCandidates] Calling parseStandardQuery...')
+      let queryParams
+      try {
+        queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: [
-          'candidate_name',
-          'candidate_email',
-          'candidate_phone',
-          'candidate_number',
-          'candidate_city',
-          'candidate_state',
-          'candidate_country',
+          'interview_company_value',
+          'interview_comment',
+          'interview_total_score',
+          'interview_description',
           'created_at',
           'updated_at'
         ],
         defaultSort: ['created_at', 'desc'],
         searchableColumns: [
-          'candidate_name',
-          'candidate_email',
-          'candidate_phone',
-          'candidate_number',
-          'candidate_city',
-          'candidate_state',
-          'candidate_country'
+          'interview_company_value',
+          'interview_comment',
+          'interview_total_score',
+          'interview_description'
         ],
         allowedFilters: [
-          'candidate_name',
-          'candidate_email',
-          'candidate_phone',
-          'candidate_number',
-          'company_id',
-          'department_id',
-          'title_id',
-          'candidate_city',
-          'candidate_state',
-          'candidate_country',
+          'schedule_interview_id',
+          'employee_id',
+          'interview_company_value',
+          'interview_comment',
+          'interview_total_score',
+          'interview_description',
           'is_delete'
         ],
         dateColumn: 'created_at'
       })
+      console.log('[getCandidates] ✅ parseStandardQuery completed')
+      console.log('[getCandidates] queryParams:', JSON.stringify(queryParams, null, 2))
+      } catch (parseError) {
+        console.error('[getCandidates] ❌ Error in parseStandardQuery:', parseError)
+        console.error('[getCandidates] Parse error name:', parseError?.name)
+        console.error('[getCandidates] Parse error message:', parseError?.message)
+        console.error('[getCandidates] Parse error stack:', parseError?.stack)
+        throw parseError
+      }
       
-      if (!queryParams || !queryParams.pagination) {
+      if (!queryParams) {
+        console.error('[getCandidates] ❌ queryParams is null or undefined after parseStandardQuery')
         return errorResponse(res, 'Invalid query parameters', 400)
       }
       
-      const result = await interviewRepository.getCandidates(queryParams)
+      // Ensure pagination exists
+      if (!queryParams.pagination) {
+        queryParams.pagination = {
+          page: requestParams.page || 1,
+          limit: requestParams.limit || 10,
+          offset: ((requestParams.page || 1) - 1) * (requestParams.limit || 10)
+        }
+      }
       
-      return successResponse(res, result, 'Candidates retrieved successfully')
+      // Ensure all required properties exist
+      if (!queryParams.sorting) {
+        queryParams.sorting = { sortBy: 'created_at', sortOrder: 'desc' }
+      }
+      if (!queryParams.search) {
+        queryParams.search = { searchTerm: '', searchableColumns: [] }
+      }
+      if (!queryParams.filters) {
+        queryParams.filters = {}
+      }
+      if (!queryParams.dateRange) {
+        queryParams.dateRange = { startDate: null, endDate: null, dateColumn: 'created_at' }
+      }
+      
+      console.log('[getCandidates] ========== CALLING REPOSITORY ==========')
+      console.log('[getCandidates] Calling repository.getInterviews with queryParams:', JSON.stringify(queryParams, null, 2))
+      
+      let result
+      try {
+        console.log('[getCandidates] Awaiting repository.getInterviews...')
+        result = await interviewRepository.getInterviews(queryParams)
+        console.log('[getCandidates] ✅ Repository call completed')
+        console.log('[getCandidates] Result type:', typeof result)
+        console.log('[getCandidates] Result:', JSON.stringify(result, null, 2))
+      } catch (error) {
+        console.error('[getCandidates] ❌ Error calling repository:', error)
+        console.error('[getCandidates] Error name:', error?.name)
+        console.error('[getCandidates] Error message:', error?.message)
+        console.error('[getCandidates] Error stack:', error.stack)
+        throw error
+      }
+      
+      // Validasi result
+      console.log('[getCandidates] Validating result...')
+      if (!result) {
+        console.error('[getCandidates] ❌ Result is null or undefined:', result)
+        return errorResponse(res, 'Invalid response from server', 500)
+      }
+      
+      if (typeof result !== 'object') {
+        console.error('[getCandidates] ❌ Result is not an object:', typeof result, result)
+        return errorResponse(res, 'Invalid response from server', 500)
+      }
+      
+      console.log('[getCandidates] ✅ Result validated')
+      console.log('[getCandidates] result.data type:', typeof result.data)
+      console.log('[getCandidates] result.data isArray:', Array.isArray(result.data))
+      console.log('[getCandidates] result.data length:', Array.isArray(result.data) ? result.data.length : 'N/A')
+      console.log('[getCandidates] result.pagination:', result.pagination)
+      
+      console.log('[getCandidates] Successfully retrieved interviews, count:', result?.data?.length || 0)
+      console.log('[getCandidates] ========== RETURNING SUCCESS RESPONSE ==========')
+      
+      console.log('[getCandidates] ========== RETURNING SUCCESS RESPONSE ==========')
+      return successResponse(res, result, 'Interviews retrieved successfully')
     } catch (error) {
-      console.error('Error getting candidates:', error)
-      return errorResponse(res, 'Failed to retrieve candidates', 500)
+      console.error('\n')
+      console.error('='.repeat(80))
+      console.error('[getCandidates] ❌❌❌ ERROR CAUGHT ❌❌❌')
+      console.error('[getCandidates] Error name:', error?.name)
+      console.error('[getCandidates] Error message:', error?.message)
+      console.error('[getCandidates] Error type:', typeof error)
+      console.error('[getCandidates] Error constructor:', error?.constructor?.name)
+      console.error('[getCandidates] Error stack:', error.stack)
+      if (error.cause) {
+        console.error('[getCandidates] Error cause:', error.cause)
+      }
+      console.error('='.repeat(80))
+      console.error('\n')
+      
+      const errorMessage = error.message || 'Failed to retrieve interviews'
+      return errorResponse(res, errorMessage, 500)
     }
   }
 
@@ -107,7 +201,22 @@ class InterviewHandler {
       }
       
       // Get user ID from token
-      const userId = req.user?.user_id || req.user?.employee_id
+      let userId = req.user?.user_id || req.user?.employee_id
+      
+      // If user_id not found in req.user, try to get from SSO endpoint
+      if (!userId) {
+        try {
+          const token = req.headers.authorization
+          if (token) {
+            const userInfo = await getUserInfoFromToken(token)
+            userId = userInfo.user_id || userInfo.employee_id
+          }
+        } catch (error) {
+          console.error('Error getting user info from token:', error)
+          return errorResponse(res, 'User ID not found in token', 401)
+        }
+      }
+      
       if (!userId) {
         return errorResponse(res, 'User ID not found in token', 401)
       }
@@ -222,7 +331,22 @@ class InterviewHandler {
       }
       
       // Get user ID from token
-      const userId = req.user?.user_id || req.user?.employee_id
+      let userId = req.user?.user_id || req.user?.employee_id
+      
+      // If user_id not found in req.user, try to get from SSO endpoint
+      if (!userId) {
+        try {
+          const token = req.headers.authorization
+          if (token) {
+            const userInfo = await getUserInfoFromToken(token)
+            userId = userInfo.user_id || userInfo.employee_id
+          }
+        } catch (error) {
+          console.error('Error getting user info from token:', error)
+          return errorResponse(res, 'User ID not found in token', 401)
+        }
+      }
+      
       if (!userId) {
         return errorResponse(res, 'User ID not found in token', 401)
       }
@@ -323,7 +447,22 @@ class InterviewHandler {
       }
       
       // Get user ID from token
-      const userId = req.user?.user_id || req.user?.employee_id
+      let userId = req.user?.user_id || req.user?.employee_id
+      
+      // If user_id not found in req.user, try to get from SSO endpoint
+      if (!userId) {
+        try {
+          const token = req.headers.authorization
+          if (token) {
+            const userInfo = await getUserInfoFromToken(token)
+            userId = userInfo.user_id || userInfo.employee_id
+          }
+        } catch (error) {
+          console.error('Error getting user info from token:', error)
+          return errorResponse(res, 'User ID not found in token', 401)
+        }
+      }
+      
       if (!userId) {
         return errorResponse(res, 'User ID not found in token', 401)
       }

@@ -118,27 +118,60 @@ const parseDateRange = (req, dateColumn = 'created_at') => {
  * @returns {Object} Parsed parameters
  */
 const parseStandardQuery = (req, options = {}) => {
-  const {
-    allowedSortColumns = [],
-    defaultSort = ['created_at', 'desc'],
-    searchableColumns = [],
-    allowedFilters = [],
-    dateColumn = 'created_at',
-  } = options;
+  const logPrefix = '[parseStandardQuery]'
   
-  const pagination = parsePagination(req, defaultSort);
-  const sorting = parseSorting(req, allowedSortColumns, defaultSort);
-  const search = parseSearch(req, searchableColumns);
-  const filters = parseFilters(req, allowedFilters);
-  const dateRange = parseDateRange(req, dateColumn);
-  
-  return {
-    pagination,
-    sorting,
-    search,
-    filters,
-    dateRange,
-  };
+  try {
+    console.log(`${logPrefix} ========== FUNCTION STARTED ==========`)
+    console.log(`${logPrefix} req type:`, typeof req)
+    console.log(`${logPrefix} req.query:`, JSON.stringify(req?.query, null, 2))
+    console.log(`${logPrefix} options:`, JSON.stringify(options, null, 2))
+    
+    const {
+      allowedSortColumns = [],
+      defaultSort = ['created_at', 'desc'],
+      searchableColumns = [],
+      allowedFilters = [],
+      dateColumn = 'created_at',
+    } = options;
+    
+    console.log(`${logPrefix} Calling parsePagination...`)
+    const pagination = parsePagination(req, defaultSort);
+    console.log(`${logPrefix} ✅ Pagination parsed:`, JSON.stringify(pagination, null, 2))
+    
+    console.log(`${logPrefix} Calling parseSorting...`)
+    const sorting = parseSorting(req, allowedSortColumns, defaultSort);
+    console.log(`${logPrefix} ✅ Sorting parsed:`, JSON.stringify(sorting, null, 2))
+    
+    console.log(`${logPrefix} Calling parseSearch...`)
+    const search = parseSearch(req, searchableColumns);
+    console.log(`${logPrefix} ✅ Search parsed:`, JSON.stringify(search, null, 2))
+    
+    console.log(`${logPrefix} Calling parseFilters...`)
+    const filters = parseFilters(req, allowedFilters);
+    console.log(`${logPrefix} ✅ Filters parsed:`, JSON.stringify(filters, null, 2))
+    
+    console.log(`${logPrefix} Calling parseDateRange...`)
+    const dateRange = parseDateRange(req, dateColumn);
+    console.log(`${logPrefix} ✅ DateRange parsed:`, JSON.stringify(dateRange, null, 2))
+    
+    const result = {
+      pagination,
+      sorting,
+      search,
+      filters,
+      dateRange,
+    };
+    
+    console.log(`${logPrefix} ✅ All parsing completed`)
+    console.log(`${logPrefix} Returning result:`, JSON.stringify(result, null, 2))
+    return result;
+  } catch (error) {
+    console.error(`${logPrefix} ❌ Error in parseStandardQuery:`, error)
+    console.error(`${logPrefix} Error name:`, error?.name)
+    console.error(`${logPrefix} Error message:`, error?.message)
+    console.error(`${logPrefix} Error stack:`, error.stack)
+    throw error
+  }
 };
 
 /**

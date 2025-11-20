@@ -7,8 +7,8 @@
 					"bearerAuth": []
 				}
 			],
-			"summary": "Get all candidates with filtering, pagination, and sorting (via request body)",
-			"description": "Retrieve a paginated list of candidates for interview with optional filtering via request body",
+			"summary": "Get all interviews with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of interviews with all relations (schedule_interview, candidate, detail_interviews) and optional filtering via request body",
 			"requestBody": {
 				"required": false,
 				"content": {
@@ -31,11 +31,37 @@
 								},
 								"search": {
 									"type": "string",
-									"description": "Search term for candidate name, email, phone, number, city, state, or country"
+									"description": "Search term for interview_company_value, interview_comment, interview_total_score, or interview_description"
+								},
+								"schedule_interview_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by schedule interview ID"
+								},
+								"employee_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by employee ID"
+								},
+								"interview_company_value": {
+									"type": "string",
+									"description": "Filter by exact interview company value"
+								},
+								"interview_comment": {
+									"type": "string",
+									"description": "Filter by exact interview comment"
+								},
+								"interview_total_score": {
+									"type": "string",
+									"description": "Filter by exact interview total score"
+								},
+								"interview_description": {
+									"type": "string",
+									"description": "Filter by exact interview description"
 								},
 								"sort_by": {
 									"type": "string",
-									"enum": ["candidate_name", "candidate_email", "candidate_phone", "candidate_number", "candidate_city", "candidate_state", "candidate_country", "created_at", "updated_at"],
+									"enum": ["interview_company_value", "interview_comment", "interview_total_score", "interview_description", "created_at", "updated_at"],
 									"default": "created_at",
 									"description": "Column to sort by"
 								},
@@ -44,6 +70,11 @@
 									"enum": ["asc", "desc"],
 									"default": "desc",
 									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
 								}
 							}
 						},
@@ -59,7 +90,7 @@
 			},
 			"responses": {
 				"200": {
-					"description": "Candidates retrieved successfully",
+					"description": "Interviews retrieved successfully",
 					"content": {
 						"application/json": {
 							"schema": {

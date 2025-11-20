@@ -9,9 +9,38 @@
  * @returns {Object} Query builder dengan pagination
  */
 const applyPagination = (queryBuilder, pagination) => {
-  return queryBuilder
-    .limit(pagination.limit)
-    .offset(pagination.offset);
+  const logPrefix = '[applyPagination]'
+  
+  try {
+    console.log(`${logPrefix} Input pagination:`, JSON.stringify(pagination, null, 2))
+    
+    if (!pagination) {
+      console.error(`${logPrefix} ❌ pagination is null or undefined!`)
+      throw new Error('pagination is required')
+    }
+    
+    if (pagination.limit === undefined || pagination.limit === null) {
+      console.error(`${logPrefix} ❌ pagination.limit is undefined or null!`)
+      throw new Error('pagination.limit is required')
+    }
+    
+    if (pagination.offset === undefined || pagination.offset === null) {
+      console.error(`${logPrefix} ❌ pagination.offset is undefined or null!`)
+      throw new Error('pagination.offset is required')
+    }
+    
+    console.log(`${logPrefix} Applying limit:`, pagination.limit, 'offset:', pagination.offset)
+    const result = queryBuilder
+      .limit(pagination.limit)
+      .offset(pagination.offset)
+    
+    console.log(`${logPrefix} ✅ Pagination applied successfully`)
+    return result
+  } catch (error) {
+    console.error(`${logPrefix} ❌ Error in applyPagination:`, error)
+    console.error(`${logPrefix} Error stack:`, error.stack)
+    throw error
+  }
 };
 
 /**
@@ -21,7 +50,36 @@ const applyPagination = (queryBuilder, pagination) => {
  * @returns {Object} Query builder dengan sorting
  */
 const applySorting = (queryBuilder, sorting) => {
-  return queryBuilder.orderBy(sorting.sortBy, sorting.sortOrder);
+  const logPrefix = '[applySorting]'
+  
+  try {
+    console.log(`${logPrefix} Input sorting:`, JSON.stringify(sorting, null, 2))
+    
+    if (!sorting) {
+      console.error(`${logPrefix} ❌ sorting is null or undefined!`)
+      throw new Error('sorting is required')
+    }
+    
+    if (!sorting.sortBy) {
+      console.error(`${logPrefix} ❌ sorting.sortBy is missing!`)
+      throw new Error('sorting.sortBy is required')
+    }
+    
+    if (!sorting.sortOrder) {
+      console.error(`${logPrefix} ❌ sorting.sortOrder is missing!`)
+      throw new Error('sorting.sortOrder is required')
+    }
+    
+    console.log(`${logPrefix} Applying orderBy:`, sorting.sortBy, sorting.sortOrder)
+    const result = queryBuilder.orderBy(sorting.sortBy, sorting.sortOrder)
+    
+    console.log(`${logPrefix} ✅ Sorting applied successfully`)
+    return result
+  } catch (error) {
+    console.error(`${logPrefix} ❌ Error in applySorting:`, error)
+    console.error(`${logPrefix} Error stack:`, error.stack)
+    throw error
+  }
 };
 
 /**
@@ -103,24 +161,64 @@ const applyDateRange = (queryBuilder, dateRange) => {
  * @returns {Object} Query builder dengan semua filter
  */
 const applyStandardFilters = (queryBuilder, queryParams) => {
-  const { pagination, sorting, search, filters, dateRange } = queryParams;
+  const logPrefix = '[applyStandardFilters]'
   
-  // Apply search first
-  queryBuilder = applySearch(queryBuilder, search);
-  
-  // Apply filters
-  queryBuilder = applyFilters(queryBuilder, filters);
-  
-  // Apply date range
-  queryBuilder = applyDateRange(queryBuilder, dateRange);
-  
-  // Apply sorting
-  queryBuilder = applySorting(queryBuilder, sorting);
-  
-  // Apply pagination last
-  queryBuilder = applyPagination(queryBuilder, pagination);
-  
-  return queryBuilder;
+  try {
+    console.log(`${logPrefix} ========== FUNCTION STARTED ==========`)
+    console.log(`${logPrefix} queryBuilder type:`, typeof queryBuilder)
+    console.log(`${logPrefix} queryParams type:`, typeof queryParams)
+    console.log(`${logPrefix} queryParams:`, JSON.stringify(queryParams, null, 2))
+    
+    if (!queryParams) {
+      console.error(`${logPrefix} ❌ queryParams is null or undefined!`)
+      throw new Error('queryParams is required')
+    }
+    
+    const { pagination, sorting, search, filters, dateRange } = queryParams;
+    
+    console.log(`${logPrefix} Extracted properties:`, {
+      pagination: pagination ? 'exists' : 'missing',
+      sorting: sorting ? 'exists' : 'missing',
+      search: search ? 'exists' : 'missing',
+      filters: filters ? 'exists' : 'missing',
+      dateRange: dateRange ? 'exists' : 'missing'
+    })
+    
+    // Apply search first
+    console.log(`${logPrefix} Applying search...`)
+    queryBuilder = applySearch(queryBuilder, search);
+    console.log(`${logPrefix} ✅ Search applied`)
+    
+    // Apply filters
+    console.log(`${logPrefix} Applying filters...`)
+    queryBuilder = applyFilters(queryBuilder, filters);
+    console.log(`${logPrefix} ✅ Filters applied`)
+    
+    // Apply date range
+    console.log(`${logPrefix} Applying date range...`)
+    queryBuilder = applyDateRange(queryBuilder, dateRange);
+    console.log(`${logPrefix} ✅ Date range applied`)
+    
+    // Apply sorting
+    console.log(`${logPrefix} Applying sorting...`)
+    queryBuilder = applySorting(queryBuilder, sorting);
+    console.log(`${logPrefix} ✅ Sorting applied`)
+    
+    // Apply pagination last
+    console.log(`${logPrefix} Applying pagination...`)
+    queryBuilder = applyPagination(queryBuilder, pagination);
+    console.log(`${logPrefix} ✅ Pagination applied`)
+    
+    console.log(`${logPrefix} ✅ All filters applied successfully`)
+    console.log(`${logPrefix} Returning queryBuilder, type:`, typeof queryBuilder)
+    return queryBuilder;
+  } catch (error) {
+    console.error(`${logPrefix} ❌ Error in applyStandardFilters:`, error)
+    console.error(`${logPrefix} Error name:`, error?.name)
+    console.error(`${logPrefix} Error message:`, error?.message)
+    console.error(`${logPrefix} Error stack:`, error.stack)
+    throw error
+  }
 };
 
 /**
@@ -130,21 +228,57 @@ const applyStandardFilters = (queryBuilder, queryParams) => {
  * @returns {Object} Count query builder
  */
 const buildCountQuery = (baseQuery, queryParams) => {
-  const { search, filters, dateRange } = queryParams;
+  const logPrefix = '[buildCountQuery]'
   
-  // Clone base query dan hapus select untuk count
-  let countQuery = baseQuery.clone().clearSelect();
-  
-  // Apply search
-  countQuery = applySearch(countQuery, search);
-  
-  // Apply filters
-  countQuery = applyFilters(countQuery, filters);
-  
-  // Apply date range
-  countQuery = applyDateRange(countQuery, dateRange);
-  
-  return countQuery.count('* as total');
+  try {
+    console.log(`${logPrefix} ========== FUNCTION STARTED ==========`)
+    console.log(`${logPrefix} baseQuery type:`, typeof baseQuery)
+    console.log(`${logPrefix} queryParams type:`, typeof queryParams)
+    
+    if (!queryParams) {
+      console.error(`${logPrefix} ❌ queryParams is null or undefined!`)
+      throw new Error('queryParams is required')
+    }
+    
+    const { search, filters, dateRange } = queryParams;
+    
+    console.log(`${logPrefix} Extracted properties:`, {
+      search: search ? 'exists' : 'missing',
+      filters: filters ? 'exists' : 'missing',
+      dateRange: dateRange ? 'exists' : 'missing'
+    })
+    
+    // Clone base query dan hapus select untuk count
+    console.log(`${logPrefix} Cloning base query...`)
+    let countQuery = baseQuery.clone().clearSelect();
+    console.log(`${logPrefix} ✅ Base query cloned`)
+    
+    // Apply search
+    console.log(`${logPrefix} Applying search...`)
+    countQuery = applySearch(countQuery, search);
+    console.log(`${logPrefix} ✅ Search applied`)
+    
+    // Apply filters
+    console.log(`${logPrefix} Applying filters...`)
+    countQuery = applyFilters(countQuery, filters);
+    console.log(`${logPrefix} ✅ Filters applied`)
+    
+    // Apply date range
+    console.log(`${logPrefix} Applying date range...`)
+    countQuery = applyDateRange(countQuery, dateRange);
+    console.log(`${logPrefix} ✅ Date range applied`)
+    
+    console.log(`${logPrefix} Adding count...`)
+    const result = countQuery.count('* as total');
+    console.log(`${logPrefix} ✅ Count query built, type:`, typeof result)
+    return result;
+  } catch (error) {
+    console.error(`${logPrefix} ❌ Error in buildCountQuery:`, error)
+    console.error(`${logPrefix} Error name:`, error?.name)
+    console.error(`${logPrefix} Error message:`, error?.message)
+    console.error(`${logPrefix} Error stack:`, error.stack)
+    throw error
+  }
 };
 
 /**
