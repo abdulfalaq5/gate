@@ -1,0 +1,159 @@
+{
+	"SchemaResponseBackgroundCheck": {
+		"type": "object",
+		"properties": {
+			"background_check_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"background_check_note": {
+				"type": "string"
+			},
+			"background_file": {
+				"type": "string"
+			},
+			"background_status": {
+				"type": "string",
+				"enum": ["hired", "rejected", "hold"]
+			},
+			"background_description": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			},
+			"candidate": {
+				"$ref": "#/components/schemas/SchemaResponseCandidates"
+			}
+		}
+	},
+	"SchemaPostBackgroundCheck": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Candidate ID reference"
+			},
+			"background_check_note": {
+				"type": "string",
+				"description": "Note for the background check"
+			},
+			"background_file": {
+				"type": "string",
+				"format": "binary",
+				"description": "File for background check document. Will be uploaded to MinIO in directory 'background-check/files'. Maximum file size: 50MB. Supports any file type."
+			},
+			"background_status": {
+				"type": "string",
+				"enum": ["hired", "rejected", "hold"],
+				"description": "Status of the background check. If set to 'hired', automatically updates candidate's candidate_status to 'hired'. If 'rejected', updates to 'rejected'. If 'hold', updates to 'hold'."
+			},
+			"background_description": {
+				"type": "string",
+				"description": "Description of the background check"
+			}
+		},
+		"example": {
+			"candidate_id": "123e4567-e89b-12d3-a456-426614174000",
+			"background_check_note": "Background check completed successfully",
+			"background_status": "hired",
+			"background_description": "All checks passed"
+		}
+	},
+	"SchemaPutBackgroundCheck": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Candidate ID reference"
+			},
+			"background_check_note": {
+				"type": "string",
+				"description": "Note for the background check"
+			},
+			"background_file": {
+				"type": "string",
+				"format": "binary",
+				"description": "File for background check document. Will be uploaded to MinIO in directory 'background-check/files'. Maximum file size: 50MB. Supports any file type."
+			},
+			"background_status": {
+				"type": "string",
+				"enum": ["hired", "rejected", "hold"],
+				"description": "Status of the background check. If set to 'hired', automatically updates candidate's candidate_status to 'hired'. If 'rejected', updates to 'rejected'. If 'hold', updates to 'hold'."
+			},
+			"background_description": {
+				"type": "string",
+				"description": "Description of the background check"
+			}
+		},
+		"example": {
+			"candidate_id": "123e4567-e89b-12d3-a456-426614174000",
+			"background_check_note": "Background check updated",
+			"background_status": "hired",
+			"background_description": "All checks passed"
+		}
+	},
+	"SchemaResponseBackgroundCheckList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseBackgroundCheck"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"description": "Current page number"
+					},
+					"limit": {
+						"type": "integer",
+						"description": "Number of items per page"
+					},
+					"total": {
+						"type": "integer",
+						"description": "Total number of records"
+					},
+					"totalPages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					}
+				}
+			}
+		}
+	}
+}
+

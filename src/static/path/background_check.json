@@ -1,0 +1,301 @@
+{
+	"/background_check/get": {
+		"post": {
+			"tags": ["Background Check"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Get all background checks with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of background checks with optional filtering via request body",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for background_check_note or background_description"
+								},
+								"candidate_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by candidate ID"
+								},
+								"background_status": {
+									"type": "string",
+									"enum": ["hired", "rejected", "hold"],
+									"description": "Filter by background status"
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["background_check_note", "background_status", "background_description", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"search": "",
+							"sort_by": "created_at",
+							"sort_order": "desc"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Background checks retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseBackgroundCheckList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/background_check/create": {
+		"post": {
+			"tags": ["Background Check"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Create a new background check",
+			"description": "Create a new background check with optional file upload to MinIO (directory: background-check/files). If background_status is set to 'hired', it will automatically update the candidate's candidate_status to 'hired'. If set to 'rejected', it will update to 'rejected'. If set to 'hold', it will update to 'hold'.",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostBackgroundCheck"
+						},
+						"encoding": {
+							"background_file": {
+								"contentType": "application/octet-stream"
+							}
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Background check created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseBackgroundCheck"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/background_check/{id}": {
+		"get": {
+			"tags": ["Background Check"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Retrieve a specific background check by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Background check ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Background check retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseBackgroundCheck"
+									}
+								}
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Background check not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Background Check"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Update an existing background check with optional file upload to MinIO (directory: background-check/files). If background_status is set to 'hired', it will automatically update the candidate's candidate_status to 'hired'. If set to 'rejected', it will update to 'rejected'. If set to 'hold', it will update to 'hold'.",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Background check ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutBackgroundCheck"
+						},
+						"encoding": {
+							"background_file": {
+								"contentType": "application/octet-stream"
+							}
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Background check updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseBackgroundCheck"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Background check not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Background Check"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Soft delete a background check",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Background check ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Background check deleted successfully"
+				},
+				"404": {
+					"description": "Background check not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}
+

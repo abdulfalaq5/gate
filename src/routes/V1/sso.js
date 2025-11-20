@@ -18,6 +18,7 @@ const titlesRoutes = require('../../modules/titles');
 const candidatesRoutes = require('../../modules/candidates');
 const scheduleInterviewRoutes = require('../../modules/schedule_interview');
 const interviewRoutes = require('../../modules/interview');
+const backgroundCheckRoutes = require('../../modules/background_check');
 const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken, verifyToken } = require('../../middlewares');
@@ -141,6 +142,13 @@ router.post('/interview/create', verifyToken, interviewRoutes.createInterview);
 router.get('/interview/:id', verifyToken, interviewRoutes.getInterviewById);
 router.put('/interview/:id', verifyToken, interviewRoutes.updateInterview);
 router.delete('/interview/:id', verifyToken, interviewRoutes.deleteInterview);
+
+// Background Checks
+router.post('/background_check/get', verifyToken, backgroundCheckRoutes.getBackgroundChecks);
+router.post('/background_check/create', verifyToken, upload.any(), backgroundCheckRoutes.createBackgroundCheck);
+router.get('/background_check/:id', verifyToken, backgroundCheckRoutes.getBackgroundCheckById);
+router.put('/background_check/:id', verifyToken, upload.any(), backgroundCheckRoutes.updateBackgroundCheck);
+router.delete('/background_check/:id', verifyToken, backgroundCheckRoutes.deleteBackgroundCheck);
 
 // Sync Data
 router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);
