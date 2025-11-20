@@ -178,15 +178,22 @@ const formatPaginatedResponse = (data, pagination, total) => {
  * @returns {Object} Formatted response dengan pagination metadata sederhana
  */
 const formatSimplePaginatedResponse = (data, pagination, total) => {
-  const totalPages = Math.ceil(total / pagination.limit);
+  // Ensure pagination is valid
+  if (!pagination || typeof pagination !== 'object') {
+    throw new Error('Invalid pagination parameter')
+  }
+  
+  // Ensure pagination.limit is valid and not zero
+  const limit = pagination.limit && pagination.limit > 0 ? pagination.limit : 10
+  const totalPages = Math.ceil(total / limit);
 
   return {
-    data,
+    data: Array.isArray(data) ? data : [],
     pagination: {
-      page: pagination.page,
-      limit: pagination.limit,
-      total: parseInt(total),
-      totalPages,
+      page: pagination.page || 1,
+      limit: limit,
+      total: parseInt(total) || 0,
+      totalPages: totalPages || 0,
     },
   };
 };

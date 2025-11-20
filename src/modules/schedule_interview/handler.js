@@ -7,8 +7,8 @@ const { sanitizeScheduleInterviewData } = require('./validation')
 
 class ScheduleInterviewHandler {
   /**
-   * Get all candidates with pagination and filtering (POST method)
-   * Endpoint ini mengambil data dari tabel candidates sesuai requirements
+   * Get all schedule interviews with pagination and filtering (POST method)
+   * Endpoint ini mengambil data dari tabel schedule_interviews beserta relasinya
    */
   async getCandidates(req, res) {
     try {
@@ -27,48 +27,33 @@ class ScheduleInterviewHandler {
       // Parse query parameters menggunakan sistem filter standar
       const queryParams = parseStandardQuery(modifiedReq, {
         allowedSortColumns: [
-          'candidate_name',
-          'candidate_email',
-          'candidate_phone',
-          'candidate_number',
-          'candidate_city',
-          'candidate_state',
-          'candidate_country',
+          'schedule_interview_date',
+          'schedule_interview_time',
+          'assign_role',
           'created_at',
           'updated_at'
         ],
         defaultSort: ['created_at', 'desc'],
         searchableColumns: [
-          'candidate_name',
-          'candidate_email',
-          'candidate_phone',
-          'candidate_number',
-          'candidate_city',
-          'candidate_state',
-          'candidate_country'
+          'assign_role',
+          'schedule_interview_duration',
+          'schedule_interview_description'
         ],
         allowedFilters: [
-          'candidate_name',
-          'candidate_email',
-          'candidate_phone',
-          'candidate_number',
-          'company_id',
-          'department_id',
-          'title_id',
-          'candidate_city',
-          'candidate_state',
-          'candidate_country',
+          'candidate_id',
+          'assign_role',
+          'schedule_interview_date',
           'is_delete'
         ],
         dateColumn: 'created_at'
       })
       
-      const result = await scheduleInterviewRepository.getCandidates(queryParams)
+      const result = await scheduleInterviewRepository.getScheduleInterviews(queryParams)
       
-      return successResponse(res, result, 'Candidates retrieved successfully')
+      return successResponse(res, result, 'Schedule interviews retrieved successfully')
     } catch (error) {
-      console.error('Error getting candidates:', error)
-      return errorResponse(res, 'Failed to retrieve candidates', 500)
+      console.error('Error getting schedule interviews:', error)
+      return errorResponse(res, 'Failed to retrieve schedule interviews', 500)
     }
   }
 

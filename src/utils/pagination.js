@@ -33,18 +33,23 @@ const parsePagination = (req, defaultOrder = ['created_at', 'desc']) => {
  * @returns {Object} Sorting parameters
  */
 const parseSorting = (req, allowedColumns = [], defaultOrder = ['created_at', 'desc']) => {
-  const sortBy = req.query.sort_by || defaultOrder[0];
-  const sortOrder = req.query.sort_order || defaultOrder[1];
+  // Ensure defaultOrder is a valid array
+  const safeDefaultOrder = Array.isArray(defaultOrder) && defaultOrder.length >= 2
+    ? defaultOrder
+    : ['created_at', 'desc'];
+  
+  const sortBy = req.query.sort_by || safeDefaultOrder[0];
+  const sortOrder = req.query.sort_order || safeDefaultOrder[1];
   
   // Validasi kolom yang diizinkan
   const validColumn = allowedColumns.length > 0 && allowedColumns.includes(sortBy) 
     ? sortBy 
-    : defaultOrder[0];
+    : safeDefaultOrder[0];
   
   // Validasi order direction
-  const validOrder = ['asc', 'desc'].includes(sortOrder.toLowerCase()) 
+  const validOrder = sortOrder && typeof sortOrder === 'string' && ['asc', 'desc'].includes(sortOrder.toLowerCase()) 
     ? sortOrder.toLowerCase() 
-    : defaultOrder[1];
+    : safeDefaultOrder[1];
   
   return {
     sortBy: validColumn,

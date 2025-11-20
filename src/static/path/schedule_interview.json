@@ -1,5 +1,5 @@
 {
-	"/schedule_interview/get": {
+		"/schedule_interview/get": {
 		"post": {
 			"tags": ["Schedule Interview"],
 			"security": [
@@ -7,8 +7,8 @@
 					"bearerAuth": []
 				}
 			],
-			"summary": "Get all candidates with filtering, pagination, and sorting (via request body)",
-			"description": "Retrieve a paginated list of candidates for schedule interview with optional filtering via request body",
+			"summary": "Get all schedule interviews with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of schedule interviews with all relations (candidate, company, department, title) and optional filtering via request body",
 			"requestBody": {
 				"required": false,
 				"content": {
@@ -31,54 +31,25 @@
 								},
 								"search": {
 									"type": "string",
-									"description": "Search term for candidate name, email, phone, number, city, state, or country"
+									"description": "Search term for assign_role, schedule_interview_duration, or schedule_interview_description"
 								},
-								"candidate_name": {
-									"type": "string",
-									"description": "Filter by exact candidate name"
-								},
-								"candidate_email": {
-									"type": "string",
-									"description": "Filter by exact candidate email"
-								},
-								"candidate_phone": {
-									"type": "string",
-									"description": "Filter by exact candidate phone"
-								},
-								"candidate_number": {
-									"type": "string",
-									"description": "Filter by exact candidate number"
-								},
-								"company_id": {
+								"candidate_id": {
 									"type": "string",
 									"format": "uuid",
-									"description": "Filter by company ID"
+									"description": "Filter by candidate ID (UUID, can be empty string, null, or omitted to get all)"
 								},
-								"department_id": {
+								"assign_role": {
 									"type": "string",
-									"format": "uuid",
-									"description": "Filter by department ID"
+									"description": "Filter by exact assign role"
 								},
-								"title_id": {
+								"schedule_interview_date": {
 									"type": "string",
-									"format": "uuid",
-									"description": "Filter by title ID"
-								},
-								"candidate_city": {
-									"type": "string",
-									"description": "Filter by exact candidate city"
-								},
-								"candidate_state": {
-									"type": "string",
-									"description": "Filter by exact candidate state"
-								},
-								"candidate_country": {
-									"type": "string",
-									"description": "Filter by exact candidate country"
+									"format": "date",
+									"description": "Filter by exact schedule interview date"
 								},
 								"sort_by": {
 									"type": "string",
-									"enum": ["candidate_name", "candidate_email", "candidate_phone", "candidate_number", "candidate_city", "candidate_state", "candidate_country", "created_at", "updated_at"],
+									"enum": ["schedule_interview_date", "schedule_interview_time", "assign_role", "created_at", "updated_at"],
 									"default": "created_at",
 									"description": "Column to sort by"
 								},
@@ -100,14 +71,15 @@
 							"limit": 10,
 							"search": "",
 							"sort_by": "created_at",
-							"sort_order": "desc"
+							"sort_order": "desc",
+							"candidate_id": ""
 						}
 					}
 				}
 			},
 			"responses": {
 				"200": {
-					"description": "Candidates retrieved successfully",
+					"description": "Schedule interviews retrieved successfully",
 					"content": {
 						"application/json": {
 							"schema": {

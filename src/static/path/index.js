@@ -11,6 +11,7 @@ const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
 const permissions = require('./permissions.json')
 const scheduleInterview = require('./schedule_interview.json')
+const interview = require('./interview.json')
 const ssoProfile = require('./sso_profile.json')
 const systems = require('./systems.json')
 const titles = require('./titles.json')
@@ -29,6 +30,7 @@ module.exports = {
   ...importModule,
   ...permissions,
   ...scheduleInterview,
+  ...interview,
   ...ssoProfile,
   ...systems,
   ...titles

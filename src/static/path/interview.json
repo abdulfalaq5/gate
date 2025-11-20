@@ -1,0 +1,303 @@
+{
+	"/interview/get": {
+		"post": {
+			"tags": ["Interview"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Get all candidates with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of candidates for interview with optional filtering via request body",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for candidate name, email, phone, number, city, state, or country"
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["candidate_name", "candidate_email", "candidate_phone", "candidate_number", "candidate_city", "candidate_state", "candidate_country", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"search": "",
+							"sort_by": "created_at",
+							"sort_order": "desc"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Candidates retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseInterviewCandidatesList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/interview/create": {
+		"post": {
+			"tags": ["Interview"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Create a new interview with detail interviews",
+			"description": "Create a new interview with the provided information and detail interviews.",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostInterview"
+						},
+						"example": {
+							"schedule_interview_id": "123e4567-e89b-12d3-a456-426614174000",
+							"interviews": [
+								{
+									"company_value": "Integrity",
+									"comment": "Kandidat menunjukkan kemampuan leadership yang baik.",
+									"total_score": "98",
+									"detail_interviews": [
+										{
+											"aspect": "Leadership",
+											"question": "Bagaimana Anda menangani konflik dalam tim?",
+											"answer": "Saya selalu mencoba mendengarkan semua pihak dan mencari solusi yang adil.",
+											"score": 85
+										},
+										{
+											"aspect": "Communication",
+											"question": "Bagaimana Anda berkomunikasi dengan stakeholder?",
+											"answer": "Saya selalu transparan dan terbuka dalam komunikasi.",
+											"score": 90
+										}
+									]
+								}
+							]
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Interview created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"type": "array",
+										"items": {
+											"$ref": "#/components/schemas/SchemaResponseInterview"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/interview/{id}": {
+		"get": {
+			"tags": ["Interview"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Retrieve a specific interview by its ID with all relations (detail_interviews, schedule_interview, candidate)",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Interview ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Interview retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseInterview"
+									}
+								}
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Interview not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Interview"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Update an existing interview with detail interviews",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Interview ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutInterview"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Interview updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseInterview"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Interview not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Interview"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Soft delete an interview",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Interview ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Interview deleted successfully"
+				},
+				"404": {
+					"description": "Interview not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}
+

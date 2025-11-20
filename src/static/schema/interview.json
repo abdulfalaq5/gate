@@ -1,0 +1,342 @@
+{
+	"SchemaResponseInterview": {
+		"type": "object",
+		"properties": {
+			"interview_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"schedule_interview_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"interview_company_value": {
+				"type": "string"
+			},
+			"interview_comment": {
+				"type": "string"
+			},
+			"interview_total_score": {
+				"type": "string"
+			},
+			"interview_description": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			},
+			"detail_interviews": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseDetailInterview"
+				}
+			},
+			"schedule_interview": {
+				"type": "object",
+				"properties": {
+					"schedule_interview_id": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"candidate_id": {
+						"type": "string",
+						"format": "uuid"
+					},
+					"assign_role": {
+						"type": "string"
+					},
+					"schedule_interview_date": {
+						"type": "string",
+						"format": "date"
+					},
+					"schedule_interview_time": {
+						"type": "string",
+						"format": "time"
+					},
+					"schedule_interview_duration": {
+						"type": "string"
+					},
+					"schedule_interview_description": {
+						"type": "string"
+					},
+					"candidate": {
+						"$ref": "#/components/schemas/SchemaResponseCandidates"
+					}
+				}
+			}
+		}
+	},
+	"SchemaResponseDetailInterview": {
+		"type": "object",
+		"properties": {
+			"detail_interview_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"interview_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"detail_interview_aspect": {
+				"type": "string"
+			},
+			"detail_interview_question": {
+				"type": "string"
+			},
+			"detail_interview_answer": {
+				"type": "string"
+			},
+			"detail_interview_score": {
+				"type": "string"
+			},
+			"detail_interview_description": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			}
+		}
+	},
+	"SchemaPostInterview": {
+		"type": "object",
+		"required": ["interviews"],
+		"properties": {
+			"schedule_interview_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Schedule interview ID reference"
+			},
+			"interviews": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+					"type": "object",
+					"properties": {
+						"company_value": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Company value assessed in the interview",
+							"example": "Integrity"
+						},
+						"comment": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Comment about the interview",
+							"example": "Kandidat menunjukkan kemampuan leadership yang baik."
+						},
+						"total_score": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Total score of the interview",
+							"example": "98"
+						},
+						"description": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Description of the interview"
+						},
+						"detail_interviews": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"aspect": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Aspect of the interview",
+										"example": "Leadership"
+									},
+									"question": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Question asked in the interview",
+										"example": "Bagaimana Anda menangani konflik dalam tim?"
+									},
+									"answer": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Answer given in the interview",
+										"example": "Saya selalu mencoba mendengarkan semua pihak dan mencari solusi yang adil."
+									},
+									"score": {
+										"type": "integer",
+										"description": "Score for this aspect",
+										"example": 85
+									},
+									"description": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Description for this detail interview"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"SchemaPutInterview": {
+		"type": "object",
+		"properties": {
+			"schedule_interview_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Schedule interview ID reference"
+			},
+			"interviews": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+					"type": "object",
+					"properties": {
+						"company_value": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Company value assessed in the interview",
+							"example": "Integrity"
+						},
+						"comment": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Comment about the interview",
+							"example": "Kandidat menunjukkan kemampuan leadership yang baik."
+						},
+						"total_score": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Total score of the interview",
+							"example": "98"
+						},
+						"description": {
+							"type": "string",
+							"maxLength": 255,
+							"description": "Description of the interview"
+						},
+						"detail_interviews": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"aspect": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Aspect of the interview",
+										"example": "Leadership"
+									},
+									"question": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Question asked in the interview",
+										"example": "Bagaimana Anda menangani konflik dalam tim?"
+									},
+									"answer": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Answer given in the interview",
+										"example": "Saya selalu mencoba mendengarkan semua pihak dan mencari solusi yang adil."
+									},
+									"score": {
+										"type": "integer",
+										"description": "Score for this aspect",
+										"example": 85
+									},
+									"description": {
+										"type": "string",
+										"maxLength": 255,
+										"description": "Description for this detail interview"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"SchemaResponseInterviewCandidatesList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseCandidates"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"description": "Current page number"
+					},
+					"limit": {
+						"type": "integer",
+						"description": "Number of items per page"
+					},
+					"total": {
+						"type": "integer",
+						"description": "Total number of records"
+					},
+					"totalPages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					}
+				}
+			}
+		}
+	}
+}
+

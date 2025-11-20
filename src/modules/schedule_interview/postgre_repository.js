@@ -3,6 +3,7 @@ const { applyStandardFilters, buildCountQuery, formatSimplePaginatedResponse } =
 
 /**
  * Get schedule interviews with pagination and filtering menggunakan sistem filter standar
+ * Include relasi: candidate, company, department, title
  */
 const getScheduleInterviews = async (queryParams) => {
   // Base query untuk schedule_interviews
@@ -22,8 +23,67 @@ const getScheduleInterviews = async (queryParams) => {
     countQuery.first()
   ])
   
+  // Load relasi untuk setiap schedule interview
+  const scheduleInterviewsWithRelations = await Promise.all(
+    scheduleInterviews.map(async (scheduleInterview) => {
+      // Get candidate relation if exists
+      if (scheduleInterview.candidate_id) {
+        const candidate = await pgCore('candidates')
+          .select('candidates.*')
+          .where('candidates.candidate_id', scheduleInterview.candidate_id)
+          .where('candidates.is_delete', false)
+          .first()
+        
+        if (candidate) {
+          scheduleInterview.candidate = candidate
+          
+          // Get company relation if exists
+          if (candidate.company_id) {
+            const company = await pgCore('companies')
+              .select('company_id', 'company_name', 'company_address', 'company_email')
+              .where('company_id', candidate.company_id)
+              .where('is_delete', false)
+              .first()
+            
+            if (company) {
+              scheduleInterview.candidate.company = company
+            }
+          }
+          
+          // Get department relation if exists
+          if (candidate.department_id) {
+            const department = await pgCore('departments')
+              .select('department_id', 'department_name', 'department_parent_id', 'company_id')
+              .where('department_id', candidate.department_id)
+              .where('is_delete', false)
+              .first()
+            
+            if (department) {
+              scheduleInterview.candidate.department = department
+            }
+          }
+          
+          // Get title relation if exists
+          if (candidate.title_id) {
+            const title = await pgCore('titles')
+              .select('title_id', 'title_name')
+              .where('title_id', candidate.title_id)
+              .where('is_delete', false)
+              .first()
+            
+            if (title) {
+              scheduleInterview.candidate.title = title
+            }
+          }
+        }
+      }
+      
+      return scheduleInterview
+    })
+  )
+  
   // Format response dengan pagination metadata
-  return formatSimplePaginatedResponse(scheduleInterviews, queryParams.pagination, countResult.total)
+  return formatSimplePaginatedResponse(scheduleInterviewsWithRelations, queryParams.pagination, countResult.total)
 }
 
 /**
@@ -92,7 +152,7 @@ const getScheduleInterviewById = async (id) => {
       // Get department relation if exists
       if (candidate.department_id) {
         const department = await pgCore('departments')
-          .select('department_id', 'department_name', 'department_code')
+          .select('department_id', 'department_name', 'department_parent_id', 'company_id')
           .where('department_id', candidate.department_id)
           .where('is_delete', false)
           .first()

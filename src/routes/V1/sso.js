@@ -17,9 +17,10 @@ const employeesRoutes = require('../../modules/employees');
 const titlesRoutes = require('../../modules/titles');
 const candidatesRoutes = require('../../modules/candidates');
 const scheduleInterviewRoutes = require('../../modules/schedule_interview');
+const interviewRoutes = require('../../modules/interview');
 const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
-const { verifySSOToken } = require('../../middlewares');
+const { verifySSOToken, verifyToken } = require('../../middlewares');
 
 // Configure multer for multipart/form-data
 const upload = multer({
@@ -133,6 +134,13 @@ router.post('/schedule_interview/create', verifySSOToken, scheduleInterviewRoute
 router.get('/schedule_interview/:id', verifySSOToken, scheduleInterviewRoutes.getScheduleInterviewById);
 router.put('/schedule_interview/:id', verifySSOToken, scheduleInterviewRoutes.updateScheduleInterview);
 router.delete('/schedule_interview/:id', verifySSOToken, scheduleInterviewRoutes.deleteScheduleInterview);
+
+// Interviews
+router.post('/interview/get', verifyToken, interviewRoutes.getCandidates);
+router.post('/interview/create', verifyToken, interviewRoutes.createInterview);
+router.get('/interview/:id', verifyToken, interviewRoutes.getInterviewById);
+router.put('/interview/:id', verifyToken, interviewRoutes.updateInterview);
+router.delete('/interview/:id', verifyToken, interviewRoutes.deleteInterview);
 
 // Sync Data
 router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);
