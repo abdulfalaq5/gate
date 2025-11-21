@@ -16,6 +16,7 @@ const interview = require('./interview.json')
 const ssoProfile = require('./sso_profile.json')
 const systems = require('./systems.json')
 const titles = require('./titles.json')
+const onBoardDocument = require('./on_board_document.json')
 
 module.exports = {
   ...auth,
@@ -35,5 +36,6 @@ module.exports = {
   ...interview,
   ...ssoProfile,
   ...systems,
-  ...titles
+  ...titles,
+  ...onBoardDocument
 }

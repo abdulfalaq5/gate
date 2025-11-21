@@ -1,0 +1,297 @@
+{
+	"/on_board_document/get": {
+		"post": {
+			"tags": ["On Board Document"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Get all on board documents with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of on board documents with optional filtering via request body. candidate_id filter will be ignored if value is empty string, null, or 'nan'.",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for on_board_document_name or on_board_document_description"
+								},
+								"candidate_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by candidate ID. Will be ignored if empty string, null, or 'nan'."
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["on_board_document_name", "on_board_document_description", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"search": "",
+							"sort_by": "created_at",
+							"sort_order": "desc",
+							"candidate_id": ""
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "On board documents retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseOnBoardDocumentList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/on_board_document/create": {
+		"post": {
+			"tags": ["On Board Document"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Create a new on board document",
+			"description": "Create a new on board document with optional file upload to MinIO (directory: on-board-documents/files).",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostOnBoardDocument"
+						},
+						"encoding": {
+							"on_board_document_file": {
+								"contentType": "application/octet-stream"
+							}
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "On board document created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseOnBoardDocument"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/on_board_document/{id}": {
+		"get": {
+			"tags": ["On Board Document"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Retrieve a specific on board document by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "On board document ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "On board document retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseOnBoardDocument"
+									}
+								}
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "On board document not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["On Board Document"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Update an existing on board document with optional file upload to MinIO (directory: on-board-documents/files).",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "On board document ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutOnBoardDocument"
+						},
+						"encoding": {
+							"on_board_document_file": {
+								"contentType": "application/octet-stream"
+							}
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "On board document updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseOnBoardDocument"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "On board document not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["On Board Document"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Soft delete an on board document",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "On board document ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "On board document deleted successfully"
+				},
+				"404": {
+					"description": "On board document not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}
+

@@ -1,0 +1,143 @@
+{
+	"SchemaResponseOnBoardDocument": {
+		"type": "object",
+		"properties": {
+			"on_board_document_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"on_board_document_name": {
+				"type": "string"
+			},
+			"on_board_document_file": {
+				"type": "string"
+			},
+			"on_board_document_description": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			},
+			"candidate": {
+				"$ref": "#/components/schemas/SchemaResponseCandidates"
+			}
+		}
+	},
+	"SchemaPostOnBoardDocument": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Candidate ID reference. Can be empty string, null, or 'nan' to ignore filter."
+			},
+			"on_board_document_name": {
+				"type": "string",
+				"description": "Name of the on board document"
+			},
+			"on_board_document_file": {
+				"type": "string",
+				"format": "binary",
+				"description": "File for on board document. Will be uploaded to MinIO in directory 'on-board-documents/files'. Maximum file size: 50MB. Supports any file type."
+			},
+			"on_board_document_description": {
+				"type": "string",
+				"description": "Description of the on board document"
+			}
+		},
+		"example": {
+			"candidate_id": "123e4567-e89b-12d3-a456-426614174000",
+			"on_board_document_name": "Employment Contract",
+			"on_board_document_description": "Employment contract document"
+		}
+	},
+	"SchemaPutOnBoardDocument": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Candidate ID reference. Can be empty string, null, or 'nan' to ignore filter."
+			},
+			"on_board_document_name": {
+				"type": "string",
+				"description": "Name of the on board document"
+			},
+			"on_board_document_file": {
+				"type": "string",
+				"format": "binary",
+				"description": "File for on board document. Will be uploaded to MinIO in directory 'on-board-documents/files'. Maximum file size: 50MB. Supports any file type."
+			},
+			"on_board_document_description": {
+				"type": "string",
+				"description": "Description of the on board document"
+			}
+		},
+		"example": {
+			"candidate_id": "123e4567-e89b-12d3-a456-426614174000",
+			"on_board_document_name": "Employment Contract Updated",
+			"on_board_document_description": "Updated employment contract document"
+		}
+	},
+	"SchemaResponseOnBoardDocumentList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseOnBoardDocument"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"description": "Current page number"
+					},
+					"limit": {
+						"type": "integer",
+						"description": "Number of items per page"
+					},
+					"total": {
+						"type": "integer",
+						"description": "Total number of records"
+					},
+					"totalPages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					}
+				}
+			}
+		}
+	}
+}
+

@@ -19,6 +19,7 @@ const candidatesRoutes = require('../../modules/candidates');
 const scheduleInterviewRoutes = require('../../modules/schedule_interview');
 const interviewRoutes = require('../../modules/interview');
 const backgroundCheckRoutes = require('../../modules/background_check');
+const onBoardDocumentRoutes = require('../../modules/on_board_document');
 const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken, verifyToken } = require('../../middlewares');
@@ -149,6 +150,13 @@ router.post('/background_check/create', verifyToken, upload.any(), backgroundChe
 router.get('/background_check/:id', verifyToken, backgroundCheckRoutes.getBackgroundCheckById);
 router.put('/background_check/:id', verifyToken, upload.any(), backgroundCheckRoutes.updateBackgroundCheck);
 router.delete('/background_check/:id', verifyToken, backgroundCheckRoutes.deleteBackgroundCheck);
+
+// On Board Documents
+router.post('/on_board_document/get', verifyToken, onBoardDocumentRoutes.getOnBoardDocuments);
+router.post('/on_board_document/create', verifyToken, upload.any(), onBoardDocumentRoutes.createOnBoardDocument);
+router.get('/on_board_document/:id', verifyToken, onBoardDocumentRoutes.getOnBoardDocumentById);
+router.put('/on_board_document/:id', verifyToken, upload.any(), onBoardDocumentRoutes.updateOnBoardDocument);
+router.delete('/on_board_document/:id', verifyToken, onBoardDocumentRoutes.deleteOnBoardDocument);
 
 // Sync Data
 router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);

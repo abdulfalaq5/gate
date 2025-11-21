@@ -1,46 +1,38 @@
 buatkan satu module (ikuti module example yang sudah ada untuk format dan struktur pembuatannya sampai swegernya)
-nama module background_check
-buatkan migrasi tabel background_checks
+nama module on_board_document
+buatkan migrasi tabel on_board_documents
 kolom: 
-background_check_id uuid PK
+on_board_document_id uuid PK
 candidate_id uuid nullable
-background_check_note text nullable
-background_file text nullable
-background_status enum (hired, rejected, hold)
-background_description (text) (nullable), 
+on_board_document_name (varchar) (nullable)
+on_board_document_file (text) (nullable)
+on_board_document_description (text) (nullable), 
 created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_delete (boolean)
 
-di tabel candidates tolong tambahkan kolom candidate_status (enum = new, interviewed, scheduled, completed, hired, rejected, hold) (default new)
 jakankan migrasinya ke database
-buat proses CRUD untuk module background_check
-buat swagger untuk module background_check
+buat proses CRUD untuk module on_board_documents
+buat swagger untuk module on_board_documents
 
 endpointnya:
-POST /api/background_check/get (ambil data dari tabel background_checks) filternya gini:
+POST /api/on_board_document/get (ambil data dari tabel on_board_documents) filternya gini:
 {
     "page": 1,
     "limit": 10,
     "search": "",
     "sort_by": "created_at",
     "sort_order": "desc",
+    "candidate_id": "" (uuid, string kosong, null, nan)
 }
 
-POST /api/background_check/create (buatkan data di tabel background_checks)
+POST /api/on_board_document/create (buatkan data di tabel on_board_documents)
 body type multipart form data
-jika background_status = hired maka otomatis akan update di tabel candidates di kolom candidate_status hired
-jika background_status = rejected maka otomatis akan update di tabel candidates di kolom candidate_status rejected
-jika background_status = hold maka otomatis akan update di tabel candidates di kolom candidate_status hold
 
-background_file ini upload file ke minio, gunakan function upload ke minio yg sudah ada untuk dir minionya ini background-check/files
+on_board_document_file ini upload file ke minio, gunakan function upload ke minio yg sudah ada untuk dir minionya ini on-board-documents/files
 
-PUT /api/background_check/:id
+PUT /api/on_board_document/:id
 body type multipart form data
-body type multipart form data
-jika background_status = hired maka otomatis akan update di tabel candidates di kolom candidate_status hired
-jika background_status = rejected maka otomatis akan update di tabel candidates di kolom candidate_status rejected
-jika background_status = hold maka otomatis akan update di tabel candidates di kolom candidate_status hold
 
-background_file ini upload file ke minio, gunakan function upload ke minio yg sudah ada untuk dir minionya ini background-check/files
+on_board_document_file ini upload file ke minio, gunakan function upload ke minio yg sudah ada untuk dir minionya ini on-board-documents/files
 
 DELETE /api/background_check/:id
 GET /api/background_check/:id
