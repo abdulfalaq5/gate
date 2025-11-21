@@ -20,6 +20,7 @@ const scheduleInterviewRoutes = require('../../modules/schedule_interview');
 const interviewRoutes = require('../../modules/interview');
 const backgroundCheckRoutes = require('../../modules/background_check');
 const onBoardDocumentRoutes = require('../../modules/on_board_document');
+const noteRoutes = require('../../modules/note');
 const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken, verifyToken } = require('../../middlewares');
@@ -157,6 +158,13 @@ router.post('/on_board_document/create', verifyToken, upload.any(), onBoardDocum
 router.get('/on_board_document/:id', verifyToken, onBoardDocumentRoutes.getOnBoardDocumentById);
 router.put('/on_board_document/:id', verifyToken, upload.any(), onBoardDocumentRoutes.updateOnBoardDocument);
 router.delete('/on_board_document/:id', verifyToken, onBoardDocumentRoutes.deleteOnBoardDocument);
+
+// Notes
+router.post('/note/get', verifyToken, noteRoutes.getNotes);
+router.post('/note/create', verifyToken, noteRoutes.createNote);
+router.get('/note/:id', verifyToken, noteRoutes.getNoteById);
+router.put('/note/:id', verifyToken, noteRoutes.updateNote);
+router.delete('/note/:id', verifyToken, noteRoutes.deleteNote);
 
 // Sync Data
 router.post('/sync/data', verifySSOToken, upload.single('file'), syncRoutes.syncDataHandler);

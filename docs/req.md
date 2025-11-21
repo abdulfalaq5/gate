@@ -1,20 +1,20 @@
 buatkan satu module (ikuti module example yang sudah ada untuk format dan struktur pembuatannya sampai swegernya)
-nama module on_board_document
-buatkan migrasi tabel on_board_documents
+nama module note
+buatkan migrasi tabel notes
 kolom: 
-on_board_document_id uuid PK
-candidate_id uuid nullable
-on_board_document_name (varchar) (nullable)
-on_board_document_file (text) (nullable)
-on_board_document_description (text) (nullable), 
+note_id
+candidate_id
+employee_id get user_id dari token prossnya mirip seperti module interview
+notes
+noted_description (text) (nullable), 
 created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_delete (boolean)
 
 jakankan migrasinya ke database
-buat proses CRUD untuk module on_board_documents
-buat swagger untuk module on_board_documents
+buat proses CRUD untuk module notes
+buat swagger untuk module notes
 
 endpointnya:
-POST /api/on_board_document/get (ambil data dari tabel on_board_documents) filternya gini:
+POST /api/on_board_dnoteocument/get (ambil data dari tabel note) filternya gini:
 {
     "page": 1,
     "limit": 10,
@@ -24,15 +24,9 @@ POST /api/on_board_document/get (ambil data dari tabel on_board_documents) filte
     "candidate_id": "" (uuid, string kosong, null, nan)
 }
 
-POST /api/on_board_document/create (buatkan data di tabel on_board_documents)
-body type multipart form data
-
-on_board_document_file ini upload file ke minio, gunakan function upload ke minio yg sudah ada untuk dir minionya ini on-board-documents/files
+POST /api/note/create (buatkan data di tabel note)
 
 PUT /api/on_board_document/:id
-body type multipart form data
-
-on_board_document_file ini upload file ke minio, gunakan function upload ke minio yg sudah ada untuk dir minionya ini on-board-documents/files
 
 DELETE /api/background_check/:id
 GET /api/background_check/:id

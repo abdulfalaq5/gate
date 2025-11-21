@@ -1,0 +1,287 @@
+{
+	"/note/get": {
+		"post": {
+			"tags": ["Note"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Get all notes with filtering, pagination, and sorting (via request body)",
+			"description": "Retrieve a paginated list of notes with optional filtering via request body. candidate_id filter will be ignored if value is empty string, null, or 'nan'.",
+			"requestBody": {
+				"required": false,
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"page": {
+									"type": "integer",
+									"minimum": 1,
+									"default": 1,
+									"description": "Page number for pagination"
+								},
+								"limit": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 100,
+									"default": 10,
+									"description": "Number of items per page (max 100)"
+								},
+								"search": {
+									"type": "string",
+									"description": "Search term for notes or noted_description"
+								},
+								"candidate_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Filter by candidate ID. Will be ignored if empty string, null, or 'nan'."
+								},
+								"sort_by": {
+									"type": "string",
+									"enum": ["notes", "noted_description", "created_at", "updated_at"],
+									"default": "created_at",
+									"description": "Column to sort by"
+								},
+								"sort_order": {
+									"type": "string",
+									"enum": ["asc", "desc"],
+									"default": "desc",
+									"description": "Sort order"
+								},
+								"is_delete": {
+									"type": "boolean",
+									"default": false,
+									"description": "Filter by deletion status"
+								}
+							}
+						},
+						"example": {
+							"page": 1,
+							"limit": 10,
+							"search": "",
+							"sort_by": "created_at",
+							"sort_order": "desc",
+							"candidate_id": ""
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Notes retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseNoteList"
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/note/create": {
+		"post": {
+			"tags": ["Note"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"summary": "Create a new note",
+			"description": "Create a new note. employee_id and created_by will be automatically set from token.",
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPostNote"
+						}
+					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Note created successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseNote"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
+	"/note/{id}": {
+		"get": {
+			"tags": ["Note"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Retrieve a specific note by its ID",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Note ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Note retrieved successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseNote"
+									}
+								}
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Note not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"put": {
+			"tags": ["Note"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Update an existing note. updated_by will be automatically set from token.",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Note ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/SchemaPutNote"
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Note updated successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean"
+									},
+									"message": {
+										"type": "string"
+									},
+									"data": {
+										"$ref": "#/components/schemas/SchemaResponseNote"
+									}
+								}
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error"
+				},
+				"404": {
+					"description": "Note not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		},
+		"delete": {
+			"tags": ["Note"],
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"description": "Soft delete a note. deleted_by will be automatically set from token.",
+			"parameters": [
+				{
+					"name": "id",
+					"in": "path",
+					"required": true,
+					"description": "Note ID",
+					"schema": {
+						"type": "string",
+						"format": "uuid"
+					}
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "Note deleted successfully"
+				},
+				"404": {
+					"description": "Note not found"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	}
+}
+

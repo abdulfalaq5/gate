@@ -1,0 +1,137 @@
+{
+	"SchemaResponseNote": {
+		"type": "object",
+		"properties": {
+			"note_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"employee_id": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"notes": {
+				"type": "string"
+			},
+			"noted_description": {
+				"type": "string"
+			},
+			"created_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"updated_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"created_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"updated_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"deleted_at": {
+				"type": "string",
+				"format": "date-time"
+			},
+			"deleted_by": {
+				"type": "string",
+				"format": "uuid"
+			},
+			"is_delete": {
+				"type": "boolean"
+			},
+			"candidate": {
+				"$ref": "#/components/schemas/SchemaResponseCandidates"
+			},
+			"employee": {
+				"$ref": "#/components/schemas/SchemaResponseEmployees"
+			}
+		}
+	},
+	"SchemaPostNote": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Candidate ID reference. Can be empty string, null, or 'nan' to ignore filter. employee_id will be automatically set from token."
+			},
+			"notes": {
+				"type": "string",
+				"description": "Note content"
+			},
+			"noted_description": {
+				"type": "string",
+				"description": "Detailed description of the note"
+			}
+		},
+		"example": {
+			"candidate_id": "123e4567-e89b-12d3-a456-426614174000",
+			"notes": "Candidate passed initial screening",
+			"noted_description": "Candidate showed excellent communication skills during interview"
+		}
+	},
+	"SchemaPutNote": {
+		"type": "object",
+		"properties": {
+			"candidate_id": {
+				"type": "string",
+				"format": "uuid",
+				"description": "Candidate ID reference. Can be empty string, null, or 'nan' to ignore filter."
+			},
+			"notes": {
+				"type": "string",
+				"description": "Note content"
+			},
+			"noted_description": {
+				"type": "string",
+				"description": "Detailed description of the note"
+			}
+		},
+		"example": {
+			"candidate_id": "123e4567-e89b-12d3-a456-426614174000",
+			"notes": "Candidate passed initial screening",
+			"noted_description": "Candidate showed excellent communication skills during interview"
+		}
+	},
+	"SchemaResponseNoteList": {
+		"type": "object",
+		"properties": {
+			"data": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/SchemaResponseNote"
+				}
+			},
+			"pagination": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"description": "Current page number"
+					},
+					"limit": {
+						"type": "integer",
+						"description": "Number of items per page"
+					},
+					"total": {
+						"type": "integer",
+						"description": "Total number of records"
+					},
+					"totalPages": {
+						"type": "integer",
+						"description": "Total number of pages"
+					}
+				}
+			}
+		}
+	}
+}
+
