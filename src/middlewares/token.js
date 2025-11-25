@@ -3,22 +3,65 @@ const { lang } = require('../lang')
 const { ROLE } = require('../utils')
 
 const verifyToken = async (req, res, next) => {
-  if (req?.headers?.authorization) {
-    const token = req?.headers?.authorization.split(' ')[1]
-    const decode = jwtDecode(token)
-    if (decode?.roles[0] === ROLE.CUSTOMER_BUYER) {
-      res.status(201).send({
+  console.log('[verifyToken] Middleware called')
+  console.log('[verifyToken] Has authorization header:', !!req?.headers?.authorization)
+  
+  try {
+    if (req?.headers?.authorization) {
+      const token = req?.headers?.authorization.split(' ')[1]
+      console.log('[verifyToken] Token extracted, length:', token?.length)
+      
+      let decode
+      try {
+        decode = jwtDecode(token)
+        console.log('[verifyToken] Token decoded successfully')
+        console.log('[verifyToken] Decode keys:', decode ? Object.keys(decode) : 'null')
+        console.log('[verifyToken] Decode.roles:', decode?.roles)
+        console.log('[verifyToken] Decode.roles type:', typeof decode?.roles)
+        console.log('[verifyToken] Decode.roles isArray:', Array.isArray(decode?.roles))
+      } catch (decodeError) {
+        console.error('[verifyToken] ERROR decoding token:', decodeError)
+        console.error('[verifyToken] Decode error message:', decodeError.message)
+        return res.status(401).send({
+          status: false,
+          message: 'Invalid token format',
+          data: []
+        })
+      }
+      
+      // Safely check roles
+      const roles = decode?.roles
+      const firstRole = Array.isArray(roles) && roles.length > 0 ? roles[0] : null
+      console.log('[verifyToken] First role:', firstRole)
+      console.log('[verifyToken] ROLE.CUSTOMER_BUYER:', ROLE.CUSTOMER_BUYER)
+      
+      if (firstRole === ROLE.CUSTOMER_BUYER) {
+        console.log('[verifyToken] Role is CUSTOMER_BUYER, rejecting')
+        return res.status(201).send({
+          status: false,
+          message: lang.__('token.invalid'),
+          data: []
+        })
+      } else {
+        console.log('[verifyToken] Token verified, calling next()')
+        next()
+      }
+    } else {
+      console.log('[verifyToken] No authorization header, rejecting')
+      return res.status(201).send({
         status: false,
-        message: lang.__('token.invalid'),
+        message: lang.__('token.required'),
         data: []
       })
-    } else {
-      next()
     }
-  } else {
-    res.status(201).send({
+  } catch (error) {
+    console.error('[verifyToken] ERROR in verifyToken:', error)
+    console.error('[verifyToken] Error name:', error.name)
+    console.error('[verifyToken] Error message:', error.message)
+    console.error('[verifyToken] Error stack:', error.stack)
+    return res.status(500).send({
       status: false,
-      message: lang.__('token.required'),
+      message: 'Token verification failed',
       data: []
     })
   }

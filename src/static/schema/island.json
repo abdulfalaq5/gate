@@ -1,0 +1,262 @@
+{
+  "SchemaPostIslandGet": {
+    "type": "object",
+    "properties": {
+      "page": {
+        "type": "integer",
+        "minimum": 1,
+        "description": "Nomor halaman untuk pagination",
+        "example": 1
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100,
+        "description": "Jumlah data per halaman (1-100)",
+        "example": 10
+      },
+      "search": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "description": "Kata kunci pencarian pulau",
+        "example": "Jawa"
+      },
+      "sort_by": {
+        "type": "string",
+        "enum": ["island_name", "created_at", "updated_at"],
+        "description": "Kolom untuk sorting",
+        "example": "created_at"
+      },
+      "sort_order": {
+        "type": "string",
+        "enum": ["asc", "desc"],
+        "description": "Urutan sorting (asc atau desc)",
+        "example": "desc"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Parameter untuk mendapatkan daftar pulau dengan pagination, search, dan sorting"
+  },
+  "SchemaPostIslandCreate": {
+    "type": "object",
+    "required": ["island_name"],
+    "properties": {
+      "island_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "description": "Nama pulau (1-100 karakter)",
+        "example": "Jawa"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Data yang diperlukan untuk membuat pulau baru"
+  },
+  "SchemaPostIslandUpdate": {
+    "type": "object",
+    "properties": {
+      "island_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "description": "Nama pulau baru (1-100 karakter)",
+        "example": "Jawa Timur"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Data yang dapat diupdate untuk pulau. Minimal satu field harus diisi."
+  },
+  "SchemaResponseIsland": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "example": true
+      },
+      "message": {
+        "type": "string",
+        "example": "Island created successfully"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "island_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID unik pulau",
+            "example": "123e4567-e89b-12d3-a456-426614174001"
+          },
+          "island_name": {
+            "type": "string",
+            "description": "Nama pulau",
+            "example": "Jawa"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tanggal pembuatan pulau",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID user yang membuat pulau",
+            "example": "123e4567-e89b-12d3-a456-426614174002"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tanggal terakhir update pulau",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID user yang terakhir update pulau",
+            "example": "123e4567-e89b-12d3-a456-426614174002"
+          },
+          "is_delete": {
+            "type": "boolean",
+            "description": "Status soft delete pulau",
+            "example": false
+          }
+        },
+        "required": ["island_id", "island_name", "created_at", "is_delete"]
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp response",
+        "example": "2024-01-01T00:00:00.000Z"
+      }
+    },
+    "required": ["success", "message", "data", "timestamp"]
+  },
+  "SchemaResponseIslandList": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "example": true
+      },
+      "message": {
+        "type": "string",
+        "example": "Islands retrieved successfully"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "island_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID unik pulau",
+                  "example": "123e4567-e89b-12d3-a456-426614174001"
+                },
+                "island_name": {
+                  "type": "string",
+                  "description": "Nama pulau",
+                  "example": "Jawa"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Tanggal pembuatan pulau",
+                  "example": "2024-01-01T00:00:00.000Z"
+                },
+                "created_by": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID user yang membuat pulau",
+                  "example": "123e4567-e89b-12d3-a456-426614174002"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Tanggal terakhir update pulau",
+                  "example": "2024-01-01T00:00:00.000Z"
+                },
+                "updated_by": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ID user yang terakhir update pulau",
+                  "example": "123e4567-e89b-12d3-a456-426614174002"
+                },
+                "is_delete": {
+                  "type": "boolean",
+                  "description": "Status soft delete pulau",
+                  "example": false
+                }
+              },
+              "required": ["island_id", "island_name", "created_at", "is_delete"]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "description": "Halaman saat ini",
+                "example": 1
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Jumlah data per halaman",
+                "example": 10
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total jumlah data",
+                "example": 25
+              },
+              "totalPages": {
+                "type": "integer",
+                "description": "Total jumlah halaman",
+                "example": 3
+              }
+            },
+            "required": ["page", "limit", "total", "totalPages"]
+          }
+        }
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp response",
+        "example": "2024-01-01T00:00:00.000Z"
+      }
+    },
+    "required": ["success", "message", "data", "timestamp"]
+  },
+  "SchemaResponseIslandDelete": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "example": true
+      },
+      "message": {
+        "type": "string",
+        "example": "Island deleted successfully"
+      },
+      "data": {
+        "type": "object",
+        "nullable": true,
+        "example": null
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp response",
+        "example": "2024-01-01T00:00:00.000Z"
+      }
+    },
+    "required": ["success", "message", "data", "timestamp"]
+  }
+}
+

@@ -1,0 +1,358 @@
+{
+  "/island/get": {
+    "post": {
+      "tags": ["Island"],
+      "summary": "Get All Islands",
+      "description": "Mendapatkan daftar semua pulau yang aktif dengan pagination, search, dan sorting",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostIslandGet"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Daftar pulau berhasil diambil",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseIslandList"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User tidak terautentikasi",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Terjadi kesalahan server",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/island/create": {
+    "post": {
+      "tags": ["Island"],
+      "summary": "Create New Island",
+      "description": "Membuat pulau baru",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostIslandCreate"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Pulau berhasil dibuat",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseIsland"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Validasi gagal atau data tidak valid",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User tidak terautentikasi",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Terjadi kesalahan server",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/island/{id}": {
+    "get": {
+      "tags": ["Island"],
+      "summary": "Get Island by ID",
+      "description": "Mendapatkan detail pulau berdasarkan ID",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID pulau (UUID)",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174001"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Detail pulau berhasil diambil",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseIsland"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Format ID tidak valid",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User tidak terautentikasi",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Pulau tidak ditemukan",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Terjadi kesalahan server",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        }
+      }
+    },
+    "put": {
+      "tags": ["Island"],
+      "summary": "Update Island",
+      "description": "Mengupdate informasi pulau berdasarkan ID",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID pulau (UUID)",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174001"
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SchemaPostIslandUpdate"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Pulau berhasil diupdate",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseIsland"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Validasi gagal atau data tidak valid",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User tidak terautentikasi",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Pulau tidak ditemukan",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Terjadi kesalahan server",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "tags": ["Island"],
+      "summary": "Delete Island",
+      "description": "Menghapus pulau berdasarkan ID (soft delete)",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID pulau (UUID)",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174001"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Pulau berhasil dihapus",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaResponseIslandDelete"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Format ID tidak valid",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "User tidak terautentikasi",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Pulau tidak ditemukan",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Terjadi kesalahan server",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaErrorResponse"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -10,10 +10,19 @@ const { LIMIT, PAGE } = require('./constant');
 /**
  * Parse query parameters untuk pagination
  * @param {Object} req - Express request object
- * @param {Array} defaultOrder - Default order [column, direction]
+ * @param {Array} defaultOrder - Default order [column, direction] (tidak digunakan, untuk backward compatibility)
  * @returns {Object} Pagination parameters
  */
 const parsePagination = (req, defaultOrder = ['created_at', 'desc']) => {
+  // Validasi req dan req.query
+  if (!req || typeof req !== 'object') {
+    req = { query: {} }
+  }
+  if (!req.query || typeof req.query !== 'object') {
+    req.query = {}
+  }
+  
+  // Parameter defaultOrder tidak digunakan, hanya untuk backward compatibility
   const page = Math.max(1, parseInt(req.query.page) || PAGE);
   const limit = Math.max(1, parseInt(req.query.limit) || LIMIT);
   const offset = (page - 1) * limit;
@@ -33,18 +42,31 @@ const parsePagination = (req, defaultOrder = ['created_at', 'desc']) => {
  * @returns {Object} Sorting parameters
  */
 const parseSorting = (req, allowedColumns = [], defaultOrder = ['created_at', 'desc']) => {
-  const sortBy = req.query.sort_by || defaultOrder[0];
-  const sortOrder = req.query.sort_order || defaultOrder[1];
+  // Validasi req dan req.query
+  if (!req || typeof req !== 'object') {
+    req = { query: {} }
+  }
+  if (!req.query || typeof req.query !== 'object') {
+    req.query = {}
+  }
+  
+  // Validasi defaultOrder untuk memastikan array yang valid
+  const safeDefaultOrder = Array.isArray(defaultOrder) && defaultOrder.length >= 2
+    ? defaultOrder
+    : ['created_at', 'desc'];
+  
+  const sortBy = req.query.sort_by || safeDefaultOrder[0];
+  const sortOrder = req.query.sort_order || safeDefaultOrder[1];
   
   // Validasi kolom yang diizinkan
   const validColumn = allowedColumns.length > 0 && allowedColumns.includes(sortBy) 
     ? sortBy 
-    : defaultOrder[0];
+    : safeDefaultOrder[0];
   
   // Validasi order direction
-  const validOrder = ['asc', 'desc'].includes(sortOrder.toLowerCase()) 
+  const validOrder = sortOrder && typeof sortOrder === 'string' && ['asc', 'desc'].includes(sortOrder.toLowerCase()) 
     ? sortOrder.toLowerCase() 
-    : defaultOrder[1];
+    : safeDefaultOrder[1];
   
   return {
     sortBy: validColumn,
@@ -59,6 +81,14 @@ const parseSorting = (req, allowedColumns = [], defaultOrder = ['created_at', 'd
  * @returns {Object} Search parameters
  */
 const parseSearch = (req, searchableColumns = []) => {
+  // Validasi req dan req.query
+  if (!req || typeof req !== 'object') {
+    req = { query: {} }
+  }
+  if (!req.query || typeof req.query !== 'object') {
+    req.query = {}
+  }
+  
   const searchTerm = req.query.search || req.query.q || '';
   
   return {
@@ -74,6 +104,14 @@ const parseSearch = (req, searchableColumns = []) => {
  * @returns {Object} Filter parameters
  */
 const parseFilters = (req, allowedFilters = []) => {
+  // Validasi req dan req.query
+  if (!req || typeof req !== 'object') {
+    req = { query: {} }
+  }
+  if (!req.query || typeof req.query !== 'object') {
+    req.query = {}
+  }
+  
   const filters = {};
   
   if (allowedFilters.length === 0) {
@@ -96,6 +134,14 @@ const parseFilters = (req, allowedFilters = []) => {
  * @returns {Object} Date range parameters
  */
 const parseDateRange = (req, dateColumn = 'created_at') => {
+  // Validasi req dan req.query
+  if (!req || typeof req !== 'object') {
+    req = { query: {} }
+  }
+  if (!req.query || typeof req.query !== 'object') {
+    req.query = {}
+  }
+  
   const startDate = req.query.start_date;
   const endDate = req.query.end_date;
   
@@ -113,19 +159,69 @@ const parseDateRange = (req, dateColumn = 'created_at') => {
  * @returns {Object} Parsed parameters
  */
 const parseStandardQuery = (req, options = {}) => {
+  // Validasi req
+  if (!req || typeof req !== 'object') {
+    req = { query: {} }
+  }
+  if (!req.query || typeof req.query !== 'object') {
+    req.query = {}
+  }
+  
+  // Validasi options
+  if (!options || typeof options !== 'object') {
+    options = {}
+  }
+  
+  // Validasi defaultSort untuk memastikan array yang valid
+  let defaultSort = options.defaultSort
+  if (!Array.isArray(defaultSort) || defaultSort.length < 2) {
+    defaultSort = ['created_at', 'desc']
+  }
+  
   const {
     allowedSortColumns = [],
-    defaultSort = ['created_at', 'desc'],
     searchableColumns = [],
     allowedFilters = [],
     dateColumn = 'created_at',
   } = options;
   
-  const pagination = parsePagination(req, defaultSort);
-  const sorting = parseSorting(req, allowedSortColumns, defaultSort);
-  const search = parseSearch(req, searchableColumns);
-  const filters = parseFilters(req, allowedFilters);
-  const dateRange = parseDateRange(req, dateColumn);
+  // Parse semua parameter dengan error handling individual
+  let pagination, sorting, search, filters, dateRange
+  
+  try {
+    pagination = parsePagination(req, defaultSort)
+  } catch (err) {
+    console.error('Error in parsePagination:', err)
+    pagination = { page: 1, limit: 10, offset: 0 }
+  }
+  
+  try {
+    sorting = parseSorting(req, allowedSortColumns, defaultSort)
+  } catch (err) {
+    console.error('Error in parseSorting:', err)
+    sorting = { sortBy: 'created_at', sortOrder: 'desc' }
+  }
+  
+  try {
+    search = parseSearch(req, searchableColumns)
+  } catch (err) {
+    console.error('Error in parseSearch:', err)
+    search = { searchTerm: '', searchableColumns: [] }
+  }
+  
+  try {
+    filters = parseFilters(req, allowedFilters)
+  } catch (err) {
+    console.error('Error in parseFilters:', err)
+    filters = {}
+  }
+  
+  try {
+    dateRange = parseDateRange(req, dateColumn)
+  } catch (err) {
+    console.error('Error in parseDateRange:', err)
+    dateRange = { startDate: null, endDate: null, dateColumn }
+  }
   
   return {
     pagination,

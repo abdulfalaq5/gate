@@ -9,10 +9,16 @@
  * @returns {Object} Query builder dengan pagination
  */
 const applyPagination = (queryBuilder, pagination) => {
+  if (!pagination) {
+    console.warn('applyPagination: pagination is undefined, using defaults')
+    return queryBuilder.limit(10).offset(0)
+  }
+  const limit = pagination.limit || 10
+  const offset = pagination.offset || 0
   return queryBuilder
-    .limit(pagination.limit)
-    .offset(pagination.offset);
-};
+    .limit(limit)
+    .offset(offset)
+}
 
 /**
  * Apply sorting ke query builder
@@ -21,8 +27,14 @@ const applyPagination = (queryBuilder, pagination) => {
  * @returns {Object} Query builder dengan sorting
  */
 const applySorting = (queryBuilder, sorting) => {
-  return queryBuilder.orderBy(sorting.sortBy, sorting.sortOrder);
-};
+  if (!sorting) {
+    console.warn('applySorting: sorting is undefined, using defaults')
+    return queryBuilder.orderBy('created_at', 'desc')
+  }
+  const sortBy = sorting.sortBy || 'created_at'
+  const sortOrder = sorting.sortOrder || 'desc'
+  return queryBuilder.orderBy(sortBy, sortOrder)
+}
 
 /**
  * Apply search ke query builder
@@ -31,22 +43,26 @@ const applySorting = (queryBuilder, sorting) => {
  * @returns {Object} Query builder dengan search
  */
 const applySearch = (queryBuilder, search) => {
-  const { searchTerm, searchableColumns } = search;
+  if (!search) {
+    return queryBuilder
+  }
   
-  if (!searchTerm || searchableColumns.length === 0) {
-    return queryBuilder;
+  const { searchTerm, searchableColumns } = search || {}
+  
+  if (!searchTerm || !searchableColumns || !Array.isArray(searchableColumns) || searchableColumns.length === 0) {
+    return queryBuilder
   }
   
   return queryBuilder.where(function() {
     searchableColumns.forEach((column, index) => {
       if (index === 0) {
-        this.where(column, 'ilike', `%${searchTerm}%`);
+        this.where(column, 'ilike', `%${searchTerm}%`)
       } else {
-        this.orWhere(column, 'ilike', `%${searchTerm}%`);
+        this.orWhere(column, 'ilike', `%${searchTerm}%`)
       }
-    });
-  });
-};
+    })
+  })
+}
 
 /**
  * Apply filters ke query builder
@@ -55,26 +71,39 @@ const applySearch = (queryBuilder, search) => {
  * @returns {Object} Query builder dengan filters
  */
 const applyFilters = (queryBuilder, filters) => {
-  Object.keys(filters).forEach(key => {
-    // Handle ambiguous columns by checking if the query has joins
-    const queryString = queryBuilder.toString().toLowerCase();
-    if (queryString.includes('join')) {
-      // For joined tables, specify the table name to avoid ambiguity
-      if (key === 'department_id' || key === 'created_by' || key === 'updated_by') {
-        queryBuilder.where(`titles.${key}`, filters[key]);
-      } else if (key === 'company_id') {
-        // For departments table with companies join, use departments.company_id
-        queryBuilder.where(`departments.${key}`, filters[key]);
-      } else {
-        queryBuilder.where(key, filters[key]);
-      }
-    } else {
-      queryBuilder.where(key, filters[key]);
-    }
-  });
+  if (!filters || typeof filters !== 'object') {
+    return queryBuilder
+  }
   
-  return queryBuilder;
-};
+  Object.keys(filters).forEach(key => {
+    if (filters[key] === undefined || filters[key] === null || filters[key] === '') {
+      return // Skip empty filters
+    }
+    
+    // Handle ambiguous columns by checking if the query has joins
+    try {
+      const queryString = queryBuilder.toString().toLowerCase()
+      if (queryString.includes('join')) {
+        // For joined tables, specify the table name to avoid ambiguity
+        if (key === 'department_id' || key === 'created_by' || key === 'updated_by') {
+          queryBuilder.where(`titles.${key}`, filters[key])
+        } else if (key === 'company_id') {
+          // For departments table with companies join, use departments.company_id
+          queryBuilder.where(`departments.${key}`, filters[key])
+        } else {
+          queryBuilder.where(key, filters[key])
+        }
+      } else {
+        queryBuilder.where(key, filters[key])
+      }
+    } catch (error) {
+      console.warn(`Error applying filter for ${key}:`, error)
+      // Continue with other filters
+    }
+  })
+  
+  return queryBuilder
+}
 
 /**
  * Apply date range ke query builder
@@ -83,18 +112,22 @@ const applyFilters = (queryBuilder, filters) => {
  * @returns {Object} Query builder dengan date range
  */
 const applyDateRange = (queryBuilder, dateRange) => {
-  const { startDate, endDate, dateColumn } = dateRange;
-  
-  if (startDate) {
-    queryBuilder.where(dateColumn, '>=', startDate);
+  if (!dateRange) {
+    return queryBuilder
   }
   
-  if (endDate) {
-    queryBuilder.where(dateColumn, '<=', endDate);
+  const { startDate, endDate, dateColumn } = dateRange || {}
+  
+  if (startDate && dateColumn) {
+    queryBuilder.where(dateColumn, '>=', startDate)
   }
   
-  return queryBuilder;
-};
+  if (endDate && dateColumn) {
+    queryBuilder.where(dateColumn, '<=', endDate)
+  }
+  
+  return queryBuilder
+}
 
 /**
  * Apply semua filter standar ke query builder
@@ -103,25 +136,36 @@ const applyDateRange = (queryBuilder, dateRange) => {
  * @returns {Object} Query builder dengan semua filter
  */
 const applyStandardFilters = (queryBuilder, queryParams) => {
-  const { pagination, sorting, search, filters, dateRange } = queryParams;
+  if (!queryParams) {
+    console.warn('applyStandardFilters: queryParams is undefined, using defaults')
+    queryParams = {
+      pagination: { page: 1, limit: 10, offset: 0 },
+      sorting: { sortBy: 'created_at', sortOrder: 'desc' },
+      search: { searchTerm: '', searchableColumns: [] },
+      filters: {},
+      dateRange: { startDate: null, endDate: null, dateColumn: 'created_at' }
+    }
+  }
+  
+  const { pagination, sorting, search, filters, dateRange } = queryParams
   
   // Apply search first
-  queryBuilder = applySearch(queryBuilder, search);
+  queryBuilder = applySearch(queryBuilder, search)
   
   // Apply filters
-  queryBuilder = applyFilters(queryBuilder, filters);
+  queryBuilder = applyFilters(queryBuilder, filters || {})
   
   // Apply date range
-  queryBuilder = applyDateRange(queryBuilder, dateRange);
+  queryBuilder = applyDateRange(queryBuilder, dateRange || {})
   
   // Apply sorting
-  queryBuilder = applySorting(queryBuilder, sorting);
+  queryBuilder = applySorting(queryBuilder, sorting)
   
   // Apply pagination last
-  queryBuilder = applyPagination(queryBuilder, pagination);
+  queryBuilder = applyPagination(queryBuilder, pagination)
   
-  return queryBuilder;
-};
+  return queryBuilder
+}
 
 /**
  * Build count query untuk pagination metadata
@@ -130,22 +174,31 @@ const applyStandardFilters = (queryBuilder, queryParams) => {
  * @returns {Object} Count query builder
  */
 const buildCountQuery = (baseQuery, queryParams) => {
-  const { search, filters, dateRange } = queryParams;
+  if (!queryParams) {
+    console.warn('buildCountQuery: queryParams is undefined, using defaults')
+    queryParams = {
+      search: { searchTerm: '', searchableColumns: [] },
+      filters: {},
+      dateRange: { startDate: null, endDate: null, dateColumn: 'created_at' }
+    }
+  }
+  
+  const { search, filters, dateRange } = queryParams
   
   // Clone base query dan hapus select untuk count
-  let countQuery = baseQuery.clone().clearSelect();
+  let countQuery = baseQuery.clone().clearSelect()
   
   // Apply search
-  countQuery = applySearch(countQuery, search);
+  countQuery = applySearch(countQuery, search)
   
   // Apply filters
-  countQuery = applyFilters(countQuery, filters);
+  countQuery = applyFilters(countQuery, filters || {})
   
   // Apply date range
-  countQuery = applyDateRange(countQuery, dateRange);
+  countQuery = applyDateRange(countQuery, dateRange)
   
-  return countQuery.count('* as total');
-};
+  return countQuery.count('* as total')
+}
 
 /**
  * Format response dengan pagination metadata
@@ -178,14 +231,20 @@ const formatPaginatedResponse = (data, pagination, total) => {
  * @returns {Object} Formatted response dengan pagination metadata sederhana
  */
 const formatSimplePaginatedResponse = (data, pagination, total) => {
-  const totalPages = Math.ceil(total / pagination.limit);
+  // Safe defaults
+  const safeData = Array.isArray(data) ? data : []
+  const safePagination = pagination || { page: 1, limit: 10 }
+  const safeTotal = parseInt(total) || 0
+  const safeLimit = parseInt(safePagination.limit) || 10
+  
+  const totalPages = safeLimit > 0 ? Math.ceil(safeTotal / safeLimit) : 0
 
   return {
-    data,
+    data: safeData,
     pagination: {
-      page: pagination.page,
-      limit: pagination.limit,
-      total: parseInt(total),
+      page: parseInt(safePagination.page) || 1,
+      limit: safeLimit,
+      total: safeTotal,
       totalPages,
     },
   };

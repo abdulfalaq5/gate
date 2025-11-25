@@ -8,6 +8,7 @@ const departments = require('./departments.json')
 const employees = require('./employees.json')
 const employeesImport = require('./employees_import.json')
 const importModule = require('./import.json')
+const island = require('./island.json')
 const permissions = require('./permissions.json')
 const ssoProfile = require('./sso_profile.json')
 const systems = require('./systems.json')
@@ -24,6 +25,7 @@ module.exports = {
   ...employees,
   ...employeesImport,
   ...importModule,
+  ...island,
   ...permissions,
   ...ssoProfile,
   ...systems,

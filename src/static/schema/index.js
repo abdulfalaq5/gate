@@ -7,6 +7,7 @@ const customers = require('./customers.json')
 const departments = require('./departments.json')
 const employees = require('./employees.json')
 const importModule = require('./import.json')
+const island = require('./island.json')
 const response = require('./response.json')
 const permissions = require('./permissions.json')
 const systems = require('./systems.json')
@@ -23,6 +24,7 @@ module.exports = {
   ...departments,
   ...employees,
   ...importModule,
+  ...island,
   ...response,
   ...permissions,
   ...systems,
