@@ -198,17 +198,33 @@ const getIslandById = async (id) => {
  */
 const createIsland = async (islandData) => {
   try {
+    console.log('[createIsland Repository] Starting insert')
+    console.log('[createIsland Repository] Island data:', JSON.stringify(islandData, null, 2))
+    
     const result = await pgCore('islands')
       .insert(islandData)
       .returning('*')
     
+    console.log('[createIsland Repository] Insert result:', JSON.stringify(result, null, 2))
+    console.log('[createIsland Repository] Result type:', typeof result)
+    console.log('[createIsland Repository] Is array:', Array.isArray(result))
+    
     // Handle result - could be array or single object
-      if (Array.isArray(result)) {
-      return result.length > 0 ? result[0] : null
+    if (Array.isArray(result)) {
+      const island = result.length > 0 ? result[0] : null
+      console.log('[createIsland Repository] Returning island:', island ? 'found' : 'null')
+      return island
     }
-    return result || null
+    
+    const island = result || null
+    console.log('[createIsland Repository] Returning island (non-array):', island ? 'found' : 'null')
+    return island
   } catch (error) {
-    console.error('Error in createIsland:', error)
+    console.error('[createIsland Repository] Error in createIsland:', error)
+    console.error('[createIsland Repository] Error code:', error.code)
+    console.error('[createIsland Repository] Error message:', error.message)
+    console.error('[createIsland Repository] Error detail:', error.detail)
+    console.error('[createIsland Repository] Error stack:', error.stack)
     throw error
   }
 }
@@ -218,21 +234,39 @@ const createIsland = async (islandData) => {
  */
 const updateIsland = async (id, islandData) => {
   try {
+    console.log('[updateIsland Repository] Starting update')
+    console.log('[updateIsland Repository] Island ID:', id)
+    console.log('[updateIsland Repository] Update data:', JSON.stringify(islandData, null, 2))
+    
     const result = await pgCore('islands')
       .where('island_id', id)
+      .where('is_delete', false)
       .update({
         ...islandData,
         updated_at: new Date().toISOString()
       })
       .returning('*')
     
+    console.log('[updateIsland Repository] Update result:', JSON.stringify(result, null, 2))
+    console.log('[updateIsland Repository] Result type:', typeof result)
+    console.log('[updateIsland Repository] Is array:', Array.isArray(result))
+    
     // Handle result - could be array or single object
-      if (Array.isArray(result)) {
-      return result.length > 0 ? result[0] : null
+    if (Array.isArray(result)) {
+      const island = result.length > 0 ? result[0] : null
+      console.log('[updateIsland Repository] Returning island:', island ? 'found' : 'null')
+      return island
     }
-    return result || null
+    
+    const island = result || null
+    console.log('[updateIsland Repository] Returning island (non-array):', island ? 'found' : 'null')
+    return island
   } catch (error) {
-    console.error('Error in updateIsland:', error)
+    console.error('[updateIsland Repository] Error in updateIsland:', error)
+    console.error('[updateIsland Repository] Error code:', error.code)
+    console.error('[updateIsland Repository] Error message:', error.message)
+    console.error('[updateIsland Repository] Error detail:', error.detail)
+    console.error('[updateIsland Repository] Error stack:', error.stack)
     throw error
   }
 }

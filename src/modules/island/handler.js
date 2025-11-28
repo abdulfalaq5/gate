@@ -3,6 +3,7 @@ const { validateRequest } = require('../../utils/validation')
 const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const { decodeToken } = require('../../utils/auth')
+const jwtDecode = require('jwt-decode')
 const islandsRepository = require('./postgre_repository')
 
 class IslandHandler {
@@ -118,32 +119,101 @@ class IslandHandler {
    */
   async createIsland(req, res) {
     try {
+      console.log('[createIsland] Starting island creation')
+      console.log('[createIsland] Request body:', JSON.stringify(req.body, null, 2))
+      console.log('[createIsland] Request query:', JSON.stringify(req.query, null, 2))
+      console.log('[createIsland] req.user:', JSON.stringify(req.user, null, 2))
+      
       // Support parameters from both query string (GET) and body (POST)
       const requestParams = {
         ...req.query,  // GET parameters
         ...req.body    // POST parameters
       }
 
+      console.log('[createIsland] requestParams:', JSON.stringify(requestParams, null, 2))
+
       // Validate request
       const validation = validateRequest(requestParams, islandsValidationRules.create, islandsColumns)
       if (!validation.isValid) {
+        console.error('[createIsland] Validation failed:', validation.errors)
         return errorResponse(res, validation.errors, 400)
       }
       
       // Get user_id or employee_id from token
-      const userId = req.user?.user_id || req.user?.employee_id || decodeToken('created', req).created_by
+      // Try multiple sources: req.user (from middleware), then decode token directly
+      let userId = null
+      
+      // First try req.user (if set by middleware)
+      if (req.user?.user_id) {
+        userId = req.user.user_id
+        console.log('[createIsland] Using user_id from req.user:', userId)
+      } else if (req.user?.employee_id) {
+        userId = req.user.employee_id
+        console.log('[createIsland] Using employee_id from req.user:', userId)
+      } else {
+        // Decode token directly using jwtDecode (same as verifyToken middleware)
+        try {
+          const token = req?.headers?.authorization?.split(' ')[1]
+          if (token) {
+            const decoded = jwtDecode(token)
+            console.log('[createIsland] Decoded token:', JSON.stringify(decoded, null, 2))
+            
+            // Try user_id or employee_id from token payload
+            userId = decoded?.user_id || decoded?.employee_id
+            
+            // Fallback to decodeToken function (uses sub field)
+            if (!userId) {
+              const decodedToken = decodeToken('created', req)
+              userId = decodedToken?.created_by
+              console.log('[createIsland] Using created_by from decodeToken:', userId)
+            } else {
+              console.log('[createIsland] Using user_id/employee_id from decoded token:', userId)
+            }
+          }
+        } catch (decodeError) {
+          console.error('[createIsland] Error decoding token:', decodeError)
+        }
+      }
+      
+      if (!userId || userId === '' || userId === 0) {
+        console.error('[createIsland] No valid user ID found')
+        return errorResponse(res, 'Unable to identify user from token', 401)
+      }
       
       const islandData = {
-        ...requestParams,
-        created_by: userId
+        island_name: requestParams.island_name,
+        created_by: userId,
+        is_delete: false
       }
+      
+      console.log('[createIsland] Island data to insert:', JSON.stringify(islandData, null, 2))
       
       const island = await islandsRepository.createIsland(islandData)
       
+      if (!island) {
+        console.error('[createIsland] Repository returned null')
+        return errorResponse(res, 'Failed to create island - no data returned', 500)
+      }
+      
+      console.log('[createIsland] Island created successfully:', JSON.stringify(island, null, 2))
       return successResponse(res, island, 'Island created successfully', 201)
     } catch (error) {
-      console.error('Error creating island:', error)
-      return errorResponse(res, 'Failed to create island', 500)
+      console.error('[createIsland] Error creating island:', error)
+      console.error('[createIsland] Error name:', error.name)
+      console.error('[createIsland] Error message:', error.message)
+      console.error('[createIsland] Error stack:', error.stack)
+      
+      // Check for unique constraint violation
+      if (error.code === '23505' || error.message?.includes('unique') || error.message?.includes('duplicate')) {
+        return errorResponse(res, 'Island name already exists', 409)
+      }
+      
+      // Return detailed error in development
+      const errorMessage = process.env.NODE_ENV === 'development' 
+        ? error.message || 'Failed to create island'
+        : 'Failed to create island'
+      
+      return errorResponse(res, errorMessage, 500)
     }
   }
 
@@ -152,35 +222,103 @@ class IslandHandler {
    */
   async updateIsland(req, res) {
     try {
+      console.log('[updateIsland] Starting island update')
+      console.log('[updateIsland] Island ID:', req.params.id)
+      console.log('[updateIsland] Request body:', JSON.stringify(req.body, null, 2))
+      console.log('[updateIsland] req.user:', JSON.stringify(req.user, null, 2))
+      
       const { id } = req.params
       
       // Check if island exists
       const existingIsland = await islandsRepository.getIslandById(id)
       if (!existingIsland) {
+        console.error('[updateIsland] Island not found:', id)
         return errorResponse(res, 'Island not found', 404)
       }
+      
+      console.log('[updateIsland] Existing island:', JSON.stringify(existingIsland, null, 2))
       
       // Validate request
       const validation = validateRequest(req.body, islandsValidationRules.update, islandsColumns)
       if (!validation.isValid) {
+        console.error('[updateIsland] Validation failed:', validation.errors)
         return errorResponse(res, validation.errors, 400)
       }
       
       // Get user_id or employee_id from token
-      const userId = req.user?.user_id || req.user?.employee_id || decodeToken('updated', req).updated_by
+      let userId = null
+      
+      // First try req.user (if set by middleware)
+      if (req.user?.user_id) {
+        userId = req.user.user_id
+        console.log('[updateIsland] Using user_id from req.user:', userId)
+      } else if (req.user?.employee_id) {
+        userId = req.user.employee_id
+        console.log('[updateIsland] Using employee_id from req.user:', userId)
+      } else {
+        // Decode token directly using jwtDecode (same as verifyToken middleware)
+        try {
+          const token = req?.headers?.authorization?.split(' ')[1]
+          if (token) {
+            const decoded = jwtDecode(token)
+            console.log('[updateIsland] Decoded token:', JSON.stringify(decoded, null, 2))
+            
+            // Try user_id or employee_id from token payload
+            userId = decoded?.user_id || decoded?.employee_id
+            
+            // Fallback to decodeToken function (uses sub field)
+            if (!userId) {
+              const decodedToken = decodeToken('updated', req)
+              userId = decodedToken?.updated_by
+              console.log('[updateIsland] Using updated_by from decodeToken:', userId)
+            } else {
+              console.log('[updateIsland] Using user_id/employee_id from decoded token:', userId)
+            }
+          }
+        } catch (decodeError) {
+          console.error('[updateIsland] Error decoding token:', decodeError)
+        }
+      }
+      
+      if (!userId || userId === '' || userId === 0) {
+        console.error('[updateIsland] No valid user ID found')
+        return errorResponse(res, 'Unable to identify user from token', 401)
+      }
       
       const updateData = {
         ...req.body,
         updated_by: userId,
-        updated_at: new Date()
+        updated_at: new Date().toISOString()
       }
+      
+      console.log('[updateIsland] Update data:', JSON.stringify(updateData, null, 2))
       
       const island = await islandsRepository.updateIsland(id, updateData)
       
+      if (!island) {
+        console.error('[updateIsland] Repository returned null')
+        return errorResponse(res, 'Failed to update island - no data returned', 500)
+      }
+      
+      console.log('[updateIsland] Island updated successfully:', JSON.stringify(island, null, 2))
       return successResponse(res, island, 'Island updated successfully')
     } catch (error) {
-      console.error('Error updating island:', error)
-      return errorResponse(res, 'Failed to update island', 500)
+      console.error('[updateIsland] Error updating island:', error)
+      console.error('[updateIsland] Error name:', error.name)
+      console.error('[updateIsland] Error message:', error.message)
+      console.error('[updateIsland] Error stack:', error.stack)
+      
+      // Check for unique constraint violation
+      if (error.code === '23505' || error.message?.includes('unique') || error.message?.includes('duplicate')) {
+        return errorResponse(res, 'Island name already exists', 409)
+      }
+      
+      // Return detailed error in development
+      const errorMessage = process.env.NODE_ENV === 'development' 
+        ? error.message || 'Failed to update island'
+        : 'Failed to update island'
+      
+      return errorResponse(res, errorMessage, 500)
     }
   }
 
