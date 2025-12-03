@@ -239,11 +239,9 @@ const updateEmployee = async (req, res) => {
       updatePayload.employee_exmail_account = updatePayload.employee_email
     }
     
-    // Set employee_phone from employee_mobile if employee_phone is empty
-    if (!updatePayload.employee_phone || updatePayload.employee_phone === '') {
-      if (updatePayload.employee_mobile) {
-        updatePayload.employee_phone = updatePayload.employee_mobile
-      }
+    // Set employee_phone from employee_mobile when employee_mobile is updated
+    if (updatePayload.employee_mobile) {
+      updatePayload.employee_phone = updatePayload.employee_mobile
     }
     
     // Handle employee photo upload to MinIO
