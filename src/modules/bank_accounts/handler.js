@@ -76,6 +76,14 @@ class BankAccountsHandler {
         return errorResponse(res, validation.errors, 400)
       }
       
+      // Check for duplicate bank_account_number
+      if (requestParams.bank_account_number) {
+        const existingBankAccount = await bankAccountsRepository.checkDuplicateBankAccountNumber(requestParams.bank_account_number)
+        if (existingBankAccount) {
+          return errorResponse(res, `Bank account number "${requestParams.bank_account_number}" already exists`, 400)
+        }
+      }
+      
       const bankAccountData = {
         ...requestParams,
         created_by: req.user?.user_id || req.user?.employee_id
@@ -107,6 +115,14 @@ class BankAccountsHandler {
       const validation = validateRequest(req.body, bankAccountsValidationRules.update, bankAccountsColumns)
       if (!validation.isValid) {
         return errorResponse(res, validation.errors, 400)
+      }
+      
+      // Check for duplicate bank_account_number (exclude current record)
+      if (req.body.bank_account_number) {
+        const duplicateBankAccount = await bankAccountsRepository.checkDuplicateBankAccountNumber(req.body.bank_account_number, id)
+        if (duplicateBankAccount) {
+          return errorResponse(res, `Bank account number "${req.body.bank_account_number}" already exists`, 400)
+        }
       }
       
       const updateData = {

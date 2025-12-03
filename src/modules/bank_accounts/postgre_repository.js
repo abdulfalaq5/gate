@@ -38,6 +38,32 @@ const getBankAccountById = async (id) => {
 }
 
 /**
+ * Check if bank account number already exists (excluding soft deleted records)
+ * @param {string} bankAccountNumber - Bank account number to check
+ * @param {string} excludeId - Optional ID to exclude from check (for update operations)
+ * @returns {Promise<Object|null>} Existing bank account or null
+ */
+const checkDuplicateBankAccountNumber = async (bankAccountNumber, excludeId = null) => {
+  if (!bankAccountNumber) {
+    return null
+  }
+  
+  let query = pgCore('bank_accounts')
+    .select('*')
+    .where('bank_account_number', bankAccountNumber)
+    .where('is_delete', false)
+  
+  // Exclude current record when updating
+  if (excludeId) {
+    query = query.where('bank_account_id', '!=', excludeId)
+  }
+  
+  const [bankAccount] = await query
+  
+  return bankAccount || null
+}
+
+/**
  * Create new bank account
  */
 const createBankAccount = async (bankAccountData) => {
@@ -84,6 +110,7 @@ module.exports = {
   getBankAccountById,
   createBankAccount,
   updateBankAccount,
-  deleteBankAccount
+  deleteBankAccount,
+  checkDuplicateBankAccountNumber
 }
 
