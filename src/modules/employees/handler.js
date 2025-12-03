@@ -111,6 +111,13 @@ const createEmployee = async (req, res) => {
       employeePayload.employee_exmail_account = employeePayload.employee_email
     }
     
+    // Set employee_phone from employee_mobile if employee_phone is empty
+    if (!employeePayload.employee_phone || employeePayload.employee_phone === '') {
+      if (employeePayload.employee_mobile) {
+        employeePayload.employee_phone = employeePayload.employee_mobile
+      }
+    }
+    
     // Handle employee photo upload to MinIO
     if (req.files && req.files.length > 0) {
       const photoFile = req.files.find(file => file.fieldname === 'employee_foto')
@@ -230,6 +237,13 @@ const updateEmployee = async (req, res) => {
     // Set employee_exmail_account from employee_email
     if (updatePayload.employee_email) {
       updatePayload.employee_exmail_account = updatePayload.employee_email
+    }
+    
+    // Set employee_phone from employee_mobile if employee_phone is empty
+    if (!updatePayload.employee_phone || updatePayload.employee_phone === '') {
+      if (updatePayload.employee_mobile) {
+        updatePayload.employee_phone = updatePayload.employee_mobile
+      }
     }
     
     // Handle employee photo upload to MinIO
