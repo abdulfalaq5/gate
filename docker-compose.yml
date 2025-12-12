@@ -1,7 +1,7 @@
 services:
   api:
-    container_name: core-api-msi-server
-    image: core-api-msi-server
+    container_name: api-gate-sso
+    image: api-gate-sso
     build:
       context: .
       dockerfile: Dockerfile
