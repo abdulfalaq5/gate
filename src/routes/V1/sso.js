@@ -19,6 +19,34 @@ const syncRoutes = require('../../modules/sync');
 const { updateProfileValidation } = require('../../modules/sso/profile_validation');
 const { verifySSOToken } = require('../../middlewares');
 
+const path = require('path');
+
+// Configure multer for CSV upload with disk storage
+const csvStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/temp/')
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, 'customer-import-' + uniqueSuffix + path.extname(file.originalname))
+  }
+})
+
+// Configure multer for CSV file upload
+const csvUpload = multer({
+  storage: csvStorage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/csv' || path.extname(file.originalname).toLowerCase() === '.csv') {
+      cb(null, true)
+    } else {
+      cb(new Error('Only CSV files are allowed'), false)
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit for CSV
+  }
+})
+
 // Configure multer for multipart/form-data
 const upload = multer({
   limits: {
@@ -90,6 +118,7 @@ router.delete('/bank_accounts/:id', verifySSOToken, bankAccountsRoutes.deleteBan
 // Customers
 router.post('/customers/get', verifySSOToken, customersRoutes.getCustomers);
 router.post('/customers/create', verifySSOToken, customersRoutes.createCustomer);
+router.post('/customers/import', verifySSOToken, csvUpload.single('file'), customersRoutes.importCustomerData);
 router.get('/customers/:id', verifySSOToken, customersRoutes.getCustomerById);
 router.put('/customers/:id', verifySSOToken, customersRoutes.updateCustomer);
 router.delete('/customers/:id', verifySSOToken, customersRoutes.deleteCustomer);

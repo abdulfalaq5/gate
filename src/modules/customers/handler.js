@@ -4,6 +4,7 @@ const { successResponse, errorResponse } = require('../../utils/response')
 const { parseStandardQuery } = require('../../utils/pagination')
 const customersRepository = require('./postgre_repository')
 const databaseQueueService = require('../../services/database_queue_service')
+const { importCustomerData: importCustomerDataHandler } = require('./import_handler')
 
 class CustomersHandler {
   /**
@@ -180,6 +181,13 @@ class CustomersHandler {
       console.error('Error getting customers stats:', error)
       return errorResponse(res, 'Failed to retrieve customers statistics', 500)
     }
+  }
+
+  /**
+   * Import customers from CSV file
+   */
+  async importCustomerData(req, res) {
+    return await importCustomerDataHandler(req, res)
   }
 }
 

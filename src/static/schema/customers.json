@@ -233,5 +233,90 @@
 				"description": "Total number of unique countries"
 			}
 		}
+	},
+	"SchemaResponseCustomerImportResult": {
+		"type": "object",
+		"properties": {
+			"success": {
+				"type": "boolean",
+				"description": "Whether the import operation was successful",
+				"example": true
+			},
+			"message": {
+				"type": "string",
+				"description": "Response message",
+				"example": "Customer import completed successfully"
+			},
+			"data": {
+				"type": "object",
+				"properties": {
+					"summary": {
+						"type": "object",
+						"properties": {
+							"total": {
+								"type": "integer",
+								"description": "Total number of records processed",
+								"example": 100
+							},
+							"created": {
+								"type": "integer",
+								"description": "Number of customers successfully created",
+								"example": 85
+							},
+							"skipped": {
+								"type": "integer",
+								"description": "Number of customers skipped (duplicates or invalid data)",
+								"example": 10
+							},
+							"errors": {
+								"type": "integer",
+								"description": "Number of records with errors",
+								"example": 5
+							}
+						}
+					},
+					"details": {
+						"type": "array",
+						"description": "Detailed results for each record",
+						"items": {
+							"type": "object",
+							"properties": {
+								"row": {
+									"type": "integer",
+									"description": "Row number in CSV file",
+									"example": 1
+								},
+								"status": {
+									"type": "string",
+									"enum": ["created", "skipped", "error"],
+									"description": "Status of the import for this record",
+									"example": "created"
+								},
+								"customer_id": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Customer ID (only for created records)",
+									"example": "123e4567-e89b-12d3-a456-426614174000"
+								},
+								"customer_name": {
+									"type": "string",
+									"description": "Customer name",
+									"example": "PT. Example Company"
+								},
+								"reason": {
+									"type": "string",
+									"description": "Reason for skip or error (only for skipped/error records)",
+									"example": "Customer already exists"
+								},
+								"data": {
+									"type": "object",
+									"description": "Customer data that was processed"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

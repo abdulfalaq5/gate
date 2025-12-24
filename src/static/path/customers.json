@@ -154,6 +154,87 @@
 			}
 		}
 	},
+	"/customers/import": {
+		"post": {
+			"tags": ["Customers"],
+			"summary": "Import customer data from CSV",
+			"description": "Import customer data from a CSV file. The CSV file must contain the following columns: cust_name, cust_contact_person, job_title, email, phone, address, city, state, zipcode, country. Maximum 1000 records per import.",
+			"security": [
+				{
+					"bearerAuth": []
+				}
+			],
+			"requestBody": {
+				"required": true,
+				"content": {
+					"multipart/form-data": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"file": {
+									"type": "string",
+									"format": "binary",
+									"description": "CSV file containing customer data with required columns: cust_name, cust_contact_person, job_title, email, phone, address, city, state, zipcode, country"
+								}
+							},
+							"required": ["file"]
+						}
+					}
+				}
+			},
+			"responses": {
+				"200": {
+					"description": "Customer import completed successfully",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SchemaResponseCustomerImportResult"
+							}
+						}
+					}
+				},
+				"400": {
+					"description": "Bad request - validation error, invalid CSV structure, file too large (max 1000 records), or no file uploaded",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"success": {
+										"type": "boolean",
+										"example": false
+									},
+									"message": {
+										"type": "string",
+										"example": "Invalid CSV structure"
+									},
+									"details": {
+										"type": "array",
+										"items": {
+											"type": "string"
+										},
+										"example": ["Missing required columns: cust_name, email"]
+									}
+								}
+							}
+						}
+					}
+				},
+				"401": {
+					"description": "Unauthorized - JWT token required or invalid"
+				},
+				"413": {
+					"description": "Payload too large - file size exceeds 10MB limit"
+				},
+				"415": {
+					"description": "Unsupported media type - only CSV files are allowed"
+				},
+				"500": {
+					"description": "Internal server error"
+				}
+			}
+		}
+	},
 	"/customers/{id}": {
 		"get": {
 			"tags": ["Customers"],

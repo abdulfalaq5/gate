@@ -7,4 +7,5 @@ module.exports = {
   updateCustomer: CustomersHandler.updateCustomer.bind(CustomersHandler),
   deleteCustomer: CustomersHandler.deleteCustomer.bind(CustomersHandler),
   getCustomersStats: CustomersHandler.getCustomersStats.bind(CustomersHandler),
+  importCustomerData: CustomersHandler.importCustomerData.bind(CustomersHandler),
 };
